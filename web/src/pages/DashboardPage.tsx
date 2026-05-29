@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { PageHeader, Card, Badge, Button } from '../components/ui';
+import { WorkflowGuide } from '../components/WorkflowGuide';
 import { mockMetrics, mockProducts } from '../lib/mock';
+import { downloadExtensionZip } from '../lib/extension';
 
 export function DashboardPage() {
   const raw = mockMetrics.rawCount;
@@ -10,7 +12,17 @@ export function DashboardPage() {
 
   return (
     <>
-      <PageHeader title="工作台" desc="今日采集与处理概览（原型数据）" />
+      <PageHeader
+        title="工作台"
+        desc="采集 → 编辑 → 草稿 → 正式发布的运营中枢"
+        action={
+          <Button onClick={downloadExtensionZip}>下载插件</Button>
+        }
+      />
+      <Card className="mb-6">
+        <h2 className="mb-3 font-medium">作业流程</h2>
+        <WorkflowGuide />
+      </Card>
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <p className="text-sm text-muted">待处理采集</p>
@@ -46,18 +58,6 @@ export function DashboardPage() {
           <p className="mt-2 text-2xl font-semibold">{mockProducts.length}</p>
         </Card>
       </div>
-      <Card className="mt-6">
-        <h2 className="font-medium">快捷操作</h2>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Button variant="outline">粘贴链接采集</Button>
-          <Link to="/app/templates">
-            <Button variant="outline">编辑童装模板</Button>
-          </Link>
-          <Link to="/app/insights">
-            <Button variant="outline">竞品 TOP10 分析</Button>
-          </Link>
-        </div>
-      </Card>
     </>
   );
 }

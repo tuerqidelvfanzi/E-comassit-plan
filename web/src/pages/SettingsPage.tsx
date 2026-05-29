@@ -1,25 +1,25 @@
-import { PageHeader, Card, Badge, Button, Select } from '../components/ui';
+import { PageHeader, Card, Select } from '../components/ui';
 import { ThemeSettings } from '../components/ThemeSettings';
+import { ExtensionDownloadCard } from '../components/ExtensionDownloadCard';
+import { WorkflowGuide } from '../components/WorkflowGuide';
 
 export function SettingsPage() {
   return (
     <>
-      <PageHeader title="设置" desc="外观、插件与模型配置" />
-      <Card>
-        <h2 className="font-medium">界面主题（CSS 配置）</h2>
-        <p className="mt-2 text-sm text-muted">
-          三种可选方案，选择后立即生效并保存在本浏览器；分享链接给他人时，对方使用各自本地保存的主题。
-        </p>
+      <PageHeader title="设置" desc="插件下载、外观与模型配置" />
+      <Card className="mb-4">
+        <h2 className="font-medium">标准作业流程</h2>
+        <p className="mt-1 text-sm text-muted">从安装插件到目标平台上架的完整路径</p>
         <div className="mt-4">
-          <ThemeSettings />
+          <WorkflowGuide compact />
         </div>
       </Card>
+      <ExtensionDownloadCard />
       <Card className="mt-4">
-        <h2 className="font-medium">浏览器插件</h2>
-        <p className="mt-2 text-sm text-muted">绑定后可在 A/C 站采集并回写草稿箱</p>
-        <div className="mt-3 flex items-center gap-2">
-          <Badge tone="warn">未绑定</Badge>
-          <Button>生成插件 Token</Button>
+        <h2 className="font-medium">界面主题（CSS 配置）</h2>
+        <p className="mt-2 text-sm text-muted">三种可选方案，选择后立即生效并保存在本浏览器。</p>
+        <div className="mt-4">
+          <ThemeSettings />
         </div>
       </Card>
       <Card className="mt-4">

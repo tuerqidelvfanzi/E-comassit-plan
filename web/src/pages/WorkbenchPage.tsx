@@ -1,10 +1,12 @@
 import { useParams } from 'react-router-dom';
 import { PageHeader, Card, Badge, Button, Input } from '../components/ui';
 import { mockProducts } from '../lib/mock';
+import { mergeInboxWithMock } from '../lib/inboxStore';
 
 export function WorkbenchPage() {
   const { id } = useParams();
-  const product = mockProducts.find((p) => p.id === id) ?? mockProducts[0];
+  const all = mergeInboxWithMock(mockProducts);
+  const product = all.find((p) => p.id === id) ?? all[0];
 
   return (
     <>

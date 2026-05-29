@@ -9,10 +9,16 @@
   <body>
     <header>
       <strong>商品选品助手</strong>
-      <span id="status" class="badge warn">未绑定 B 站</span>
+      <span class="badge demo">演示 v0.2</span>
     </header>
 
+    <section class="field">
+      <label for="app-base">后台地址</label>
+      <input id="app-base" type="url" placeholder="https://tuerqidelvfanzi.github.io/E-comassit-plan" />
+    </section>
+
     <section>
+      <p class="hint">步骤 2：在已登录的商品页采集</p>
       <button type="button" id="btn-capture" class="primary">采集当前页</button>
       <button type="button" id="btn-link" class="secondary">粘贴链接采集</button>
     </section>
@@ -25,17 +31,18 @@
     </section>
 
     <section>
-      <h2>发布</h2>
+      <h2>步骤 4：发布草稿</h2>
       <select id="platform">
         <option value="shopee">Shopee 草稿</option>
         <option value="tiktok">TikTok Shop 草稿</option>
         <option value="taobao">淘宝草稿</option>
       </select>
-      <button type="button" id="btn-publish" class="secondary" disabled>填入当前后台页（需打开卖家中心）</button>
+      <button type="button" id="btn-publish" class="secondary">填入当前卖家后台页</button>
+      <p class="hint">步骤 5：在目标网站草稿页内点击「发布」</p>
     </section>
 
     <footer>
-      <a href="http://localhost:3004/app/settings" target="_blank">绑定 Token</a>
+      <a id="link-inbox" href="#" target="_blank" rel="noopener">打开采集箱后台</a>
     </footer>
     <script src="popup.js"></script>
   </body>
