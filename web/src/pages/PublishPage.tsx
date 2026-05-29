@@ -7,7 +7,7 @@ export function PublishPage() {
       <PageHeader title="发布中心" desc="由插件写入各平台草稿箱" action={<Button>新建发布任务</Button>} />
       <Card className="overflow-hidden p-0">
         <table className="w-full text-left text-sm">
-          <thead className="border-b bg-slate-50 text-slate-500">
+          <thead className="border-b bg-table-head text-muted">
             <tr>
               <th className="p-3">平台</th>
               <th className="p-3">商品</th>
@@ -24,7 +24,7 @@ export function PublishPage() {
                   <Badge tone={t.status === 'completed' ? 'ok' : 'warn'}>
                     {t.status === 'completed' ? '已完成' : t.status === 'failed' ? '失败待重试' : '待插件填入'}
                   </Badge>
-                  {t.reason ? <p className="mt-1 text-xs text-red-500">{t.reason}</p> : null}
+                  {t.reason ? <p className="mt-1 text-xs text-danger">{t.reason}</p> : null}
                 </td>
                 <td className="p-3">
                   <Button variant="outline">打开卖家后台</Button>

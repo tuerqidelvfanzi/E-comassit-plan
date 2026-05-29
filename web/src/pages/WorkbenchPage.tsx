@@ -12,9 +12,9 @@ export function WorkbenchPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <h2 className="font-medium">原始数据（A/C 站）</h2>
-          <p className="mt-2 text-sm text-slate-600">{product.title}</p>
+          <p className="mt-2 text-sm text-label">{product.title}</p>
           <p className="mt-1 text-sm">进价 ¥{product.priceCny} · 来源 {product.source}</p>
-          <p className="mt-1 text-sm text-slate-500">目标语言：{product.targetLocale}</p>
+          <p className="mt-1 text-sm text-muted">目标语言：{product.targetLocale}</p>
           <a href={product.sourceUrl} className="mt-2 inline-block text-sm text-[var(--color-primary)]">
             查看源链接
           </a>
@@ -36,7 +36,7 @@ export function WorkbenchPage() {
             </li>
           </ol>
           <label className="mt-4 block text-sm">
-            <span className="text-slate-600">临时提示词（本商品）</span>
+            <span className="text-label">临时提示词（本商品）</span>
             <Input className="mt-1" placeholder="例如：突出纯棉、适合 3-6 岁" />
           </label>
           <div className="mt-4 flex gap-2">
@@ -47,14 +47,14 @@ export function WorkbenchPage() {
       </div>
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <Card>
-          <h3 className="text-sm font-medium text-slate-500">输出预览 · 高曝光</h3>
+          <h3 className="text-sm font-medium text-muted">输出预览 · 高曝光</h3>
           <p className="mt-2 font-medium">váy công chúa bé gái mùa hè</p>
-          <p className="mt-1 text-sm text-slate-600">售价：₫498,750</p>
+          <p className="mt-1 text-sm text-label">售价：₫498,750</p>
         </Card>
         <Card>
-          <h3 className="text-sm font-medium text-slate-500">输出预览 · 高转化</h3>
+          <h3 className="text-sm font-medium text-muted">输出预览 · 高转化</h3>
           <p className="mt-2 font-medium">đầm bé gái cotton cao cấp</p>
-          <p className="mt-1 text-sm text-slate-600">售价：₫498,750</p>
+          <p className="mt-1 text-sm text-label">售价：₫498,750</p>
         </Card>
       </div>
     </>

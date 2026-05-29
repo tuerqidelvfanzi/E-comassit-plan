@@ -9,8 +9,8 @@ export function RulesPage() {
         {mockRules.map((r) => (
           <Card key={r.name}>
             <h2 className="font-medium">{r.name}</h2>
-            <p className="mt-1 text-xs uppercase tracking-wide text-slate-400">{r.group}</p>
-            <code className="mt-2 block rounded bg-slate-50 p-2 text-sm">{r.expr}</code>
+            <p className="mt-1 text-xs uppercase tracking-wide text-muted">{r.group}</p>
+            <code className="code-block mt-2 block rounded bg-code p-2">{r.expr}</code>
           </Card>
         ))}
       </div>

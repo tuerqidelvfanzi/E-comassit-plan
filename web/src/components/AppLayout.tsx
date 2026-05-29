@@ -8,10 +8,16 @@ export function AppLayout() {
   const { logout } = useAuth();
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="flex w-56 flex-col border-r border-[var(--color-border)] bg-white">
-        <div className="flex items-center gap-2 border-b border-[var(--color-border)] px-4 py-4">
-          <Package className="h-6 w-6 text-[var(--color-primary)]" />
+    <div className="flex min-h-screen bg-[var(--color-bg)]">
+      <aside className="flex w-56 flex-col border-r border-[var(--color-border)] bg-[var(--color-surface)]">
+        <div
+          className="flex items-center gap-2 border-b border-[var(--color-border)] px-4 py-4"
+          style={{
+            background: 'var(--color-topbar)',
+            color: 'var(--color-topbar-fg)',
+          }}
+        >
+          <Package className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
           <span className="font-semibold">商品选品助手</span>
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-3">
@@ -21,7 +27,11 @@ export function AppLayout() {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `rounded-lg px-3 py-2 text-sm ${isActive ? 'bg-blue-50 font-medium text-[var(--color-primary)]' : 'text-slate-600 hover:bg-slate-50'}`
+                `rounded-lg px-3 py-2 text-sm ${
+                  isActive
+                    ? 'bg-[var(--color-primary-soft)] font-medium text-[var(--color-nav-accent,var(--color-primary))]'
+                    : 'text-label hover:bg-[var(--color-muted)]'
+                }`
               }
             >
               {item.label}

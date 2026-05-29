@@ -13,7 +13,7 @@ export function TemplatesPage() {
                 <h2 className="font-medium">{t.name}</h2>
                 <Badge tone={t.status === 'active' ? 'ok' : 'default'}>{t.status === 'active' ? '启用' : '草稿'}</Badge>
               </div>
-              <p className="mt-1 text-sm text-slate-500">{t.note} · 目标语言：{t.language}</p>
+              <p className="mt-1 text-sm text-muted">{t.note} · 目标语言：{t.language}</p>
             </div>
             <Button variant="outline">编辑 Prompt</Button>
           </Card>

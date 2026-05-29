@@ -14,7 +14,7 @@ export function InboxPage() {
       />
       <Card className="overflow-hidden p-0">
         <table className="w-full text-left text-sm">
-          <thead className="border-b bg-slate-50 text-slate-500">
+          <thead className="border-b bg-table-head text-muted">
             <tr>
               <th className="p-3">商品</th>
               <th className="p-3">来源</th>
