@@ -129,11 +129,65 @@ function defaultProviders(): LlmProvider[] {
   ];
 }
 
+function normalizeModel(raw: unknown): LlmModel | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const m = raw as Partial<LlmModel>;
+  if (!m.id || !m.modelId) return null;
+  return {
+    id: String(m.id),
+    modelId: String(m.modelId),
+    displayName: String(m.displayName ?? m.modelId),
+    enabled: Boolean(m.enabled),
+    capabilities: Array.isArray(m.capabilities) ? m.capabilities : ['chat'],
+    group: m.group ? String(m.group) : undefined,
+  };
+}
+
+function normalizeProvider(raw: unknown): LlmProvider | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const p = raw as Partial<LlmProvider>;
+  if (!p.id || !p.name) return null;
+  const models = Array.isArray(p.models)
+    ? p.models.map(normalizeModel).filter((m): m is LlmModel => m !== null)
+    : [];
+  return {
+    id: String(p.id),
+    name: String(p.name),
+    enabled: Boolean(p.enabled),
+    apiKey: typeof p.apiKey === 'string' ? p.apiKey : '',
+    apiBaseUrl: typeof p.apiBaseUrl === 'string' ? p.apiBaseUrl : '',
+    apiFormat: p.apiFormat === 'anthropic' ? 'anthropic' : 'openai',
+    docsUrl: typeof p.docsUrl === 'string' ? p.docsUrl : undefined,
+    models,
+  };
+}
+
+function mergeWithDefaults(stored: LlmProvider[]): LlmProvider[] {
+  const defaults = defaultProviders();
+  const byId = new Map(stored.map((p) => [p.id, p]));
+  return defaults.map((d) => {
+    const hit = byId.get(d.id);
+    if (!hit) return d;
+    return {
+      ...d,
+      ...hit,
+      models: hit.models.length > 0 ? hit.models : d.models,
+    };
+  });
+}
+
+function normalizeProviders(data: unknown): LlmProvider[] {
+  if (!Array.isArray(data)) return defaultProviders();
+  const parsed = data.map(normalizeProvider).filter((p): p is LlmProvider => p !== null);
+  if (parsed.length === 0) return defaultProviders();
+  return mergeWithDefaults(parsed);
+}
+
 function loadProviders(): LlmProvider[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultProviders();
-    return JSON.parse(raw) as LlmProvider[];
+    return normalizeProviders(JSON.parse(raw));
   } catch {
     return defaultProviders();
   }
@@ -144,11 +198,57 @@ function saveProviders(data: LlmProvider[]) {
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
+/** 启动时修复损坏的 localStorage，避免设置页白屏 */
+export function repairLlmStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) {
+        localStorage.removeItem(STORAGE_KEY);
+      } else {
+        const normalized = normalizeProviders(parsed);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+      }
+    }
+    const bindingRaw = localStorage.getItem(BINDING_KEY);
+    if (bindingRaw) {
+      const parsed = JSON.parse(bindingRaw);
+      if (!Array.isArray(parsed)) {
+        localStorage.removeItem(BINDING_KEY);
+      } else {
+        localStorage.setItem(BINDING_KEY, JSON.stringify(normalizeBindings(parsed)));
+      }
+    }
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(BINDING_KEY);
+  }
+}
+
+function normalizeBindings(data: unknown): TaskModelBinding[] {
+  const base = TASK_BINDINGS.map((b) => ({ ...b }));
+  if (!Array.isArray(data)) return base;
+  const byTask = new Map(
+    data
+      .filter((x) => x && typeof x === 'object' && 'taskId' in x)
+      .map((x) => [String((x as TaskModelBinding).taskId), x as TaskModelBinding]),
+  );
+  return base.map((b) => {
+    const hit = byTask.get(b.taskId);
+    if (!hit) return b;
+    return {
+      ...b,
+      modelRefId: hit.modelRefId ?? null,
+    };
+  });
+}
+
 function loadBindings(): TaskModelBinding[] {
   try {
     const raw = localStorage.getItem(BINDING_KEY);
     if (!raw) return TASK_BINDINGS.map((b) => ({ ...b }));
-    return JSON.parse(raw) as TaskModelBinding[];
+    return normalizeBindings(JSON.parse(raw));
   } catch {
     return TASK_BINDINGS.map((b) => ({ ...b }));
   }
@@ -249,9 +349,17 @@ export function fetchRemoteModels(provider: LlmProvider): LlmModel[] {
   ];
 }
 
+function getServerProviders() {
+  return defaultProviders();
+}
+
+function getServerBindings() {
+  return TASK_BINDINGS.map((b) => ({ ...b }));
+}
+
 export function useLlmSettings() {
-  const providers = useSyncExternalStore(subscribe, loadProviders, defaultProviders);
-  const bindings = useSyncExternalStore(subscribe, loadBindings, () => TASK_BINDINGS.map((b) => ({ ...b })));
+  const providers = useSyncExternalStore(subscribe, loadProviders, getServerProviders);
+  const bindings = useSyncExternalStore(subscribe, loadBindings, getServerBindings);
 
   return {
     providers,

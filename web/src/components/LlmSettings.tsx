@@ -381,8 +381,9 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function groupModels(models: LlmProvider['models']) {
-  const map: Record<string, typeof models> = {};
+function groupModels(models: LlmProvider['models'] | undefined) {
+  const map: Record<string, LlmProvider['models']> = {};
+  if (!Array.isArray(models)) return map;
   for (const m of models) {
     const g = m.group || '其他';
     if (!map[g]) map[g] = [];
