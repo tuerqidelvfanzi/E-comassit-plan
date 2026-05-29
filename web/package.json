@@ -7,7 +7,7 @@
     "dev": "vite --port=3004 --host=0.0.0.0",
     "zip:extension": "node ../scripts/zip-extension.mjs",
     "prebuild": "npm run zip:extension",
-    "build": "vite build",
+    "build": "vite build && node ../scripts/copy-spa-fallback.mjs",
     "preview": "vite preview --port=3004",
     "lint": "tsc --noEmit"
   },

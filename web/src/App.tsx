@@ -16,6 +16,7 @@ export default function App() {
 
   return (
     <Routes>
+      <Route path="/" element={<Navigate to={isLoggedIn ? '/app' : '/login'} replace />} />
       <Route path="/login" element={isLoggedIn ? <Navigate to="/app" replace /> : <LoginPage />} />
       <Route
         path="/app"

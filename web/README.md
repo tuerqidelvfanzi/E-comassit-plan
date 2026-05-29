@@ -10,7 +10,10 @@ npm install
 npm run dev
 ```
 
-浏览器打开 http://localhost:3004/login
+浏览器打开 http://localhost:3004/login（本地 `base` 为 `/`）
+
+**GitHub Pages 请访问（带仓库名路径）：**  
+https://tuerqidelvfanzi.github.io/E-comassit-plan/login
 
 - 用户名：`admin01`
 - 密码：`abcd234`
