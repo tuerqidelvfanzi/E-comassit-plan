@@ -1,10 +1,11 @@
-# 任务分工 A / B（当前迭代）
+# 任务分工 Scope-A / Scope-B（当前迭代）
 
+> **详细功能列表**：`docs/SCOPE_FEATURES.md`  
 > 数据契约：`docs/COLLECT_SCHEMA.md` v1.0.0 · 协作：`docs/DEV_SPLIT.md`
 
 ---
 
-## A. 插件 `extension/`
+## Scope-A · 插件 `extension/`
 
 **目标**：1688 / 淘宝 / 天猫采集、分层提取、上传到 B 站。
 
@@ -27,7 +28,7 @@
 
 ---
 
-## B. Web `web/`
+## Scope-B · Web `web/`
 
 **目标**：采集箱、工作台、设置、未来 API。
 

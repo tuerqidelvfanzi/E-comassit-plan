@@ -8,8 +8,8 @@
 
 | 代号 | 全称 | 仓库路径 | 一句话 |
 |------|------|----------|--------|
-| **Scope-A** / **插件端** / **ext** | 浏览器插件 | `extension/` | 1688/淘宝采集、分层提取、上传 |
-| **Scope-B** / **Web端** / **web** | B 站前端 | `web/` | 采集箱、工作台、设置、未来 API |
+| **Scope-A** / **插件端** / **ext** | 浏览器插件 | `extension/` | 1688/淘宝采集、分层提取、上传（详见 `SCOPE_FEATURES.md` §Scope-A） |
+| **Scope-B** / **Web端** / **web** | B 站前端 | `web/` | 采集箱、工作台、设置、未来 API（详见 `SCOPE_FEATURES.md` §Scope-B） |
 | **Scope-Contract** / **契约** | 跨端契约 | `docs/COLLECT_SCHEMA.md` + `shared/schemas/` | 两边都必须遵守的数据格式 |
 
 不要说「改一下采集」——要说 **Scope-A 采集提取** 或 **Scope-B 采集箱导入**。
