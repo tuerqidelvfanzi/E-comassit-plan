@@ -31,11 +31,16 @@ export function LlmSettings() {
   const [newDisplayName, setNewDisplayName] = useState('');
   const [fetching, setFetching] = useState(false);
 
-  const selected = providers.find((p) => p.id === selectedId) ?? providers[0];
-  const enabledModelOptions = useMemo(() => getEnabledModels(providers), [providers]);
+  const safeProviders = Array.isArray(providers) ? providers : [];
+  const selected = safeProviders.find((p) => p.id === selectedId) ?? safeProviders[0];
+  const enabledModelOptions = useMemo(() => getEnabledModels(safeProviders), [safeProviders]);
+  const enabledRefs = useMemo(
+    () => new Set(enabledModelOptions.map((o) => o.ref)),
+    [enabledModelOptions],
+  );
 
-  const filtered = providers.filter((p) =>
-    p.name.toLowerCase().includes(query.trim().toLowerCase()),
+  const filtered = safeProviders.filter((p) =>
+    (p.name ?? '').toLowerCase().includes(query.trim().toLowerCase()),
   );
 
   if (!selected) {
@@ -329,7 +334,7 @@ export function LlmSettings() {
               <p className="text-xs text-muted">{b.description}</p>
               <Select
                 className="mt-2 w-full"
-                value={b.modelRefId ?? ''}
+                value={b.modelRefId && enabledRefs.has(b.modelRefId) ? b.modelRefId : ''}
                 onChange={(e) => {
                   const next = bindings.map((x) =>
                     x.taskId === b.taskId

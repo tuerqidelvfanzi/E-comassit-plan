@@ -3,6 +3,7 @@ import { ThemeSettings } from '../components/ThemeSettings';
 import { ExtensionDownloadCard } from '../components/ExtensionDownloadCard';
 import { WorkflowGuide } from '../components/WorkflowGuide';
 import { LlmSettings } from '../components/LlmSettings';
+import { SettingsSectionBoundary } from '../components/SettingsSectionBoundary';
 
 export function SettingsPage() {
   return (
@@ -26,7 +27,9 @@ export function SettingsPage() {
       <Card className="mt-4">
         <h2 className="font-medium">大模型设置</h2>
         <div className="mt-4">
-          <LlmSettings />
+          <SettingsSectionBoundary title="大模型设置">
+            <LlmSettings />
+          </SettingsSectionBoundary>
         </div>
       </Card>
     </>

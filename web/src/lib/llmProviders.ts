@@ -183,18 +183,37 @@ function normalizeProviders(data: unknown): LlmProvider[] {
   return mergeWithDefaults(parsed);
 }
 
+const SERVER_PROVIDERS: LlmProvider[] = defaultProviders();
+const SERVER_BINDINGS: TaskModelBinding[] = TASK_BINDINGS.map((b) => ({ ...b }));
+
+let providersCache = SERVER_PROVIDERS;
+let providersCacheKey = '';
+
+let bindingsCache = SERVER_BINDINGS;
+let bindingsCacheKey = '';
+
+function invalidateLlmCache() {
+  providersCacheKey = '\0';
+  bindingsCacheKey = '\0';
+}
+
 function loadProviders(): LlmProvider[] {
+  const raw = localStorage.getItem(STORAGE_KEY) ?? '';
+  if (raw === providersCacheKey) return providersCache;
+  providersCacheKey = raw;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultProviders();
-    return normalizeProviders(JSON.parse(raw));
+    providersCache = raw ? normalizeProviders(JSON.parse(raw)) : SERVER_PROVIDERS;
   } catch {
-    return defaultProviders();
+    providersCache = SERVER_PROVIDERS;
   }
+  return providersCache;
 }
 
 function saveProviders(data: LlmProvider[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  const raw = JSON.stringify(data);
+  localStorage.setItem(STORAGE_KEY, raw);
+  providersCacheKey = raw;
+  providersCache = data;
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
@@ -223,7 +242,16 @@ export function repairLlmStorage() {
   } catch {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(BINDING_KEY);
+  } finally {
+    invalidateLlmCache();
   }
+}
+
+export function clearLlmStorage() {
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(BINDING_KEY);
+  invalidateLlmCache();
+  window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
 function normalizeBindings(data: unknown): TaskModelBinding[] {
@@ -245,17 +273,22 @@ function normalizeBindings(data: unknown): TaskModelBinding[] {
 }
 
 function loadBindings(): TaskModelBinding[] {
+  const raw = localStorage.getItem(BINDING_KEY) ?? '';
+  if (raw === bindingsCacheKey) return bindingsCache;
+  bindingsCacheKey = raw;
   try {
-    const raw = localStorage.getItem(BINDING_KEY);
-    if (!raw) return TASK_BINDINGS.map((b) => ({ ...b }));
-    return normalizeBindings(JSON.parse(raw));
+    bindingsCache = raw ? normalizeBindings(JSON.parse(raw)) : SERVER_BINDINGS;
   } catch {
-    return TASK_BINDINGS.map((b) => ({ ...b }));
+    bindingsCache = SERVER_BINDINGS;
   }
+  return bindingsCache;
 }
 
 function saveBindings(data: TaskModelBinding[]) {
-  localStorage.setItem(BINDING_KEY, JSON.stringify(data));
+  const raw = JSON.stringify(data);
+  localStorage.setItem(BINDING_KEY, raw);
+  bindingsCacheKey = raw;
+  bindingsCache = data;
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
@@ -350,11 +383,11 @@ export function fetchRemoteModels(provider: LlmProvider): LlmModel[] {
 }
 
 function getServerProviders() {
-  return defaultProviders();
+  return SERVER_PROVIDERS;
 }
 
 function getServerBindings() {
-  return TASK_BINDINGS.map((b) => ({ ...b }));
+  return SERVER_BINDINGS;
 }
 
 export function useLlmSettings() {
