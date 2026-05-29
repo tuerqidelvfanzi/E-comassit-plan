@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>商品选品助手</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <strong>商品选品助手</strong>
+      <span id="status" class="badge warn">未绑定 B 站</span>
+    </header>
+
+    <section>
+      <button type="button" id="btn-capture" class="primary">采集当前页</button>
+      <button type="button" id="btn-link" class="secondary">粘贴链接采集</button>
+    </section>
+
+    <section class="preview hidden" id="preview">
+      <h2>采集预览</h2>
+      <p id="preview-title"></p>
+      <p class="meta" id="preview-meta"></p>
+      <button type="button" id="btn-upload" class="primary">上传到采集箱</button>
+    </section>
+
+    <section>
+      <h2>发布</h2>
+      <select id="platform">
+        <option value="shopee">Shopee 草稿</option>
+        <option value="tiktok">TikTok Shop 草稿</option>
+        <option value="taobao">淘宝草稿</option>
+      </select>
+      <button type="button" id="btn-publish" class="secondary" disabled>填入当前后台页（需打开卖家中心）</button>
+    </section>
+
+    <footer>
+      <a href="http://localhost:3004/app/settings" target="_blank">绑定 Token</a>
+    </footer>
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+{
+  "version": "0.1.0",
+  "generatedAt": "2026-05-29T09:00:00+08:00",
+  "products": [
+    {
+      "id": "p1",
+      "title": "韩版童装连衣裙夏季女童公主裙",
+      "source": "1688",
+      "sourceUrl": "https://detail.1688.com/offer/example-01",
+      "priceCny": 28.5,
+      "status": "raw",
+      "category": "童装",
+      "targetLocale": "vi-VN"
+    },
+    {
+      "id": "p2",
+      "title": "儿童纯棉短袖T恤男女童打底衫",
+      "source": "淘宝",
+      "sourceUrl": "https://item.taobao.com/item.htm?id=example02",
+      "priceCny": 19.9,
+      "status": "processing",
+      "category": "童装",
+      "targetLocale": "vi-VN"
+    },
+    {
+      "id": "p3",
+      "title": "婴儿连体衣新生儿哈衣爬服",
+      "source": "链接采集",
+      "sourceUrl": "https://example.com/product/3",
+      "priceCny": 35,
+      "status": "ready",
+      "category": "童装",
+      "targetLocale": "vi-VN"
+    },
+    {
+      "id": "p4",
+      "title": "泰式儿童防晒外套轻薄透气",
+      "source": "1688",
+      "sourceUrl": "https://detail.1688.com/offer/example-04",
+      "priceCny": 44.8,
+      "status": "ready",
+      "category": "童装",
+      "targetLocale": "th-TH"
+    },
+    {
+      "id": "p5",
+      "title": "女童牛仔背带裤夏款百搭",
+      "source": "拼多多",
+      "sourceUrl": "https://mobile.yangkeduo.com/goods5",
+      "priceCny": 27.2,
+      "status": "published",
+      "category": "童装",
+      "targetLocale": "th-TH"
+    }
+  ],
+  "rules": [
+    "price_vnd = price_cny * 3500 * 2.5",
+    "price_thb = price_cny * 5.2 * 1.8",
+    "len(title) <= 20",
+    "translate(title, target_locale)"
+  ],
+  "publishTasks": [
+    { "id": "pub1", "platform": "Shopee", "status": "pending" },
+    { "id": "pub2", "platform": "TikTok Shop", "status": "completed" },
+    { "id": "pub3", "platform": "淘宝", "status": "failed", "reason": "selector_miss" }
+  ]
+}
