@@ -16,10 +16,30 @@ export function WorkbenchPage() {
           <h2 className="font-medium">原始数据（A/C 站）</h2>
           <p className="mt-2 text-sm text-label">{product.title}</p>
           <p className="mt-1 text-sm">进价 ¥{product.priceCny} · 来源 {product.source}</p>
+          {'extractLayer' in product && product.extractLayer ? (
+            <p className="mt-1 text-xs text-muted">
+              采集层 {product.extractLayer}
+              {'extractMethod' in product && product.extractMethod
+                ? ` · ${product.extractMethod}`
+                : ''}
+            </p>
+          ) : null}
           <p className="mt-1 text-sm text-muted">目标语言：{product.targetLocale}</p>
           <a href={product.sourceUrl} className="mt-2 inline-block text-sm text-[var(--color-primary)]">
             查看源链接
           </a>
+          {'images' in product && product.images && product.images.length > 0 ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {product.images.slice(0, 6).map((url) => (
+                <img
+                  key={url}
+                  src={url}
+                  alt=""
+                  className="h-14 w-14 rounded border border-[var(--color-border)] object-cover"
+                />
+              ))}
+            </div>
+          ) : null}
         </Card>
         <Card>
           <h2 className="font-medium">处理管线</h2>

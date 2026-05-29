@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "电商助手",
-  "description": "演示版：源站采集 → 后台采集箱编辑 → 卖家后台草稿发布",
-  "version": "0.2.0",
+  "description": "演示版：1688/淘宝/天猫采集 → 后台采集箱 → 卖家草稿发布",
+  "version": "0.3.0",
   "action": {
     "default_popup": "popup/popup.html",
     "default_title": "电商助手"
@@ -21,17 +21,35 @@
   ],
   "content_scripts": [
     {
-      "matches": ["https://detail.1688.com/*"],
-      "js": ["content/1688.js"],
+      "matches": [
+        "https://detail.1688.com/*",
+        "https://item.taobao.com/*",
+        "https://detail.tmall.com/*",
+        "https://*.taobao.com/item.htm*",
+        "https://*.tmall.com/item.htm*",
+        "https://chaoshi.detail.tmall.com/*",
+        "https://item.taobao.com/item.htm*"
+      ],
+      "js": [
+        "content/shared/registry.js",
+        "content/shared/normalize.js",
+        "content/shared/extract-utils.js",
+        "content/shared/adapters/1688.js",
+        "content/shared/adapters/taobao.js",
+        "content/shared/extract-product.js",
+        "content/bridge.js"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": [
-        "https://item.taobao.com/*",
-        "https://detail.tmall.com/*",
-        "https://mobile.yangkeduo.com/*"
+      "matches": ["https://mobile.yangkeduo.com/*"],
+      "js": [
+        "content/shared/registry.js",
+        "content/shared/normalize.js",
+        "content/shared/extract-utils.js",
+        "content/shared/extract-product.js",
+        "content/bridge.js"
       ],
-      "js": ["content/generic.js"],
       "run_at": "document_idle"
     }
   ]

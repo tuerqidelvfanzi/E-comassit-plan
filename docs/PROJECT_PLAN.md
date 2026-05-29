@@ -46,8 +46,9 @@ flowchart LR
 
 | 能力 | 说明 | 优先级 |
 |------|------|--------|
-| 详情页 DOM 抓取 | 插件已验证可获取页面可见数据；需真实电商账号联调 | P0 |
-| 链接直采 | 粘贴 URL，服务端/插件解析基础字段 | P0 |
+| 详情页分层抓取 | 插件：L1 JSON → L2 JSON-LD → L4 DOM；见 `COLLECT_ARCHITECTURE.md` | P0 |
+| 链接直采 | 粘贴 URL，B 站 parse API；复杂页走 Worker | P0 |
+| 批量榜单 TOP N | Worker：Playwright + 随机延迟 250–2400ms；用户确认后执行 | P2 |
 | Cookie 模式 | 用户授权后复用登录态（合规与用户确认） | P1 |
 | 图片/主图/SKU | 详情页与输出图数据 | P0 |
 | 写入 B 站 | `POST /api/v1/collect-jobs` 批量入库 | P0 |

@@ -23,7 +23,9 @@ export function InboxPage() {
     if (!payload) return;
     const item = decodeDemoImport(payload);
     if (item) {
-      setImportMsg(`已从插件导入：${item.title}`);
+      const layer = item.extractLayer ? `（${item.extractLayer}）` : '';
+      const imgs = item.images?.length ? ` · ${item.images.length} 张图` : '';
+      setImportMsg(`已从插件导入：${item.title}${layer}${imgs}`);
       setTick((n) => n + 1);
     } else {
       setImportMsg('导入失败，请重新在插件中点击「上传到采集箱」。');
@@ -77,7 +79,10 @@ export function InboxPage() {
                     <div>
                       <span className="line-clamp-1 max-w-xs font-medium">{p.title}</span>
                       {p.fromExtension ? (
-                        <span className="text-xs text-[var(--color-primary)]">插件导入</span>
+                        <span className="text-xs text-[var(--color-primary)]">
+                          插件导入
+                          {p.extractLayer ? ` · ${p.extractLayer}` : ''}
+                        </span>
                       ) : null}
                     </div>
                   </div>

@@ -21,7 +21,8 @@ flowchart TB
   end
   subgraph Workers
     LLM[LLM Worker]
-    SCRAPE[Scrape/RPA Worker]
+    COLLECT[Collect Worker Playwright/Crawlee]
+    SCRAPE[Insights Scrape Worker]
   end
   subgraph External
     SRC[A/C 电商平台]
@@ -34,7 +35,9 @@ flowchart TB
   EXT --> DST
   API --> COL & PRD & PIPE & PUB & TPL
   PIPE --> LLM
+  COL --> COLLECT
   PIPE --> SCRAPE
+  COLLECT --> SRC
   LLM --> MODEL
   SCRAPE --> SRC
 ```

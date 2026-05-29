@@ -30,14 +30,17 @@ document.getElementById('btn-capture').addEventListener('click', async () => {
   const res = await chrome.tabs.sendMessage(tab.id, { type: 'CAPTURE_PAGE' }).catch(() => null);
   if (!res?.ok) {
     previewTitle.textContent = '当前页暂不支持自动采集';
-    previewMeta.textContent = (tab.url ?? '') + '\n可改用「粘贴链接采集」或在 1688 详情页重试。';
+    previewMeta.textContent =
+      (tab.url ?? '') + '\n请在 1688 / 淘宝 / 天猫 商品详情页重试，或使用「粘贴链接采集」。';
     preview.classList.remove('hidden');
     lastCapture = null;
     return;
   }
   lastCapture = res.data;
   previewTitle.textContent = res.data.title || '(无标题)';
-  previewMeta.textContent = `${res.data.source} · ¥${res.data.price?.amount ?? '-'}`;
+  const layer = res.data.extractLayer ? ` · ${res.data.extractLayer}` : '';
+  const imgN = res.data.images?.length ? ` · ${res.data.images.length} 图` : '';
+  previewMeta.textContent = `${res.data.source} · ¥${res.data.price?.amount ?? '-'}${layer}${imgN}`;
   preview.classList.remove('hidden');
 });
 

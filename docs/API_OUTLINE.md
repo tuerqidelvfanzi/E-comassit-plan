@@ -15,9 +15,11 @@
 | Method | Path | 说明 |
 |--------|------|------|
 | POST | `/collect-jobs` | 插件/链接提交原始 payload |
+| POST | `/collect-jobs/batch` | Phase 2：批量任务（榜单 URL、maxItems≤10、delay 250–2400ms） |
 | GET | `/collect-jobs` | 列表、分页 |
 | GET | `/collect-jobs/:id` | 详情 |
 | POST | `/collect-jobs/:id/parse` | 服务端补全解析（链接模式） |
+| GET | `/collect-adapters/:site` | Worker 站点适配器版本与脚本元数据 |
 
 ## 商品（采集箱）
 

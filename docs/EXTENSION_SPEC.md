@@ -12,12 +12,23 @@
 3. 「粘贴链接采集」（调用 B 站 parse API）
 4. 最近 5 条采集记录快捷入口
 
+## 采集提取策略（分层，见 `COLLECT_ARCHITECTURE.md`）
+
+Content Script 内 `extractProduct()` 按顺序尝试，命中即返回：
+
+1. 页面内嵌 JSON / 状态对象  
+2. `application/ld+json`  
+3. （仅 Worker）拦截 XHR 复用的 API 响应  
+4. DOM 选择器（服务端 `GET /extension/selectors` 热更新，多选择器 fallback）
+
+**插件不做**静默批量爬榜单；批量 TOP N（默认 10、延迟 250–2400ms）由 B 站发起任务，**Collect Worker**（Playwright + Crawlee）执行。
+
 ## Content Script 站点矩阵
 
 | 阶段 | 站点类型 | 用途 |
 |------|----------|------|
-| P0 | 1688 / 淘宝详情 | 源站采集 |
-| P0 | 任意（通用） | 链接模式由后端解析 |
+| P0 | 1688 / 淘宝详情 | 源站采集（插件：当前页确认） |
+| P0 | 任意（通用） | 链接模式由 B 站 parse / Worker |
 | P1 | Shopee / TikTok 卖家后台 | 草稿写入 |
 | P2 | 拼多多、Amazon | 扩展源站 |
 
