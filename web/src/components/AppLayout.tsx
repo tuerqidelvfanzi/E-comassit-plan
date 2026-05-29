@@ -4,6 +4,7 @@ import { PRODUCT_NAME } from '../lib/brand';
 import { navItems } from '../lib/mock';
 import { useAuth } from '../lib/auth';
 import { Button } from './ui';
+import { SettingsSectionBoundary } from './SettingsSectionBoundary';
 
 export function AppLayout() {
   const { logout } = useAuth();
@@ -47,7 +48,9 @@ export function AppLayout() {
         </div>
       </aside>
       <main className="flex-1 overflow-auto p-6">
-        <Outlet />
+        <SettingsSectionBoundary title="页面内容">
+          <Outlet />
+        </SettingsSectionBoundary>
       </main>
     </div>
   );

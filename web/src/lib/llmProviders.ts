@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export type ApiFormat = 'openai' | 'anthropic';
 
@@ -382,29 +382,40 @@ export function fetchRemoteModels(provider: LlmProvider): LlmModel[] {
   ];
 }
 
-function getServerProviders() {
-  return SERVER_PROVIDERS;
-}
-
-function getServerBindings() {
-  return SERVER_BINDINGS;
-}
-
 export function useLlmSettings() {
-  const providers = useSyncExternalStore(subscribe, loadProviders, getServerProviders);
-  const bindings = useSyncExternalStore(subscribe, loadBindings, getServerBindings);
+  const [providers, setProvidersState] = useState<LlmProvider[]>(() => loadProviders());
+  const [bindings, setBindingsState] = useState<TaskModelBinding[]>(() => loadBindings());
+
+  useEffect(
+    () =>
+      subscribe(() => {
+        setProvidersState(loadProviders());
+        setBindingsState(loadBindings());
+      }),
+    [],
+  );
+
+  const persistProviders = useCallback((data: LlmProvider[]) => {
+    saveProviders(data);
+    setProvidersState(data);
+  }, []);
+
+  const persistBindings = useCallback((data: TaskModelBinding[]) => {
+    saveBindings(data);
+    setBindingsState(data);
+  }, []);
 
   return {
     providers,
     bindings,
-    setProviders: saveProviders,
-    setBindings: saveBindings,
+    setProviders: persistProviders,
+    setBindings: persistBindings,
     updateProvider(providerId: string, patch: Partial<LlmProvider>) {
-      saveProviders(providers.map((p) => (p.id === providerId ? { ...p, ...patch } : p)));
+      persistProviders(providers.map((p) => (p.id === providerId ? { ...p, ...patch } : p)));
     },
     addModel(providerId: string, model: Omit<LlmModel, 'id'>) {
       const id = `m-${Date.now()}`;
-      saveProviders(
+      persistProviders(
         providers.map((p) =>
           p.id === providerId
             ? { ...p, models: [...p.models, { ...model, id }] }
@@ -414,7 +425,7 @@ export function useLlmSettings() {
       return id;
     },
     updateModel(providerId: string, modelId: string, patch: Partial<LlmModel>) {
-      saveProviders(
+      persistProviders(
         providers.map((p) =>
           p.id === providerId
             ? {
@@ -426,14 +437,14 @@ export function useLlmSettings() {
       );
     },
     removeModel(providerId: string, modelId: string) {
-      saveProviders(
+      persistProviders(
         providers.map((p) =>
           p.id === providerId ? { ...p, models: p.models.filter((m) => m.id !== modelId) } : p,
         ),
       );
     },
     mergeFetchedModels(providerId: string, fetched: LlmModel[]) {
-      saveProviders(
+      persistProviders(
         providers.map((p) => {
           if (p.id !== providerId) return p;
           const existingIds = new Set(p.models.map((m) => m.modelId));

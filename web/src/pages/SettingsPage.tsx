@@ -1,9 +1,26 @@
+import { useEffect, useState } from 'react';
 import { PageHeader, Card } from '../components/ui';
 import { ThemeSettings } from '../components/ThemeSettings';
 import { ExtensionDownloadCard } from '../components/ExtensionDownloadCard';
 import { WorkflowGuide } from '../components/WorkflowGuide';
 import { LlmSettings } from '../components/LlmSettings';
 import { SettingsSectionBoundary } from '../components/SettingsSectionBoundary';
+
+function DeferredLlmSettings() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+  if (!ready) {
+    return <p className="text-sm text-muted">正在加载大模型配置…</p>;
+  }
+  return (
+    <SettingsSectionBoundary title="大模型设置">
+      <LlmSettings />
+    </SettingsSectionBoundary>
+  );
+}
 
 export function SettingsPage() {
   return (
@@ -27,9 +44,7 @@ export function SettingsPage() {
       <Card className="mt-4">
         <h2 className="font-medium">大模型设置</h2>
         <div className="mt-4">
-          <SettingsSectionBoundary title="大模型设置">
-            <LlmSettings />
-          </SettingsSectionBoundary>
+          <DeferredLlmSettings />
         </div>
       </Card>
     </>
