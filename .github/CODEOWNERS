@@ -1,0 +1,8 @@
+# 可选：将 @用户名 换成实际 GitHub 账号后生效
+# 契约变更需双方都看到
+/docs/COLLECT_SCHEMA.md @tuerqidelvfanzi
+/shared/ @tuerqidelvfanzi
+
+# 建议指定两名维护者，例如：
+# /extension/ @dev-plugin
+# /web/ @dev-web

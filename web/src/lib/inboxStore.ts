@@ -1,3 +1,8 @@
+/**
+ * 采集箱演示存储。导入数据必须符合 COLLECT_SCHEMA v1.0.0。
+ * @see docs/COLLECT_SCHEMA.md
+ * @coupling extension/content/shared/normalize.js
+ */
 import type { NormalizedProduct } from './collectTypes';
 import { isNormalizedProduct } from './collectTypes';
 import type { Product, ProductStatus } from './mock';

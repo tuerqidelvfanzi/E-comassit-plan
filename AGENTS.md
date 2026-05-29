@@ -13,6 +13,7 @@
 
 1. 先读 `docs/PROJECT_PLAN.md` 与 `docs/ARCHITECTURE.md` 再改代码。
 2. **插件与 Web 采集数据**以 `docs/COLLECT_SCHEMA.md` 为唯一契约；改字段须同步插件、`web/src/lib/collectTypes.ts` 与 `shared/schemas/normalized-product.schema.json`。
+3. 双人协作读 `docs/DEV_SPLIT.md`；关联代码搜索 `COLLECT_SCHEMA` 或 `@coupling`。
 2. Web 工程遵循 `frontend-stack-reference-pack/agent-execution.md`：View 编排、Panel 承载业务、React Query 管服务端数据。
 3. 业务与参考包解耦：不复制参考包中的业务模块名/API。
 4. 前端验收须浏览器实开页面，不能仅凭 `vite` 终端输出。

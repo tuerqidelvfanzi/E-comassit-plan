@@ -2,6 +2,7 @@
  * 与插件、API、Worker 统一的采集契约。
  * @see docs/COLLECT_SCHEMA.md
  * @see shared/schemas/normalized-product.schema.json
+ * @coupling extension/content/shared/normalize.js
  */
 export const COLLECT_SCHEMA_VERSION = '1.0.0';
 

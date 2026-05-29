@@ -138,3 +138,4 @@ flowchart LR
 - `docs/COLLECT_ARCHITECTURE.md` — 采集架构与批量 Worker  
 - `docs/EXTENSION_SPEC.md` — 插件行为  
 - `docs/API_OUTLINE.md` — REST 纲要  
+- `docs/DEV_SPLIT.md` — **双人异步开发、分支、PR、关联文件备注**  
