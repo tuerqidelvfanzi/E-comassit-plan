@@ -1,3 +1,4 @@
+/** 输出须符合 docs/COLLECT_SCHEMA.md · schema 1.0.0 */
 /**
  * @param {object} p
  */

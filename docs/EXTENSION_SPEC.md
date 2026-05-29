@@ -34,18 +34,7 @@ Content Script 内 `extractProduct()` 按顺序尝试，命中即返回：
 
 ## 字段映射（NormalizedProduct）
 
-```json
-{
-  "source": "1688",
-  "sourceUrl": "https://...",
-  "title": "",
-  "price": { "amount": 0, "currency": "CNY" },
-  "images": [],
-  "skus": [],
-  "attributes": {},
-  "capturedAt": "ISO8601"
-}
-```
+**契约以 `docs/COLLECT_SCHEMA.md` 与 `shared/schemas/normalized-product.schema.json` 为准**（版本 1.0.0）。插件禁止输出契约外字段。
 
 选择器存服务端 `/extension/selectors`，避免每次发版改选择器。
 

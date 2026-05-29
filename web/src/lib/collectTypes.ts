@@ -1,4 +1,9 @@
-/** 与 extension NormalizedProduct、API collect-jobs 对齐 */
+/**
+ * 与插件、API、Worker 统一的采集契约。
+ * @see docs/COLLECT_SCHEMA.md
+ * @see shared/schemas/normalized-product.schema.json
+ */
+export const COLLECT_SCHEMA_VERSION = '1.0.0';
 
 export type ExtractLayer = 'L1' | 'L2' | 'L4';
 export type ExtractMethod = 'json_embed' | 'json_ld' | 'dom';
