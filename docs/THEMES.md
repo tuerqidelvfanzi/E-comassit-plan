@@ -5,8 +5,8 @@
 | 选项 | ID | 说明 |
 |------|-----|------|
 | 当前浏览器配置 | `browser` | 跟随系统 `prefers-color-scheme`，浅色/深色自动切换 |
-| 阳光墨玉 | `solarized` | Solarized Dark 配色（#002b36 / #073642 / #268bd2 等） |
-| 赛博朋克 | `cyberpunk` | 霓虹深色 + 黄顶栏 + 青色主按钮 |
+| 阳光墨玉 | `solarized` | Solarized Dark：主背景 #002b36、卡片 #073642、主按钮 #268bd2、成功 #859900、警示 #dc322f |
+| 赛博朋克 | `cyberpunk` | 深紫底 #0a0a12、黄顶栏 #fcee0a、霓虹青按钮 #00f0ff、品红强调 #ff2a6d |
 
 实现文件：
 

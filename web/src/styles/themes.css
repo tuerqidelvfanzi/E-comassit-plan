@@ -1,6 +1,6 @@
-/* 语义变量：各主题统一命名，页面用 var(--color-*) 或 .text-muted 等工具类 */
+/* 语义变量：各主题统一命名，组件使用 var(--color-*) */
 
-/* —— 当前浏览器配置（默认浅色 + 系统深色）—— */
+/* —— 当前浏览器配置 —— */
 :root[data-theme='browser'] {
   --color-bg: #f8fafc;
   --color-bg-gradient-from: #f8fafc;
@@ -28,7 +28,10 @@
   --color-focus-ring: rgba(37, 99, 235, 0.2);
   --color-topbar: var(--color-surface);
   --color-topbar-fg: var(--color-text);
+  --color-sidebar-fg: var(--color-text-label);
+  --color-nav-accent: var(--color-primary);
   --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --glow-primary: none;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -52,7 +55,7 @@
   }
 }
 
-/* —— 阳光墨玉 · Solarized Dark —— */
+/* —— 阳光墨玉 · Solarized Dark（Ethan Schoonover）—— */
 :root[data-theme='solarized'] {
   --color-bg: #002b36;
   --color-bg-gradient-from: #002b36;
@@ -60,6 +63,7 @@
   --color-surface: #073642;
   --color-muted: #073642;
   --color-table-head: #073642;
+  --color-table-row-hover: rgba(131, 148, 150, 0.08);
   --color-code-bg: #002b36;
   --color-text: #839496;
   --color-text-muted: #586e75;
@@ -67,77 +71,110 @@
   --color-border: #586e75;
   --color-primary: #268bd2;
   --color-primary-fg: #fdf6e3;
-  --color-primary-soft: rgba(38, 139, 210, 0.2);
+  --color-primary-soft: rgba(38, 139, 210, 0.22);
   --color-accent-teal: #2aa198;
   --color-accent-green: #859900;
   --color-accent-yellow: #b58900;
   --color-accent-purple: #6c71c4;
   --color-success: #859900;
-  --color-success-soft: rgba(133, 153, 0, 0.25);
+  --color-success-soft: rgba(133, 153, 0, 0.28);
   --color-success-fg: #859900;
   --color-warn: #b58900;
-  --color-warn-soft: rgba(181, 137, 0, 0.2);
+  --color-warn-soft: rgba(181, 137, 0, 0.22);
   --color-warn-fg: #b58900;
   --color-danger: #dc322f;
-  --color-badge-default-bg: #073642;
+  --color-badge-default-bg: #002b36;
   --color-badge-default-fg: #93a1a1;
-  --color-focus-ring: rgba(38, 139, 210, 0.35);
+  --color-focus-ring: rgba(38, 139, 210, 0.4);
   --color-topbar: #073642;
   --color-topbar-fg: #93a1a1;
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
-  /* 语法/代码块（对齐 Solarized Dark） */
+  --color-sidebar-fg: #839496;
+  --color-nav-accent: #268bd2;
+  --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.35);
+  --glow-primary: 0 0 0 1px rgba(38, 139, 210, 0.15);
   --syntax-keyword: #268bd2;
   --syntax-string: #859900;
   --syntax-number: #b58900;
   --syntax-comment: #586e75;
   --syntax-type: #6c71c4;
   --syntax-fn: #2aa198;
+  --syntax-error: #dc322f;
 }
 
-/* —— 赛博朋克 —— */
+/* —— 赛博朋克 · 霓虹工具界面 —— */
 :root[data-theme='cyberpunk'] {
   --color-bg: #0a0a12;
   --color-bg-gradient-from: #0a0a12;
-  --color-bg-gradient-to: #1a0a2e;
-  --color-surface: #141428;
-  --color-muted: #1a1a32;
-  --color-table-head: #1a1a32;
-  --color-code-bg: #0f0f22;
-  --color-text: #e0e6ed;
-  --color-text-muted: #8892a6;
-  --color-text-label: #c8d0dc;
-  --color-border: #2d2d5a;
+  --color-bg-gradient-to: #12061f;
+  --color-surface: #12122a;
+  --color-muted: #1a1a38;
+  --color-table-head: #16162e;
+  --color-table-row-hover: rgba(0, 240, 255, 0.06);
+  --color-code-bg: #0c0c1a;
+  --color-text: #e8ecf4;
+  --color-text-muted: #7a8499;
+  --color-text-label: #b8c0d0;
+  --color-border: #3d3d6b;
   --color-primary: #00f0ff;
   --color-primary-fg: #0a0a12;
-  --color-primary-soft: rgba(0, 240, 255, 0.15);
+  --color-primary-soft: rgba(0, 240, 255, 0.18);
   --color-accent-pink: #ff2a6d;
   --color-accent-yellow: #fcee0a;
   --color-accent-green: #39ff14;
   --color-success: #39ff14;
-  --color-success-soft: rgba(57, 255, 20, 0.15);
+  --color-success-soft: rgba(57, 255, 20, 0.18);
   --color-success-fg: #39ff14;
   --color-warn: #fcee0a;
-  --color-warn-soft: rgba(252, 238, 10, 0.15);
+  --color-warn-soft: rgba(252, 238, 10, 0.18);
   --color-warn-fg: #fcee0a;
   --color-danger: #ff0055;
-  --color-badge-default-bg: #1a1a32;
+  --color-badge-default-bg: #1a1a38;
   --color-badge-default-fg: #c8d0dc;
-  --color-focus-ring: rgba(0, 240, 255, 0.35);
+  --color-focus-ring: rgba(0, 240, 255, 0.45);
   --color-topbar: #fcee0a;
   --color-topbar-fg: #0a0a12;
+  --color-sidebar-fg: #fcee0a;
   --color-nav-accent: #fcee0a;
-  --shadow-card: 0 0 12px rgba(0, 240, 255, 0.12);
+  --shadow-card: 0 0 16px rgba(0, 240, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.5);
+  --glow-primary: 0 0 14px rgba(0, 240, 255, 0.35);
   --syntax-keyword: #00f0ff;
   --syntax-string: #39ff14;
   --syntax-number: #fcee0a;
-  --syntax-comment: #8892a6;
+  --syntax-comment: #7a8499;
   --syntax-type: #ff2a6d;
   --syntax-fn: #00f0ff;
+  --syntax-error: #ff0055;
 }
 
-/* 代码块展示（规则库等） */
+/* 主题专属微调 */
+:root[data-theme='solarized'] .btn-primary {
+  box-shadow: var(--glow-primary);
+}
+
+:root[data-theme='cyberpunk'] .btn-primary {
+  box-shadow: var(--glow-primary);
+  font-weight: 600;
+}
+
+:root[data-theme='cyberpunk'] aside nav a {
+  color: var(--color-sidebar-fg);
+}
+
+:root[data-theme='cyberpunk'] aside nav a:hover {
+  background: rgba(252, 238, 10, 0.08);
+}
+
+:root[data-theme='solarized'] tbody tr:hover {
+  background: var(--color-table-row-hover);
+}
+
+:root[data-theme='cyberpunk'] tbody tr:hover {
+  background: var(--color-table-row-hover);
+}
+
 .code-block {
-  color: var(--color-text);
+  color: var(--syntax-string);
   font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
   font-size: 0.875rem;
+  border: 1px solid var(--color-border);
 }

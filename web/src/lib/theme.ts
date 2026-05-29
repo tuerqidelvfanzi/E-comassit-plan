@@ -19,14 +19,14 @@ export const THEME_OPTIONS: ThemeOption[] = [
   {
     id: 'solarized',
     label: '阳光墨玉',
-    description: 'Solarized Dark · 科学调校深色，长时间阅读更舒适',
+    description: 'Solarized Dark · 青墨底 + 蓝绿语法色，护眼阅读',
     preview: ['#002b36', '#073642', '#268bd2', '#859900'],
   },
   {
     id: 'cyberpunk',
     label: '赛博朋克',
-    description: '霓虹高对比 · 青/品红/黄强调，工具感界面',
-    preview: ['#0a0a12', '#141428', '#00f0ff', '#fcee0a'],
+    description: '深紫底 + 黄顶栏 + 霓虹青按钮，高对比工具风',
+    preview: ['#0a0a12', '#12122a', '#00f0ff', '#fcee0a'],
   },
 ];
 
