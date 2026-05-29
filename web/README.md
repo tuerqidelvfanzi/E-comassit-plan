@@ -1,4 +1,4 @@
-# 商品选品助手 — Web 原型
+# 电商助手 — Web 原型
 
 可点击的 B 站线框原型，技术栈轻量版（React + Vite + Tailwind v4）。完整工程化请逐步对齐 `frontend-stack-reference-pack`。
 

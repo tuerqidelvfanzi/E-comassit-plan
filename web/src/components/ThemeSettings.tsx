@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Card } from './ui';
-import {
-  DEFAULT_CUSTOM_CSS,
-  type ThemeId,
-  useTheme,
-} from '../lib/theme';
+import { DEFAULT_CUSTOM_CSS, type ThemeId, useTheme } from '../lib/theme';
 
 export function ThemeSettings() {
   const { theme, setTheme, options, customCss, applyCustomCss, resetCustomCss } = useTheme();
@@ -22,11 +18,11 @@ export function ThemeSettings() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {options.map((opt) => (
           <label
             key={opt.id}
-            className={`cursor-pointer rounded-xl border p-3 transition ${
+            className={`cursor-pointer rounded-lg border px-4 py-3 transition ${
               theme === opt.id
                 ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-focus-ring)]'
                 : 'border-[var(--color-border)] hover:border-[var(--color-primary)]'
@@ -42,13 +38,8 @@ export function ThemeSettings() {
                 setMsg(opt.id === 'custom' ? '已选择自定义主题，可在下方编辑 CSS。' : '');
               }}
             />
-            <div className="theme-preview mb-2">
-              {opt.preview.map((color) => (
-                <span key={color} style={{ background: color }} />
-              ))}
-            </div>
             <p className="text-sm font-medium">{opt.label}</p>
-            <p className="mt-0.5 text-xs text-muted line-clamp-2">{opt.description}</p>
+            <p className="mt-1 text-xs text-muted">{opt.description}</p>
           </label>
         ))}
       </div>
@@ -59,7 +50,7 @@ export function ThemeSettings() {
             <h3 className="font-medium">自定义 CSS</h3>
             <p className="mt-1 text-xs text-muted">
               编写 <code className="text-label">:root[data-theme=&apos;custom&apos;]</code>{' '}
-              覆盖语义变量；保存于本浏览器。可参考 Cherry Studio 等工具的 CSS 片段。
+              覆盖语义变量；保存于本浏览器。
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -78,11 +69,6 @@ export function ThemeSettings() {
           onChange={(e) => setDraftCss(e.target.value)}
           aria-label="自定义主题 CSS"
         />
-        <p className="mt-2 text-xs text-muted">
-          常用变量：<code className="text-label">--color-bg</code>、<code className="text-label">--color-surface</code>、
-          <code className="text-label">--color-text</code>、<code className="text-label">--color-primary</code>、
-          <code className="text-label">--color-topbar</code> 等（完整列表见 docs/THEMES.md）。
-        </p>
         {msg ? <p className="mt-2 text-sm text-[var(--color-primary)]">{msg}</p> : null}
         {theme === 'custom' ? (
           <button

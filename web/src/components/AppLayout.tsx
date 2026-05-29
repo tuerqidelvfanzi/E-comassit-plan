@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { Package, LogOut } from 'lucide-react';
+import { PRODUCT_NAME } from '../lib/brand';
 import { navItems } from '../lib/mock';
 import { useAuth } from '../lib/auth';
 import { Button } from './ui';
@@ -18,7 +19,7 @@ export function AppLayout() {
           }}
         >
           <Package className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
-          <span className="font-semibold">商品选品助手</span>
+          <span className="font-semibold">{PRODUCT_NAME}</span>
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-3">
           {navItems.map((item) => (

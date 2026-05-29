@@ -3,12 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>商品选品助手</title>
+    <title>电商助手</title>
     <script>
       (function () {
-        var valid = ['browser', 'solarized', 'cyberpunk', 'jade', 'sunlight', 'sunset', 'parchment', 'custom'];
+        var valid = ['solarized', 'cyberpunk', 'jade', 'sunset', 'parchment', 'custom'];
+        var deprecated = { browser: 'jade', sunlight: 'parchment' };
         var t = localStorage.getItem('psa_theme');
-        if (valid.indexOf(t) === -1) t = 'browser';
+        if (deprecated[t]) t = deprecated[t];
+        if (valid.indexOf(t) === -1) t = 'jade';
         document.documentElement.setAttribute('data-theme', t);
         if (t === 'custom') {
           var css = localStorage.getItem('psa_theme_custom_css');

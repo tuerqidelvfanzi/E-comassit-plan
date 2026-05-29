@@ -54,18 +54,3 @@ body {
 .text-danger {
   color: var(--color-danger);
 }
-
-.theme-preview {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-  height: 2rem;
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-}
-
-.theme-preview span {
-  display: block;
-  min-height: 100%;
-}

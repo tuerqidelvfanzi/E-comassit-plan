@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "商品选品助手",
+  "name": "电商助手",
   "description": "演示版：源站采集 → 后台采集箱编辑 → 卖家后台草稿发布",
   "version": "0.2.0",
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "商品选品助手"
+    "default_title": "电商助手"
   },
   "background": {
     "service_worker": "background/service-worker.js"

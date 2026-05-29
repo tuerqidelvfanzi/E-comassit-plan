@@ -17,7 +17,7 @@ export function SettingsPage() {
       <ExtensionDownloadCard />
       <Card className="mt-4">
         <h2 className="font-medium">界面主题（CSS 配置）</h2>
-        <p className="mt-2 text-sm text-muted">三种可选方案，选择后立即生效并保存在本浏览器。</p>
+        <p className="mt-2 text-sm text-muted">选择配色方案后立即生效，并保存在本浏览器。</p>
         <div className="mt-4">
           <ThemeSettings />
         </div>

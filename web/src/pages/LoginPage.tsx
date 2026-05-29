@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
+import { PRODUCT_NAME } from '../lib/brand';
 import { Button, Card, Input } from '../components/ui';
 
 export function LoginPage() {
@@ -23,7 +24,7 @@ export function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-app-gradient p-4">
       <Card className="w-full max-w-md">
-        <h1 className="text-xl font-semibold">商品选品助手</h1>
+        <h1 className="text-xl font-semibold">{PRODUCT_NAME}</h1>
         <p className="mt-1 text-sm text-muted">登录您的账户以继续</p>
         <form className="mt-6 space-y-4" onSubmit={onSubmit}>
           <label className="block text-sm">
