@@ -35,9 +35,7 @@ jobs:
           cache-dependency-path: web/package-lock.json
 
       - name: Install
-        run: |
-          if (Test-Path package-lock.json) { npm ci } else { npm install }
-        shell: pwsh
+        run: npm ci
 
       - name: Typecheck
         run: npm run lint

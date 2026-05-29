@@ -133,7 +133,9 @@ export const mockMetrics = {
   publishedCount: mockProducts.filter((p) => p.status === 'published').length,
 };
 
-export const navItems = [
+export type NavItem = { to: string; label: string; end?: boolean };
+
+export const navItems: NavItem[] = [
   { to: '/app', label: '工作台', end: true },
   { to: '/app/inbox', label: '采集箱' },
   { to: '/app/templates', label: '类目模板' },
@@ -141,4 +143,4 @@ export const navItems = [
   { to: '/app/insights', label: '选品洞察' },
   { to: '/app/publish', label: '发布中心' },
   { to: '/app/settings', label: '设置' },
-] as const;
+];
