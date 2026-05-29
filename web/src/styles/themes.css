@@ -172,6 +172,216 @@
   background: var(--color-table-row-hover);
 }
 
+/* —— 翡翠暗绿 · Jade —— */
+:root[data-theme='jade'] {
+  --color-bg: #051f18;
+  --color-bg-gradient-from: #051f18;
+  --color-bg-gradient-to: #0b2e24;
+  --color-surface: #0b2e24;
+  --color-muted: #164738;
+  --color-table-head: #0b2e24;
+  --color-table-row-hover: rgba(52, 211, 153, 0.08);
+  --color-code-bg: #051f18;
+  --color-text: #a7f3d0;
+  --color-text-muted: #6ee7b7;
+  --color-text-label: #34d399;
+  --color-border: #064e3b;
+  --color-primary: #34d399;
+  --color-primary-fg: #051f18;
+  --color-primary-soft: rgba(52, 211, 153, 0.22);
+  --color-success: #34d399;
+  --color-success-soft: rgba(52, 211, 153, 0.25);
+  --color-success-fg: #6ee7b7;
+  --color-warn: #fbbf24;
+  --color-warn-soft: rgba(251, 191, 36, 0.2);
+  --color-warn-fg: #fbbf24;
+  --color-danger: #f87171;
+  --color-badge-default-bg: #0b2e24;
+  --color-badge-default-fg: #a7f3d0;
+  --color-focus-ring: rgba(52, 211, 153, 0.4);
+  --color-topbar: #0b2e24;
+  --color-topbar-fg: #a7f3d0;
+  --color-sidebar-fg: #6ee7b7;
+  --color-nav-accent: #34d399;
+  --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.35);
+  --glow-primary: 0 0 12px rgba(52, 211, 153, 0.25);
+  --syntax-keyword: #34d399;
+  --syntax-string: #6ee7b7;
+  --syntax-number: #a7f3d0;
+  --syntax-comment: #064e3b;
+  --syntax-type: #2dd4bf;
+  --syntax-fn: #34d399;
+  --syntax-error: #f87171;
+}
+
+/* —— 日光暖白 · Sunlight —— */
+:root[data-theme='sunlight'] {
+  --color-bg: #fffbeb;
+  --color-bg-gradient-from: #fffbeb;
+  --color-bg-gradient-to: #fef3c7;
+  --color-surface: #ffffff;
+  --color-muted: #fef3c7;
+  --color-table-head: #fffbeb;
+  --color-table-row-hover: rgba(245, 158, 11, 0.12);
+  --color-code-bg: #fef3c7;
+  --color-text: #78350f;
+  --color-text-muted: #92400e;
+  --color-text-label: #b45309;
+  --color-border: #fde68a;
+  --color-primary: #f59e0b;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(245, 158, 11, 0.2);
+  --color-success: #059669;
+  --color-success-soft: #d1fae5;
+  --color-success-fg: #065f46;
+  --color-warn: #d97706;
+  --color-warn-soft: #fef3c7;
+  --color-warn-fg: #92400e;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #fef3c7;
+  --color-badge-default-fg: #78350f;
+  --color-focus-ring: rgba(245, 158, 11, 0.35);
+  --color-topbar: #fef3c7;
+  --color-topbar-fg: #78350f;
+  --color-sidebar-fg: #92400e;
+  --color-nav-accent: #f59e0b;
+  --shadow-card: 0 1px 3px rgba(120, 53, 15, 0.08);
+  --glow-primary: none;
+  --syntax-keyword: #d97706;
+  --syntax-string: #059669;
+  --syntax-number: #b45309;
+  --syntax-comment: #92400e;
+  --syntax-type: #ca8a04;
+  --syntax-fn: #f59e0b;
+  --syntax-error: #dc2626;
+}
+
+/* —— 落日橙黑 · Sunset —— */
+:root[data-theme='sunset'] {
+  --color-bg: #121212;
+  --color-bg-gradient-from: #121212;
+  --color-bg-gradient-to: #1e1e1e;
+  --color-surface: #1e1e1e;
+  --color-muted: #2c2c2c;
+  --color-table-head: #1e1e1e;
+  --color-table-row-hover: rgba(255, 87, 34, 0.08);
+  --color-code-bg: #121212;
+  --color-text: #e5e5e5;
+  --color-text-muted: #a3a3a3;
+  --color-text-label: #d4d4d4;
+  --color-border: #333333;
+  --color-primary: #ff5722;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(255, 87, 34, 0.2);
+  --color-success: #4ade80;
+  --color-success-soft: rgba(74, 222, 128, 0.15);
+  --color-success-fg: #4ade80;
+  --color-warn: #fbbf24;
+  --color-warn-soft: rgba(251, 191, 36, 0.15);
+  --color-warn-fg: #fbbf24;
+  --color-danger: #ef4444;
+  --color-badge-default-bg: #2c2c2c;
+  --color-badge-default-fg: #e5e5e5;
+  --color-focus-ring: rgba(255, 87, 34, 0.4);
+  --color-topbar: #ff5722;
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #e5e5e5;
+  --color-nav-accent: #ff5722;
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --glow-primary: 0 0 14px rgba(255, 87, 34, 0.35);
+  --syntax-keyword: #ff5722;
+  --syntax-string: #4ade80;
+  --syntax-number: #fbbf24;
+  --syntax-comment: #737373;
+  --syntax-type: #fb923c;
+  --syntax-fn: #ff5722;
+  --syntax-error: #ef4444;
+}
+
+/* —— 羊皮纸 · Parchment（浅色手稿风）—— */
+:root[data-theme='parchment'] {
+  --color-bg: #f4e4be;
+  --color-bg-gradient-from: #f4e4be;
+  --color-bg-gradient-to: #f7eac9;
+  --color-surface: #f7eac9;
+  --color-muted: #f2e1b8;
+  --color-table-head: #f0deb5;
+  --color-table-row-hover: rgba(163, 104, 44, 0.1);
+  --color-code-bg: #e8d5ab;
+  --color-text: #5f4b32;
+  --color-text-muted: #7a6248;
+  --color-text-label: #594633;
+  --color-border: rgba(95, 75, 50, 0.2);
+  --color-primary: #a3682c;
+  --color-primary-fg: #f8f7f2;
+  --color-primary-soft: rgba(163, 104, 44, 0.2);
+  --color-success: #6b8e23;
+  --color-success-soft: rgba(107, 142, 35, 0.2);
+  --color-success-fg: #556b2f;
+  --color-warn: #b8860b;
+  --color-warn-soft: rgba(184, 134, 11, 0.2);
+  --color-warn-fg: #8b6914;
+  --color-danger: #a0522d;
+  --color-badge-default-bg: #e8d5ab;
+  --color-badge-default-fg: #5f4b32;
+  --color-focus-ring: rgba(163, 104, 44, 0.35);
+  --color-topbar: #f0deb5;
+  --color-topbar-fg: #5f4b32;
+  --color-sidebar-fg: #5f4b32;
+  --color-nav-accent: #a3682c;
+  --shadow-card: 0 2px 8px rgba(95, 75, 50, 0.12);
+  --glow-primary: none;
+  --syntax-keyword: #a3682c;
+  --syntax-string: #6b8e23;
+  --syntax-number: #b8860b;
+  --syntax-comment: #7a6248;
+  --syntax-type: #8b4513;
+  --syntax-fn: #a3682c;
+  --syntax-error: #a0522d;
+}
+
+/* —— 自定义（由用户 CSS 覆盖，以下为兜底）—— */
+:root[data-theme='custom'] {
+  --color-bg: #f8fafc;
+  --color-bg-gradient-from: #f8fafc;
+  --color-bg-gradient-to: #eff6ff;
+  --color-surface: #ffffff;
+  --color-muted: #f1f5f9;
+  --color-table-head: #f8fafc;
+  --color-table-row-hover: rgba(37, 99, 235, 0.06);
+  --color-code-bg: #f1f5f9;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-label: #475569;
+  --color-border: #e2e8f0;
+  --color-primary: #2563eb;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: #eff6ff;
+  --color-success: #059669;
+  --color-success-soft: #d1fae5;
+  --color-success-fg: #065f46;
+  --color-warn: #d97706;
+  --color-warn-soft: #fef3c7;
+  --color-warn-fg: #92400e;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #f1f5f9;
+  --color-badge-default-fg: #334155;
+  --color-focus-ring: rgba(37, 99, 235, 0.2);
+  --color-topbar: var(--color-surface);
+  --color-topbar-fg: var(--color-text);
+  --color-sidebar-fg: var(--color-text-label);
+  --color-nav-accent: var(--color-primary);
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --glow-primary: none;
+  --syntax-keyword: #2563eb;
+  --syntax-string: #059669;
+  --syntax-number: #d97706;
+  --syntax-comment: #64748b;
+  --syntax-type: #7c3aed;
+  --syntax-fn: #2563eb;
+  --syntax-error: #dc2626;
+}
+
 .code-block {
   color: var(--syntax-string);
   font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;

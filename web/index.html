@@ -6,11 +6,19 @@
     <title>商品选品助手</title>
     <script>
       (function () {
+        var valid = ['browser', 'solarized', 'cyberpunk', 'jade', 'sunlight', 'sunset', 'parchment', 'custom'];
         var t = localStorage.getItem('psa_theme');
-        document.documentElement.setAttribute(
-          'data-theme',
-          t === 'solarized' || t === 'cyberpunk' ? t : 'browser',
-        );
+        if (valid.indexOf(t) === -1) t = 'browser';
+        document.documentElement.setAttribute('data-theme', t);
+        if (t === 'custom') {
+          var css = localStorage.getItem('psa_theme_custom_css');
+          if (css) {
+            var s = document.createElement('style');
+            s.id = 'psa-custom-theme';
+            s.textContent = css;
+            document.head.appendChild(s);
+          }
+        }
       })();
     </script>
   </head>
