@@ -1,32 +1,48 @@
-import { useSyncExternalStore } from 'react';
+import { useSyncExternalStore, useCallback } from 'react';
+import { api, resolveApiMode } from './api';
+import { getStoredToken, setStoredToken } from './api/httpClient';
 
-const KEY = 'psa_demo_auth';
+const LEGACY_KEY = 'psa_demo_auth';
+const AUTH_EVENT = 'psa-auth-change';
 
 function getSnapshot() {
-  return localStorage.getItem(KEY) === '1';
+  if (resolveApiMode() === 'http') return Boolean(getStoredToken());
+  return localStorage.getItem(LEGACY_KEY) === '1' || Boolean(getStoredToken());
 }
 
 function subscribe(cb: () => void) {
+  window.addEventListener(AUTH_EVENT, cb);
   window.addEventListener('storage', cb);
-  return () => window.removeEventListener('storage', cb);
+  return () => {
+    window.removeEventListener(AUTH_EVENT, cb);
+    window.removeEventListener('storage', cb);
+  };
+}
+
+function notify() {
+  window.dispatchEvent(new Event(AUTH_EVENT));
 }
 
 export function useAuth() {
   const isLoggedIn = useSyncExternalStore(subscribe, getSnapshot, () => false);
 
-  return {
-    isLoggedIn,
-    login(username: string, password: string) {
-      if (username === 'admin01' && password === 'abcd234') {
-        localStorage.setItem(KEY, '1');
-        window.dispatchEvent(new Event('storage'));
-        return true;
-      }
+  const login = useCallback(async (username: string, password: string) => {
+    try {
+      const session = await api.login(username, password);
+      setStoredToken(session.accessToken);
+      localStorage.setItem(LEGACY_KEY, '1');
+      notify();
+      return true;
+    } catch {
       return false;
-    },
-    logout() {
-      localStorage.removeItem(KEY);
-      window.dispatchEvent(new Event('storage'));
-    },
-  };
+    }
+  }, []);
+
+  const logout = useCallback(() => {
+    setStoredToken(null);
+    localStorage.removeItem(LEGACY_KEY);
+    notify();
+  }, []);
+
+  return { isLoggedIn, login, logout };
 }

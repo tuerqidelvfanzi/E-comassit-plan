@@ -5,15 +5,20 @@ import App from './App';
 import { getRouterBasename } from './lib/router';
 import { initTheme } from './lib/theme';
 import { repairLlmStorage } from './lib/llmProviders';
+import { installExtensionBridge } from './lib/api/extensionBridge';
+import { QueryProvider } from './providers/QueryProvider';
 import './index.css';
 
 initTheme();
 repairLlmStorage();
+installExtensionBridge();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter basename={getRouterBasename()}>
-      <App />
-    </BrowserRouter>
+    <QueryProvider>
+      <BrowserRouter basename={getRouterBasename()}>
+        <App />
+      </BrowserRouter>
+    </QueryProvider>
   </StrictMode>,
 );

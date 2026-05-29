@@ -1,26 +1,58 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { PageHeader, Card, Badge, Button } from '../components/ui';
-import { mockPublishTasks } from '../lib/mock';
+import { api } from '../lib/api';
+import { queryKeys, useProducts, usePublishTasks } from '../hooks/useAppQueries';
+import type { PublishTask } from '../lib/api/types';
+
+const sellerUrls: Record<PublishTask['platform'], string> = {
+  Shopee: 'https://seller.shopee.cn/',
+  'TikTok Shop': 'https://seller.tiktokglobalshop.com/',
+  淘宝: 'https://sell.taobao.com/',
+};
 
 export function PublishPage() {
+  const { data: tasks = [] } = usePublishTasks();
+  const { data: products = [] } = useProducts('ready');
+  const qc = useQueryClient();
+
+  const createMut = useMutation({
+    mutationFn: () => {
+      const p = products[0];
+      if (!p) throw new Error('NO_READY_PRODUCT');
+      return api.createPublishTask({
+        platform: p.targetLocale === 'vi-VN' ? 'Shopee' : 'TikTok Shop',
+        title: p.processed?.conversion.title ?? p.title,
+        productId: p.id,
+      });
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.publish }),
+  });
+
+  const patchMut = useMutation({
+    mutationFn: (vars: { id: string; status: PublishTask['status'] }) =>
+      api.updatePublishTask(vars.id, { status: vars.status }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.publish }),
+  });
+
   return (
     <>
       <PageHeader
         title="发布中心"
-        desc="步骤 4–5：插件写入各平台草稿箱 → 在目标卖家中心正式发布"
-        action={<Button>新建发布任务</Button>}
+        desc="插件填入草稿 → 卖家中心正式发布"
+        action={
+          <Button
+            disabled={createMut.isPending || products.length === 0}
+            onClick={() => {
+              createMut.mutate(undefined, {
+                onError: () => alert('请先将商品处理为「可发布」'),
+              });
+            }}
+          >
+            新建发布任务
+          </Button>
+        }
       />
-      <Card className="mb-4">
-        <ol className="list-decimal space-y-2 pl-5 text-sm text-muted">
-          <li>在本站确认商品已处理完成（状态「可发布」）</li>
-          <li>打开 Shopee / TikTok Shop / 淘宝卖家中心的新建商品或草稿页</li>
-          <li>点击浏览器插件，选择平台后「填入当前后台页」</li>
-          <li>在目标网站检查草稿并点击平台内的「发布」按钮上架</li>
-        </ol>
-        <p className="mt-3 text-xs text-muted">
-          演示版填入草稿为模拟提示；正式版将自动填表并回传状态。
-        </p>
-      </Card>
       <Card className="overflow-hidden p-0">
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-table-head text-muted">
@@ -32,28 +64,31 @@ export function PublishPage() {
             </tr>
           </thead>
           <tbody>
-            {mockPublishTasks.map((t) => (
+            {tasks.map((t) => (
               <tr key={t.id} className="border-b">
                 <td className="p-3">{t.platform}</td>
                 <td className="p-3">{t.title}</td>
                 <td className="p-3">
-                  <Badge tone={t.status === 'completed' ? 'ok' : 'warn'}>
-                    {t.status === 'completed' ? '草稿已填入' : t.status === 'failed' ? '失败待重试' : '待插件填入草稿'}
-                  </Badge>
-                  {t.reason ? <p className="mt-1 text-xs text-danger">{t.reason}</p> : null}
+                  <Badge tone={t.status === 'completed' ? 'ok' : 'warn'}>{t.status}</Badge>
                 </td>
-                <td className="p-3">
-                  <Button variant="outline">打开卖家后台</Button>
+                <td className="p-3 flex gap-2">
+                  <Button variant="outline" onClick={() => window.open(sellerUrls[t.platform], '_blank')}>
+                    打开后台
+                  </Button>
+                  {t.status === 'pending' ? (
+                    <Button variant="outline" onClick={() => patchMut.mutate({ id: t.id, status: 'completed' })}>
+                      标记已填入
+                    </Button>
+                  ) : null}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </Card>
-      <p className="mt-4 text-sm text-muted">
-        上一步：
+      <p className="mt-4 text-sm">
         <Link to="/app/inbox" className="text-[var(--color-primary)]">
-          采集箱编辑
+          采集箱
         </Link>
       </p>
     </>

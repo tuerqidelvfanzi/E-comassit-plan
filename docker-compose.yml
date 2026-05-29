@@ -1,0 +1,29 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - '8080:8080'
+    environment:
+      PORT: 8080
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      DATABASE_PATH: /data/app.db
+    volumes:
+      - api-data:/data
+
+  web:
+    image: node:20-alpine
+    working_dir: /app/web
+    volumes:
+      - ./web:/app/web
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
+    ports:
+      - '3004:3004'
+    environment:
+      VITE_PROXY_TARGET: http://api:8080
+    depends_on:
+      - api
+
+volumes:
+  api-data:

@@ -6,8 +6,10 @@
 |------|------|
 | `frontend-stack-reference-pack/` | **只读参考**：技术栈、架构、Vite 模板、Git/Skills，不直接改业务 |
 | `docs/` | 本项目规划、架构、API、插件规范 |
-| `web/` | B 站 Web 应用（React + Vite，对齐参考包） |
+| `api/` | 生产 REST API（Hono + SQLite，`/api/v1/*`） |
+| `web/` | B 站 Web 应用（React + Vite + React Query） |
 | `extension/` | 浏览器插件（Manifest V3） |
+| `shared/pipeline/` | 处理管线共享逻辑（Web/API 测试） |
 
 ## 开发原则
 

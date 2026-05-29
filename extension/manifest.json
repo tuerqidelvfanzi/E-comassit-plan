@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "电商助手",
   "description": "演示版：1688/淘宝/天猫采集 → 后台采集箱 → 卖家草稿发布",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "action": {
     "default_popup": "popup/popup.html",
     "default_title": "电商助手"
@@ -17,7 +17,12 @@
     "https://*.1688.com/*",
     "https://*.taobao.com/*",
     "https://*.tmall.com/*",
-    "https://*.yangkeduo.com/*"
+    "https://*.yangkeduo.com/*",
+    "https://seller.shopee.cn/*",
+    "https://seller.shopee.com/*",
+    "https://sell.taobao.com/*",
+    "https://seller.tiktokglobalshop.com/*",
+    "https://seller-us.tiktok.com/*"
   ],
   "content_scripts": [
     {
@@ -50,6 +55,26 @@
         "content/shared/extract-product.js",
         "content/bridge.js"
       ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://tuerqidelvfanzi.github.io/E-comassit-plan/*",
+        "http://localhost:3004/*",
+        "http://127.0.0.1:3004/*"
+      ],
+      "js": ["content/app-receiver.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://seller.shopee.cn/*",
+        "https://seller.shopee.com/*",
+        "https://sell.taobao.com/*",
+        "https://seller.tiktokglobalshop.com/*",
+        "https://seller-us.tiktok.com/*"
+      ],
+      "js": ["content/publish-fill.js"],
       "run_at": "document_idle"
     }
   ]

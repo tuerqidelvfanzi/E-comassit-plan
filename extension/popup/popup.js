@@ -12,16 +12,32 @@ function normalizeBase(url) {
   return (url || DEFAULT_APP_BASE).replace(/\/+$/, '');
 }
 
-chrome.storage.local.get(['appBaseUrl'], (data) => {
+const apiBaseInput = document.getElementById('api-base');
+const extTokenInput = document.getElementById('ext-token');
+
+chrome.storage.local.get(['appBaseUrl', 'apiBaseUrl', 'extensionToken'], (data) => {
   const base = normalizeBase(data.appBaseUrl || DEFAULT_APP_BASE);
   appBaseInput.value = base;
   linkInbox.href = `${base}/app/inbox`;
+  if (apiBaseInput) apiBaseInput.value = data.apiBaseUrl || 'http://127.0.0.1:8080';
+  if (extTokenInput && data.extensionToken) extTokenInput.value = data.extensionToken;
 });
+
+function persistPluginConfig() {
+  chrome.storage.local.set({
+    appBaseUrl: normalizeBase(appBaseInput.value.trim()),
+    apiBaseUrl: apiBaseInput?.value?.trim() || 'http://127.0.0.1:8080',
+    extensionToken: extTokenInput?.value?.trim() || '',
+  });
+}
+
+apiBaseInput?.addEventListener('change', persistPluginConfig);
+extTokenInput?.addEventListener('change', persistPluginConfig);
 
 appBaseInput.addEventListener('change', () => {
   const base = normalizeBase(appBaseInput.value.trim());
-  chrome.storage.local.set({ appBaseUrl: base });
   linkInbox.href = `${base}/app/inbox`;
+  persistPluginConfig();
 });
 
 document.getElementById('btn-capture').addEventListener('click', async () => {
@@ -50,16 +66,29 @@ document.getElementById('btn-upload').addEventListener('click', async () => {
     return;
   }
   const base = normalizeBase(appBaseInput.value.trim());
-  await chrome.storage.local.set({ appBaseUrl: base });
-  const payload = encodeURIComponent(JSON.stringify(lastCapture));
-  const url = `${base}/app/inbox?demoImport=${payload}`;
-  chrome.tabs.create({ url });
+  persistPluginConfig();
+  await chrome.storage.local.set({ lastCapture });
+  chrome.runtime.sendMessage(
+    { type: 'UPLOAD_COLLECT', payload: lastCapture, appBase: base },
+    (res) => {
+      if (!res?.ok) {
+        alert('上传失败，请检查 B 站地址是否已登录并打开');
+        return;
+      }
+      if (res.viaBridge) {
+        alert('已写入采集箱（当前已打开的 B 站标签页）');
+      } else {
+        alert('已打开采集箱页面完成导入');
+      }
+    },
+  );
 });
 
 document.getElementById('btn-link').addEventListener('click', () => {
   const url = prompt('粘贴商品链接');
   if (!url) return;
   lastCapture = {
+    schemaVersion: '1.0.0',
     source: '链接采集',
     sourceUrl: url,
     title: `链接商品 ${url.slice(0, 40)}…`,
@@ -73,9 +102,28 @@ document.getElementById('btn-link').addEventListener('click', () => {
 
 document.getElementById('btn-publish').addEventListener('click', async () => {
   const platform = document.getElementById('platform').value;
-  const names = { shopee: 'Shopee', tiktok: 'TikTok Shop', taobao: '淘宝' };
-  alert(
-    `演示版：请在已打开的${names[platform] || ''}卖家后台「新建商品/草稿」页面使用。\n` +
-      '正式版将自动填入标题、价格与图片。\n\n步骤 5：在目标网站点击「发布」完成上架。',
-  );
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (!tab?.id) return;
+
+  const stored = await chrome.storage.local.get(['lastCapture']);
+  const payload = lastCapture || stored.lastCapture;
+  if (!payload) {
+    alert('请先在商品页采集，或从采集箱选择可发布商品后再填入。');
+    return;
+  }
+
+  const fillPayload = {
+    title: payload.title,
+    priceCny: payload.price?.amount ?? 0,
+    platform,
+  };
+
+  const res = await chrome.tabs.sendMessage(tab.id, { type: 'FILL_DRAFT', payload: fillPayload }).catch(() => null);
+  if (!res) {
+    const names = { shopee: 'Shopee', tiktok: 'TikTok Shop', taobao: '淘宝' };
+    alert(
+      `请在已打开的${names[platform] || ''}卖家后台「新建商品/草稿」页面重试。\n` +
+        '若页面无反应，请刷新卖家后台后再点「填入草稿」。',
+    );
+  }
 });

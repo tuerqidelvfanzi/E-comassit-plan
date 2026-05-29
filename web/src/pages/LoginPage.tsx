@@ -10,15 +10,15 @@ export function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError('');
     const fd = new FormData(e.target as HTMLFormElement);
-    const ok = login(String(fd.get('username')), String(fd.get('password')));
+    const ok = await login(String(fd.get('username')), String(fd.get('password')));
     setLoading(false);
     if (ok) navigate('/app');
-    else setError('用户名或密码错误（原型：admin01 / abcd234）');
+    else setError('用户名或密码错误（演示：admin01 / abcd234）');
   }
 
   return (
