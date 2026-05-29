@@ -1,7 +1,8 @@
-import { PageHeader, Card, Select } from '../components/ui';
+import { PageHeader, Card } from '../components/ui';
 import { ThemeSettings } from '../components/ThemeSettings';
 import { ExtensionDownloadCard } from '../components/ExtensionDownloadCard';
 import { WorkflowGuide } from '../components/WorkflowGuide';
+import { LlmSettings } from '../components/LlmSettings';
 
 export function SettingsPage() {
   return (
@@ -23,13 +24,10 @@ export function SettingsPage() {
         </div>
       </Card>
       <Card className="mt-4">
-        <h2 className="font-medium">LLM 模型</h2>
-        <p className="mt-2 text-sm text-muted">支持多模型 A/B（会议：排查 Prompt vs 模型）</p>
-        <Select className="mt-2 w-full max-w-xs">
-          <option>默认模型（待配置）</option>
-          <option>GPT-4o</option>
-          <option>Claude Sonnet</option>
-        </Select>
+        <h2 className="font-medium">大模型设置</h2>
+        <div className="mt-4">
+          <LlmSettings />
+        </div>
       </Card>
     </>
   );
