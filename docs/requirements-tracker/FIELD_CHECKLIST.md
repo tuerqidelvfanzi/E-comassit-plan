@@ -242,23 +242,42 @@
 
 根据 `BUSINESS_REQUIREMENTS_TRACEABILITY.md`，以下功能状态为 `planned`：
 
-| ID | 功能 | 代码路径 | 优先级 |
-|----|------|----------|--------|
-| BRD-1.1 | 选品：源平台筛选爆款 | `InboxPage.tsx` | P1 |
-| BRD-1.2 | 采集：插件9-12图+SKU | `extension/content/` | P0 |
-| BRD-1.3 | 优化：LLM标题描述本地化 | `shared/pipeline/engine.ts` | P0 |
-| BRD-1.4 | 搬家：插件自动填表草稿 | `publish-fill.js` | P0 |
-| BRD-3.1 | 13步Shopee上品流程 | - | P1 |
-| BRD-3.4b | 中→越图片翻译 | `contracts.ts` | P1 |
-| BRD-4.1 | 10步TikTok流程 | - | P1 |
-| BRD-5.1 | Product字段扩展 | `types.ts` | P1 |
-| BRD-5.1b | hasVariants/skuCount/imageCount | - | P1 |
-| BRD-5.4 | ProcessedResult双指标 | `pipeline/engine.ts` | P1 |
-| BRD-6.x | 模板CRUD UI | `TemplatesPage.tsx` | P1 |
-| BRD-10-P1-2 | SKU变体编辑 | `WorkbenchPage` | P1 |
-| EXT-6 | Redis运行时API | `api/src/app.ts` | P2 |
-| EXT-7 | ADS Power运行时 | `adsPowerBridge.js` | P2 |
-| EXT-8 | 计费持久化API | `POST /billing/hooks` | P2 |
+| ID | 功能 | 代码路径 | 优先级 | 状态 |
+|----|------|----------|--------|------|
+| BRD-1.1 | 选品：源平台筛选爆款 | `InboxPage.tsx` | P1 | ⚠️ 基础筛选已完成 |
+| BRD-1.2 | 采集：插件9-12图+SKU | `extension/content/` | P0 | ⏳ |
+| BRD-1.3 | 优化：LLM标题描述本地化 | `shared/pipeline/engine.ts` | P0 | ✅ 管线已配置 |
+| BRD-1.4 | 搬家：插件自动填表草稿 | `publish-fill.js` | P0 | ⏳ |
+| BRD-3.1 | 13步Shopee上品流程 | - | P1 | ✅ 流程UI已完成 |
+| BRD-3.4b | 中→越图片翻译 | `contracts.ts` | P1 | ✅ 按钮已添加 |
+| BRD-4.1 | 10步TikTok流程 | - | P1 | ✅ 发布中心已实现 |
+| BRD-5.1 | Product字段扩展 | `types.ts` | P1 | ✅ 已完善 |
+| BRD-5.1b | hasVariants/skuCount/imageCount | - | P1 | ✅ 已添加 |
+| BRD-5.4 | ProcessedResult双指标 | `pipeline/engine.ts` | P1 | ✅ 双栏对比已完成 |
+| BRD-6.x | 模板CRUD UI | `TemplatesPage.tsx` | P1 | ✅ 完整SKU配置 |
+| BRD-10-P1-2 | SKU变体编辑 | `WorkbenchPage` | P1 | ✅ 印花后缀已支持 |
+| EXT-6 | Redis运行时API | `api/src/app.ts` | P2 | ⏳ |
+| EXT-7 | ADS Power运行时 | `adsPowerBridge.js` | P2 | ⏳ |
+| EXT-8 | 计费持久化API | `POST /billing/hooks` | P2 | ⏳ |
+
+---
+
+## 九、2026-05-30 更新：已完善功能
+
+### P0 已修复
+| 功能 | 说明 | 代码文件 |
+|------|------|----------|
+| SKU六段编码 | 支持+B/+H印花后缀 | `skuEncoder.ts`, `WorkbenchPage.tsx` |
+| 物流信息编辑 | 包裹尺寸10-5-10cm | `WorkbenchPage.tsx` |
+| 类目选择 | 产品类目下拉 | `WorkbenchPage.tsx` |
+
+### P1 已完善
+| 功能 | 说明 | 代码文件 |
+|------|------|----------|
+| 详细描述编辑 | 富文本编辑区 | `WorkbenchPage.tsx` |
+| 违禁词检测 | 标题/描述实时检测 | `WorkbenchPage.tsx` |
+| 双栏对比视图 | 左原右译对照 | `WorkbenchPage.tsx` |
+| 一键翻译按钮 | 越南语一键翻译 | `WorkbenchPage.tsx` |
 
 ---
 
