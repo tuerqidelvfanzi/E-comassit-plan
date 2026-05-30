@@ -1,4 +1,9 @@
-/** @see shared/listing/status.ts — keep in sync */
+/**
+ * 上架/发布状态机（BRD §5.4、§8）
+ * @see docs/LISTING_PUBLISH_IMPLEMENTATION.md
+ */
+
+/** 平台侧商品生命周期（BRD 扩展状态） */
 export const ListingStatus = {
   Pending: 'pending',
   Draft: 'draft',
@@ -9,6 +14,7 @@ export const ListingStatus = {
 
 export type ListingStatus = (typeof ListingStatus)[keyof typeof ListingStatus];
 
+/** 发布任务状态（插件填表队列） */
 export const PublishTaskStatus = {
   Draft: 'draft',
   Pending: 'pending',
@@ -20,6 +26,7 @@ export const PublishTaskStatus = {
 
 export type PublishTaskStatus = (typeof PublishTaskStatus)[keyof typeof PublishTaskStatus];
 
+/** B 站采集箱内部状态（现有 API / Web，保持不变） */
 export const ProductLifecycleStatus = {
   Raw: 'raw',
   Processing: 'processing',
@@ -30,6 +37,7 @@ export const ProductLifecycleStatus = {
 export type ProductLifecycleStatus =
   (typeof ProductLifecycleStatus)[keyof typeof ProductLifecycleStatus];
 
+/** 内部状态 → 平台展示状态（BRD 映射，不替换 DB 字段） */
 export const PRODUCT_TO_LISTING_STATUS: Record<ProductLifecycleStatus, ListingStatus> = {
   raw: ListingStatus.Pending,
   processing: ListingStatus.Draft,

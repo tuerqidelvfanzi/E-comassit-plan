@@ -1,40 +1,42 @@
 import { describe, expect, it } from 'vitest';
-import { encodeSku, parseSku, variantSuffixForPrint } from './skuEncoder.js';
+import { encodeSku, encodeDummyHookSku, parseSku } from './skuEncoder.js';
 
-describe('skuEncoder', () => {
-  it('encodes BRD example white M black print', () => {
+describe('skuEncoder BRD v1.1', () => {
+  it('encodes five-part example BF-0001-PR-WH-S', () => {
     const code = encodeSku({
+      prefix: 'BF',
+      sequence: 1,
+      side: 'PR',
       color: '白色',
-      size: 'M',
-      sequence: 12,
-      variantSuffix: 'B',
+      size: 'S',
     });
-    expect(code).toBe('01T-C10-M-G0012-B');
+    expect(code).toBe('BF-0001-PR-WH-S');
   });
 
-  it('encodes black L white print variant', () => {
-    const code = encodeSku({
-      color: '黑色',
-      size: 'L',
-      sequence: 12,
-      variantSuffix: variantSuffixForPrint('blackOnWhite'),
-    });
-    expect(code).toBe('01T-C20-L-G0012-H');
+  it('encodes dummy hook white hook sku', () => {
+    expect(encodeDummyHookSku('BF', 'M')).toBe('BF-9999-P-WH-M');
   });
 
   it('round-trips parse', () => {
-    const raw = '01T-C10-M-G0012-B';
-    const parsed = parseSku(raw);
+    const parsed = parseSku('BF-0001-PR-WH-S');
     expect(parsed).toEqual({
-      prefix: '01T',
-      colorCode: 'C10',
-      sizeCode: 'M',
-      sequence: 12,
-      variantSuffix: 'B',
+      prefix: 'BF',
+      sequence: 1,
+      side: 'PR',
+      colorCode: 'WH',
+      size: 'S',
+      isDummyHook: false,
     });
   });
 
+  it('detects dummy hook from parse', () => {
+    const parsed = parseSku('BF-9999-P-WH-L');
+    expect(parsed?.isDummyHook).toBe(true);
+  });
+
   it('throws on unknown color', () => {
-    expect(() => encodeSku({ color: '金色', size: 'M', sequence: 1 })).toThrow(/UNKNOWN_COLOR/);
+    expect(() =>
+      encodeSku({ sequence: 1, side: 'P', color: '金色', size: 'M' }),
+    ).toThrow(/UNKNOWN_COLOR/);
   });
 });

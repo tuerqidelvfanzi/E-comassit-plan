@@ -26,6 +26,15 @@ const BANNED_TERMS = [
   { pattern: /耐克|nike/i, label: 'Nike' },
   { pattern: /阿迪达斯|adidas/i, label: 'Adidas' },
   { pattern: /迪士尼|disney/i, label: 'Disney' },
+  { pattern: /\blv\b|路易威登|louis vuitton/i, label: 'LV' },
+  { pattern: /gucci|古驰/i, label: 'Gucci' },
+  { pattern: /chanel|香奈儿/i, label: 'Chanel' },
+  { pattern: /爱马仕|hermes/i, label: 'Hermès' },
+  { pattern: /苹果|apple(?!\s*watch)/i, label: 'Apple' },
+  { pattern: /三星|samsung/i, label: 'Samsung' },
+  { pattern: /华为|huawei/i, label: 'Huawei' },
+  { pattern: /\bnasa\b/i, label: 'NASA' },
+  { pattern: /3[Cc]认证|产地[:：]|发货地[:：]/, label: '国内标识' },
   { pattern: /最便宜|全网最低|绝对|100%正品|国家级|世界级|最佳/i, label: '虚假宣传' },
 ];
 

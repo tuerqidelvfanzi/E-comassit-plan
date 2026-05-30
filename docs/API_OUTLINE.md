@@ -25,7 +25,7 @@
 
 | Method | Path | 说明 |
 |--------|------|------|
-| GET | `/products` | 采集箱列表 `?status=&source=` |
+| GET | `/products` | 采集箱列表 `?status=&source=&minGmv=&minCtr=&minImageCount=`（P1 筛选，见 `productFilters.ts`） |
 | GET | `/products/:id` | 含 raw + processed 快照 |
 | PATCH | `/products/:id` | 人工改字段 |
 | DELETE | `/products/:id` | 删除 |
@@ -80,6 +80,8 @@
 | POST | `/products/:id/images/model-generate` | P2 | AI 模特图异步任务 |
 | POST | `/integrations/tiktok/oauth` | P2 | TikTok Open API 授权回调 |
 | GET | `/integrations/adspower/profiles` | P2 | ADS Power 指纹环境列表 |
+| POST | `/billing/hooks` | P2 | 记录 LLM/AI token 或 image 计费事件（`BillingHook`） |
+| DELETE | `/link-catcher/:id` | P2 | 链接消费确认 |
 
 **PublishTask.status**（目标）：`draft` → `pending` → `filling` → `completed` \| `failed` \| `cancelled`  
 **Product.status**（不变）：`raw` \| `processing` \| `ready` \| `published` — UI 映射 ListingStatus：`pending` \| `draft` \| `reviewing` \| `live` \| `suspended`

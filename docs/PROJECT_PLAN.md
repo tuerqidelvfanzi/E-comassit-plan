@@ -88,6 +88,8 @@ flowchart LR
 
 实现策略：内容脚本 + 可选手动确认；敏感操作二次确认；失败重试与日志回传 B 站。
 
+**BRD v1.1 对齐**：越南 Shopee（标题≤20字、×3.5、9图）与泰国 TikTok（五段SKU、×2.5、主图≥5）规则见 `docs/LISTING_PUBLISH_IMPLEMENTATION.md` 与 `docs/BUSINESS_REQUIREMENTS_TRACEABILITY.md`。
+
 ### 3.4 选品建议（B 站增值）
 
 - 类目趋势、毛利测算、跨平台价差（依赖规则引擎数据）

@@ -22,4 +22,15 @@ describe('antiBan material scan', () => {
     const result = validateMaterialConsistency({ 材质: '纯棉' }, '优质 Polyester 面料');
     expect(result.ok).toBe(false);
   });
+
+  it('flags BRD banned brands', () => {
+    const result = scanAntiBan('', 'Gucci 正品 T恤');
+    expect(result.ok).toBe(false);
+    expect(result.issues.some((i) => i.code === 'BANNED_TERM')).toBe(true);
+  });
+
+  it('flags domestic identifiers', () => {
+    const result = scanAntiBan('', '3C认证 产地：广东');
+    expect(result.issues.some((i) => i.message.includes('国内标识'))).toBe(true);
+  });
 });

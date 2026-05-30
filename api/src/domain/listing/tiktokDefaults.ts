@@ -1,12 +1,17 @@
-/** @see shared/listing/tiktokDefaults.ts — keep in sync */
-import { PRINT_VARIANT_SUFFIX } from './skuEncoder.js';
+/**
+ * TikTok Shop / 平台上架默认值（BRD v1.1 §4、§7）
+ */
 
-export const TIKTOK_PRICE_MULTIPLIER = 3.5;
+import { calcListPrice, getDefaultStock, getDefaultWeightGrams } from './marketPricing.js';
+import { encodeDummyHookSku } from './skuEncoder.js';
+
+/** @deprecated 使用 marketPricing calcListPrice('th-tiktok') — 泰国 TikTok 倍率 2.5 */
+export const TIKTOK_PRICE_MULTIPLIER = 2.5;
 
 export const NO_BRAND = 'No Brand';
 
 export const LOGISTICS_DEFAULTS = {
-  weightKg: 0.3,
+  weightKg: 0.22,
   lengthCm: 30,
   widthCm: 25,
   heightCm: 2,
@@ -14,11 +19,14 @@ export const LOGISTICS_DEFAULTS = {
   warehouseCode: 'DEFAULT',
 } as const;
 
+/** BRD §4.4 白色钩子变体 */
 export const WHITE_HOOK_VARIANT = {
   id: 'white-hook',
   label: 'White Hook 白钩款',
-  skuSuffix: 'WH',
-  printVariant: 'whiteOnBlack' as const,
+  colorName: 'empty',
+  price: 400,
+  stock: 5,
+  weightGrams: 220,
   allowPolyesterListing: true,
   listingMaterial: 'Polyester',
   attributeOverrides: {
@@ -27,6 +35,7 @@ export const WHITE_HOOK_VARIANT = {
   },
 } as const;
 
+/** 详情图固定 4 张顺序（TikTok 泰国 §4.1 步骤 9） */
 export const DETAIL_IMAGE_SEQUENCE = [
   { slot: 1, assetKey: 'size_chart', label: '尺码表' },
   { slot: 2, assetKey: 'fabric_detail', label: '面料细节' },
@@ -37,12 +46,15 @@ export const DETAIL_IMAGE_SEQUENCE = [
 export type DetailImageSlot = (typeof DETAIL_IMAGE_SEQUENCE)[number];
 
 export function calcTikTokListPrice(costCny: number, multiplier = TIKTOK_PRICE_MULTIPLIER): number {
-  return Math.round(costCny * multiplier * 100) / 100;
+  return calcListPrice(costCny, 'th-tiktok');
+}
+
+export function buildDummyHookSkuCode(prefix: string, size: string): string {
+  return encodeDummyHookSku(prefix, size);
 }
 
 export function buildTikTokSkuSuffix(isWhiteHook: boolean): string {
-  if (isWhiteHook) return WHITE_HOOK_VARIANT.skuSuffix;
-  return PRINT_VARIANT_SUFFIX.whiteOnBlack;
+  return isWhiteHook ? 'WH' : 'PR';
 }
 
 export function orderDetailImages<T extends { assetKey?: string; type?: string }>(
@@ -60,3 +72,5 @@ export function orderDetailImages<T extends { assetKey?: string; type?: string }
   }
   return ordered.slice(0, 4);
 }
+
+export { getDefaultStock, getDefaultWeightGrams };
