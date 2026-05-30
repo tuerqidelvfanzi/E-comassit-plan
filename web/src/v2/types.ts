@@ -133,3 +133,49 @@ export interface PipelineRunV2 {
   warnings: string[];
   ranAt: string;
 }
+
+export type TitleOptimizationStatus =
+  | 'created'
+  | 'search_terms_ready'
+  | 'title_generated'
+  | 'original_fetched'
+  | 'awaiting_confirm'
+  | 'applying'
+  | 'completed'
+  | 'cancelled'
+  | 'failed';
+
+export interface TitleSearchTermRow {
+  keyword: string;
+  metrics: string;
+}
+
+export interface TitleComparison {
+  originalTitle: string;
+  originalScore: string;
+  suggestedTitle: string;
+  suggestedScore: string;
+  wordsToRemove: string[];
+  wordsToAdd: string[];
+  otherSuggestions: string[];
+}
+
+export interface TitleOptimizationJob {
+  id: string;
+  categoryName: string;
+  tmallProductId: string;
+  status: TitleOptimizationStatus;
+  currentStep: number;
+  workerNote?: string;
+  searchTerms?: TitleSearchTermRow[];
+  generatedTitle?: string;
+  originalTitle?: string;
+  originalScore?: string;
+  suggestedTitle?: string;
+  comparison?: TitleComparison;
+  appliedAt?: string;
+  verificationNote?: string;
+  lastError?: string;
+  createdAt: string;
+  updatedAt: string;
+}

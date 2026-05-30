@@ -1,6 +1,7 @@
 # v2.0 验收演示流程
 
 > 目标：按 [`REQUIREMENTS_V2_0.md`](./REQUIREMENTS_V2_0.md) 逐项可点选验证（全 Mock）  
+> **多场景讲解（含 Mxx 点击模块顺序、模块-流程映射）**：见 [`DEMO_PRESENTATION_FLOWS.md`](./DEMO_PRESENTATION_FLOWS.md)  
 > 账号：`admin01` / `abcd234`
 
 ---

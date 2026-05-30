@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Card, Button, Badge } from '../../components/ui';
 import { V2Shell } from '../components/V2Shell';
+import { RequirementModuleGrid } from '../components/RequirementModuleGrid';
 import { useV2Overview } from '../hooks/useV2Queries';
 import { useMetrics } from '../../hooks/useAppQueries';
 
@@ -19,7 +20,7 @@ export function DashboardV2Page() {
   return (
     <V2Shell
       title="工作台"
-      desc="v2.0–v2.3 全功能演示（采集 → 处理 → 发布），数据均为 Mock API"
+      desc="REQUIREMENTS_V2 全量演示：采集 → 处理 → 发布；侧栏与下方模块卡可逐一点开验收"
       milestone="v2.0"
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -32,30 +33,44 @@ export function DashboardV2Page() {
       </div>
 
       <Card>
-        <h2 className="font-medium">推荐流程</h2>
+        <h2 className="font-medium">推荐演示路径（8 分钟主线）</h2>
         <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-muted">
           <li>
             <Link to="/app/competitors" className="text-[var(--color-primary)]">
               竞品分析
             </Link>
-            ：在源平台找爆款关键词与价格带
+            →{' '}
+            <Link to="/app/insights" className="text-[var(--color-primary)]">
+              选品洞察
+            </Link>
+            （可选）
           </li>
           <li>
-            <Link to="/app/inbox" className="text-[var(--color-primary)]">
-              采集箱
-            </Link>
-            /{' '}
             <Link to="/app/link-collect" className="text-[var(--color-primary)]">
               链接直采
             </Link>
-            ：入库原始商品
+            或插件采集 →{' '}
+            <Link to="/app/inbox" className="text-[var(--color-primary)]">
+              采集箱
+            </Link>
           </li>
-          <li>处理工作台：选模板 → 运行 Mock 管线 → 双指标预览</li>
+          <li>
+            <Link to="/app/workbench/p1" className="text-[var(--color-primary)]">
+              处理工作台
+            </Link>
+            ：模板 + 管线 + 五段 SKU + 9 图
+          </li>
           <li>
             <Link to="/app/publish" className="text-[var(--color-primary)]">
               发布中心
             </Link>
-            ：模拟填表与状态跟踪
+            ：生成填表 → 插件写入 Shopee
+          </li>
+          <li>
+            <Link to="/app/title-optimization" className="text-[var(--color-primary)]">
+              天猫标题优化
+            </Link>
+            （国内源站运营单独演示）
           </li>
         </ol>
       </Card>
@@ -71,18 +86,23 @@ export function DashboardV2Page() {
         </div>
       </Card>
 
+      <div>
+        <h2 className="mb-3 text-lg font-medium">全部功能模块（点击验收 UI）</h2>
+        <RequirementModuleGrid />
+      </div>
+
       <div className="flex flex-wrap gap-2">
-        <Link to="/app/competitors">
-          <Button type="button">开始竞品分析</Button>
-        </Link>
         <Link to="/app/inbox">
+          <Button type="button">采集箱</Button>
+        </Link>
+        <Link to="/app/title-optimization">
           <Button type="button" variant="outline">
-            打开采集箱
+            标题优化
           </Button>
         </Link>
         <Link to="/app/settings">
           <Button type="button" variant="ghost">
-            插件与模型设置
+            设置与插件
           </Button>
         </Link>
       </div>

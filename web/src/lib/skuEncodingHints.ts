@@ -27,16 +27,13 @@ export function getSkuEncodingHint(
   switch (categoryId) {
     case 'tpl-clothing-tshirt':
       return {
-        format:
-          market === 'th-TH'
-            ? '{店铺}-{序号4}-{P|R|PR}-{颜色2}-{尺码}[+B|+H]'
-            : '{店铺}-{序号4}-{P|R|PR}-{颜色2}-{尺码}',
-        example:
-          market === 'th-TH' ? 'BF-0001-PR-WH-M+B' : 'BF-0001-PR-WH-S',
+        format: '{店铺}-{序号4}-{P|R|PR}-{颜色2}-{尺码}',
+        example: 'BF-0001-PR-WH-S',
         notes: [
-          `${marketName}：服装-T恤 推荐五段/六段（泰站印花可加 +B/+H）`,
+          `${marketName}：服装-T恤 采用五段主码（PRD v2.0）`,
           'P=正面图案，R=背面，PR=正反面；颜色 WH/BK/PK 等',
           '单款式占位：BF-9999-P-WH-{尺码}（Hook 价400/库存5）',
+          '印花款 v2.1 用商品属性记录，不 lengthen 主 SKU 码',
           '越南：售价×3.5、库存50；泰国：×2.5、主图≥5张',
         ],
       };

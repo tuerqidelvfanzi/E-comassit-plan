@@ -13,6 +13,7 @@ export const v2Keys = {
   linkCollect: ['v2', 'linkCollect'] as const,
   publishV2: ['v2', 'publish'] as const,
   pipelineRuns: (id: string) => ['v2', 'pipeline', id] as const,
+  titleOptimization: ['v2', 'title-optimization'] as const,
 };
 
 export function useV2Overview() {
@@ -108,5 +109,66 @@ export function useV2RunPipeline(productId: string) {
       qc.invalidateQueries({ queryKey: ['products'] });
       qc.invalidateQueries({ queryKey: ['product', productId] });
     },
+  });
+}
+
+export function useTitleOptimizationJobs() {
+  return useQuery({
+    queryKey: v2Keys.titleOptimization,
+    queryFn: () => v2Api.listTitleOptimizationJobs(),
+  });
+}
+
+function invalidateTitleJobs(qc: ReturnType<typeof useQueryClient>) {
+  qc.invalidateQueries({ queryKey: v2Keys.titleOptimization });
+}
+
+export function useCreateTitleOptimizationJob() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (v: { categoryName: string; tmallProductId: string }) =>
+      v2Api.createTitleOptimizationJob(v.categoryName, v.tmallProductId),
+    onSuccess: () => invalidateTitleJobs(qc),
+  });
+}
+
+export function useTitleOptimizationCollectTerms() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => v2Api.collectTitleSearchTerms(id),
+    onSuccess: () => invalidateTitleJobs(qc),
+  });
+}
+
+export function useGenerateOptimizationTitle() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => v2Api.generateTitleOptimization(id),
+    onSuccess: () => invalidateTitleJobs(qc),
+  });
+}
+
+export function useFetchOriginalTitle() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => v2Api.fetchTitleOriginal(id),
+    onSuccess: () => invalidateTitleJobs(qc),
+  });
+}
+
+export function useCompareTitleOptimization() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => v2Api.compareTitleOptimization(id),
+    onSuccess: () => invalidateTitleJobs(qc),
+  });
+}
+
+export function useApplyTitleOptimization() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (v: { id: string; confirmed: boolean }) =>
+      v2Api.applyTitleOptimization(v.id, v.confirmed),
+    onSuccess: () => invalidateTitleJobs(qc),
   });
 }

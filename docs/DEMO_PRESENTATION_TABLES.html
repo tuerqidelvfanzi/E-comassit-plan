@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>演示讲解 · 业务流程三表</title>
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --surface: #fff;
+      --text: #15202b;
+      --muted: #52606d;
+      --border: #d9e2ec;
+      --primary: #1d4ed8;
+      --primary-soft: #dbeafe;
+      --warn-soft: #fffbeb;
+      --warn-border: #f59e0b;
+      --head: #e8eef4;
+      --ok: #047857;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text);
+      background: var(--bg);
+      padding: 24px 28px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 1.4rem; margin-bottom: 6px; }
+    h2 {
+      font-size: 1.12rem;
+      margin: 36px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--primary);
+    }
+    h3 { font-size: 1rem; margin: 20px 0 8px; color: var(--muted); font-weight: 600; }
+    .meta { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+    .callout {
+      background: var(--warn-soft);
+      border: 1px solid var(--warn-border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin: 12px 0 20px;
+      font-size: 13px;
+    }
+    .callout strong { color: #92400e; }
+    .callout ul { margin: 8px 0 0 1.2rem; }
+    .callout li { margin: 4px 0; }
+    .wrap {
+      overflow-x: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.05);
+      margin-bottom: 8px;
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 720px; }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 9px 11px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--head); font-weight: 600; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    .flow-head td { background: var(--primary-soft); font-weight: 600; }
+    .tag-ok { color: var(--ok); font-size: 12px; }
+    .tag-gap { color: #b45309; font-size: 12px; }
+    .tag-miss { color: #b91c1c; font-size: 12px; }
+    .verdict {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <h1>演示讲解 · 业务流程三表</h1>
+  <p class="meta">
+    面向运营与业务评审 ·
+    <strong>本平台</strong> = 电商助手后台 ·
+    <strong>供货网站</strong> = 淘宝/1688 等用来选款、采集的页面 ·
+    <strong>卖货平台</strong> = Shopee/TikTok 等卖家后台用来上架的页面
+  </p>
+
+  <div class="callout">
+    <strong>选品洞察页的数据从哪来？（讲解时务必说清）</strong>
+    <ul>
+      <li><strong>竞品分析页</strong>：运营填写「在哪个供货网站、搜什么关键词」，点「运行分析」后得到一份报告（热卖程度、点击率、热词、价格带、样例标题、类似在售款列表）。当前演示为<strong>示例数据</strong>，正式版需对接真实抓取或第三方数据。</li>
+      <li><strong>选品洞察页</strong>：是<strong>只读汇总看板</strong>。「关联竞品报告」来自<strong>已经跑完的竞品分析任务</strong>；页上的热词排行、成交档位等，演示里部分是固定示例，尚未与每一次分析结果严格联动。</li>
+      <li><strong>正确顺序</strong>：先竞品分析出报告 → 再选品洞察看汇总；不能只在选品洞察里「找同款」。要把结论用于加工：在<strong>商品加工工作台</strong>里选择「带入本次竞品结论」。</li>
+    </ul>
+  </div>
+
+  <h2>表一 · 业务流程演示表</h2>
+
+  <h3>1.1 七套演示总览</h3>
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>流程</th>
+          <th>名称</th>
+          <th>时长</th>
+          <th>要证明的业务能力</th>
+          <th>演示操作路径（按侧栏与页面）</th>
+          <th>是否够用</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>一</td>
+          <td>业务主线</td>
+          <td>约 8 分钟</td>
+          <td>从供货网站选款 → 在本平台改标题/SKU/图片 → 在卖货平台上架，整条链路能走通（替代 ERP 里反复复制粘贴）</td>
+          <td>登录 → 工作台 → 竞品分析（可选）→ 链接直采 → 采集箱 → 商品加工 → 发布中心 → 设置 → 插件连接 → 插件在卖货平台填表</td>
+          <td class="tag-ok">对外路演够用</td>
+        </tr>
+        <tr>
+          <td>二</td>
+          <td>选品洞察专场</td>
+          <td>约 10 分钟</td>
+          <td>上架前能在供货网站侧做词与价研究，并把结论带进单款加工</td>
+          <td>登录 → 竞品分析 → 选品洞察 → 回到竞品分析 → 采集箱进商品加工</td>
+          <td class="tag-gap">页面够用；真实供货站数据待接入</td>
+        </tr>
+        <tr>
+          <td>三</td>
+          <td>采集入库专场</td>
+          <td>约 12 分钟</td>
+          <td>插件、粘贴链接、榜单批量等多种方式把商品收进采集箱</td>
+          <td>设置 → 插件连接 → 插件在供货页采集 → 采集箱 → 链接直采 → 批量采集 → 同步登录状态</td>
+          <td class="tag-gap">未单独演示拼多多、抖音采集</td>
+        </tr>
+        <tr>
+          <td>四</td>
+          <td>商品加工专场</td>
+          <td>约 15 分钟</td>
+          <td>类目模板、倍率与违禁规则、越南短标题、六段 SKU、九图、物流与上架检查清单、智能改写（演示为示例输出）</td>
+          <td>类目模板 → 模板管理 → 规则库 → 采集箱 → 商品加工工作台</td>
+          <td class="tag-ok">核心加工能力演示充分</td>
+        </tr>
+        <tr>
+          <td>五</td>
+          <td>发布与插件闭环</td>
+          <td>约 10 分钟</td>
+          <td>在本平台生成「给插件用的填表数据」，插件在卖货平台卖家后台自动填入</td>
+          <td>商品加工 → 发布中心 → 平台集成 → 设置 → 插件连接 → 插件发布</td>
+          <td class="tag-gap">实填以越南 Shopee 为主；泰国、菲律宾多为说明</td>
+        </tr>
+        <tr>
+          <td>六</td>
+          <td>系统与协作</td>
+          <td>约 8 分钟</td>
+          <td>安装插件、配置令牌与大模型、查看标准流程图、团队分工预留</td>
+          <td>设置 → 团队 → 退出登录</td>
+          <td class="tag-ok">系统配置够用</td>
+        </tr>
+        <tr>
+          <td>七</td>
+          <td>全功能点一遍</td>
+          <td>约 30 分钟</td>
+          <td>侧栏每个菜单都能打开，用于验收界面是否齐全</td>
+          <td>按侧栏从上到下点遍（选品洞察建议在跑完竞品分析之后再看）</td>
+          <td class="tag-ok">界面覆盖够用</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verdict">
+    <strong>七套演示够不够？</strong>
+    讲清「选款—加工—上架」主流程、加工规则、插件闭环，<strong>够用</strong>。
+    尚不适合单独承诺的能力包括：拼多多/抖音采集、吊灯/橱柜等类目深配、按历史在售标题自动举例、真实榜单抓取、泰国/菲律宾/印尼实际上架、开放平台正式对接、订单仓储店群等 ERP 功能。
+    详见文末「演示未覆盖或仅点到为止的能力」。
+  </div>
+
+  <h3>1.2 分步演示明细</h3>
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>流程</th>
+          <th>步</th>
+          <th>操作路径</th>
+          <th>这一步要说明的业务点</th>
+          <th>数据说明（给观众）</th>
+          <th>讲解话术提示</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="flow-head"><td colspan="6">流程一 · 业务主线</td></tr>
+        <tr><td>一</td><td>1</td><td>登录 → 工作台</td><td>进入本公司运营后台，不是打开淘宝或 Shopee 网页</td><td>登录后看到采集量、能力说明等总览</td><td>强调「本平台」与供货站、卖货平台的区别</td></tr>
+        <tr><td>一</td><td>2</td><td>工作台 → 竞品分析</td><td>（可选）在供货网站语境下看关键词竞争情况</td><td>演示为示例分析报告</td><td>选品发生在供货网站侧，不是搜自己仓库</td></tr>
+        <tr><td>一</td><td>3</td><td>竞品分析页内</td><td>查看「类似在售款」列表</td><td>示例链接，正式版对应供货站搜索结果</td><td>找同款仍在供货站结果里</td></tr>
+        <tr><td>一</td><td>4</td><td>竞品分析 → 链接直采 → 采集箱</td><td>定下款式后，把商品收进采集箱</td><td>粘贴商品链接后预览再入库；也可改用插件采集</td><td>采集箱是「待加工商品清单」</td></tr>
+        <tr><td>一</td><td>5</td><td>采集箱 → 商品加工</td><td>按规则与模板改标题、SKU、图片等</td><td>智能改写为演示输出，保存后写入商品资料</td><td>对应 ERP 里手工编标题、SKU、九图</td></tr>
+        <tr><td>一</td><td>6</td><td>商品加工页内</td><td>越南短标题、六段 SKU、九图位、上架检查清单</td><td>字数与违禁为系统校验；图片处理按钮为演示</td><td>逐项指给观众看</td></tr>
+        <tr><td>一</td><td>7</td><td>商品加工 → 发布中心</td><td>生成给浏览器插件使用的填表数据</td><td>「生成填表」为真实业务能力；不是插件直接连卖货平台后台账号</td><td>数据先在本平台准备好</td></tr>
+        <tr><td>一</td><td>8</td><td>发布中心 → 设置 → 插件连接 → 插件发布</td><td>在卖货平台卖家后台新建商品页，由插件填入字段</td><td>需先在设置里复制连接令牌</td><td>设置 → 连接 → 打开 Shopee 卖家页 → 发布</td></tr>
+        <tr><td>一</td><td>9</td><td>回到工作台</td><td>收尾：回顾已具备的能力模块</td><td>首页能力列表</td><td>对照里程碑说明</td></tr>
+
+        <tr class="flow-head"><td colspan="6">流程二 · 选品洞察专场</td></tr>
+        <tr><td>二</td><td>1</td><td>登录 → 竞品分析</td><td>新建「供货网站 + 关键词」分析任务</td><td>演示环境立即生成示例报告</td><td>说明分析的是外部市场，不是内部库存</td></tr>
+        <tr><td>二</td><td>2</td><td>竞品分析 · 品类洞察</td><td>看热卖程度、点击率、热词、价格带</td><td>来自当前这一次分析报告</td><td>切换「品类洞察」标签</td></tr>
+        <tr><td>二</td><td>3</td><td>竞品分析 · 找同类</td><td>看类似在售款与链接</td><td>示例商品列表</td><td>切换「找同类/类似款」</td></tr>
+        <tr><td>二</td><td>4</td><td>竞品分析 → 选品洞察</td><td>跨多次分析看热词档位、报告列表</td><td>报告列表依赖已完成的分析；部分图表为演示固定样例</td><td>须先跑完分析，否则报告列表为空</td></tr>
+        <tr><td>二</td><td>5</td><td>选品洞察 → 竞品分析</td><td>从汇总回到某一次具体分析</td><td>点击关联报告</td><td>报告可来回跳转</td></tr>
+        <tr><td>二</td><td>6</td><td>竞品分析 → 商品加工</td><td>把竞品结论带入本款加工的「临时说明」</td><td>加工页下拉选择本次分析</td><td>研究结论进入写标题、写描述时的上下文</td></tr>
+
+        <tr class="flow-head"><td colspan="6">流程三 · 采集入库专场</td></tr>
+        <tr><td>三</td><td>1</td><td>设置 → 插件 · 连接</td><td>插件与本公司后台建立连接</td><td>复制令牌、测试连通</td><td>采集和发布都依赖这一步</td></tr>
+        <tr><td>三</td><td>2</td><td>插件 · 采集（在供货网站商品页）</td><td>从 1688/淘宝等详情页抓取商品信息</td><td>按统一商品字段上传</td><td>打开供货站商品页再点采集</td></tr>
+        <tr><td>三</td><td>3</td><td>插件采集 → 采集箱</td><td>确认新商品已进入待加工列表</td><td>可筛选、导出</td><td>采集箱出现新行</td></tr>
+        <tr><td>三</td><td>4</td><td>采集箱</td><td>批量筛选、导出</td><td>列表为已入库商品</td><td>演示筛选与导出</td></tr>
+        <tr><td>三</td><td>5</td><td>链接直采 → 采集箱</td><td>不装插件时，粘贴商品链接入库</td><td>演示为模拟解析进度</td><td>适合单链接试跑</td></tr>
+        <tr><td>三</td><td>6</td><td>批量采集 → 采集箱</td><td>按榜单链接一次采多款</td><td>演示任务进度；需登录供货站同步 Cookie</td><td>看批量任务表</td></tr>
+        <tr><td>三</td><td>7</td><td>插件 · 连接</td><td>把供货站登录状态同步给批量任务用</td><td>演示级能力</td><td>在淘宝已登录页操作同步</td></tr>
+
+        <tr class="flow-head"><td colspan="6">流程四 · 商品加工专场</td></tr>
+        <tr><td>四</td><td>1</td><td>类目模板</td><td>按童装、T 恤、灯具等类目选加工策略</td><td>目录展示各类模板卡片</td><td>可筛「服装 A 类」</td></tr>
+        <tr><td>四</td><td>2</td><td>类目模板 → 模板管理</td><td>配置颜色尺码规则、印花加价、白色引流款</td><td>可新建、编辑保存</td><td>打开管理页演示</td></tr>
+        <tr><td>四</td><td>3</td><td>规则库</td><td>各国售价倍数、违禁词</td><td>可新增规则；违禁词有默认表</td><td>指违禁词区域</td></tr>
+        <tr><td>四</td><td>4</td><td>采集箱 → 商品加工</td><td>进入某一商品的加工界面</td><td>从列表点「编辑」</td><td>选一条商品</td></tr>
+        <tr><td>四</td><td>5</td><td>商品加工</td><td>挂载本次竞品分析结论</td><td>依赖已完成的竞品任务</td><td>竞品洞察下拉框</td></tr>
+        <tr><td>四</td><td>6</td><td>商品加工</td><td>改标题、短描述、详描；校验字数与违禁</td><td>智能文案为演示输出</td><td>强调越南 20 字等规则</td></tr>
+        <tr><td>四</td><td>7</td><td>商品加工</td><td>九张主图位；去水印/翻译为演示按钮</td><td>图片任务未接真实服务商</td><td>点三个图片相关按钮</td></tr>
+        <tr><td>四</td><td>8</td><td>商品加工</td><td>默认重量尺寸；Shopee 上架检查清单</td><td>如 220 克、常用包裹尺寸</td><td>物流区 + 清单勾选</td></tr>
+        <tr><td>四</td><td>9</td><td>商品加工</td><td>一键跑加工流程；双风格标题；SKU 表</td><td>加工结果为演示</td><td>点「运行管线」</td></tr>
+        <tr><td>四</td><td>10</td><td>商品加工</td><td>保存本款修改</td><td>写入商品资料</td><td>保存编辑</td></tr>
+
+        <tr class="flow-head"><td colspan="6">流程五 · 发布与插件闭环</td></tr>
+        <tr><td>五</td><td>1</td><td>商品加工 → 发布中心</td><td>创建发布任务并「生成填表」</td><td>生成的是插件可读的一套字段；与「仅演示状态的模拟填表」不同</td><td>务必点「生成填表」</td></tr>
+        <tr><td>五</td><td>2</td><td>发布中心</td><td>说明：本平台生成数据 → 插件 → 卖货平台</td><td>页顶说明卡片</td><td>三端闭环</td></tr>
+        <tr><td>五</td><td>3</td><td>发布中心 → 平台集成</td><td>多国卖货平台适配方式说明</td><td>页面展示计划支持的站点</td><td>路线图讲解</td></tr>
+        <tr><td>五</td><td>4</td><td>设置 → 插件 · 连接</td><td>配置令牌并连接</td><td>与流程三相同</td><td>复制令牌 → 连接</td></tr>
+        <tr><td>五</td><td>5</td><td>发布中心 → 插件 · 发布</td><td>在卖货平台卖家页拉取并填入</td><td>以越南 Shopee 新建商品页为主</td><td>拉取 → 填入</td></tr>
+        <tr><td>五</td><td>6</td><td>插件 · 发布（页内）</td><td>左侧对照预览填了哪些字段</td><td>预览为演示面板</td><td>指预览与悬浮按钮</td></tr>
+        <tr><td>五</td><td>7</td><td>发布中心（可选）</td><td>只看任务状态变化的「模拟填表」</td><td>不写入真实卖货后台，仅演示进度</td><td>与「生成填表」区分开讲</td></tr>
+
+        <tr class="flow-head"><td colspan="6">流程六 · 系统与协作</td></tr>
+        <tr><td>六</td><td>1</td><td>设置</td><td>下载插件安装包、查看标准作业流程图</td><td>提供安装包与说明</td><td>下载插件</td></tr>
+        <tr><td>六</td><td>2</td><td>设置</td><td>大模型账号、界面主题</td><td>表单配置</td><td>大模型与主题</td></tr>
+        <tr><td>六</td><td>3</td><td>团队</td><td>成员与角色（演示为示例人员）</td><td>示例数据</td><td>协作预留</td></tr>
+        <tr><td>六</td><td>4</td><td>退出登录</td><td>结束会话</td><td>—</td><td>侧栏退出</td></tr>
+
+        <tr class="flow-head"><td colspan="6">流程七 · 全功能点一遍</td></tr>
+        <tr><td>七</td><td>—</td><td>按侧栏顺序逐项打开</td><td>每个菜单 1～2 分钟说明用途</td><td>选品洞察建议在完成至少一次竞品分析后再打开</td><td>用于验收「是否都能点到」</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>表二 · 功能页面一览</h2>
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>功能页面</th>
+          <th>在业务里干什么</th>
+          <th>数据从哪来（给观众的说法）</th>
+          <th>在整条链路中的位置</th>
+          <th>常出现在哪套演示</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>登录</td>
+          <td>账号进入后台</td>
+          <td>公司账号体系</td>
+          <td>最先一步</td>
+          <td>全部</td>
+        </tr>
+        <tr>
+          <td>工作台</td>
+          <td>看采集量、发布情况、能做什么</td>
+          <td>汇总本账号商品数量与能力说明</td>
+          <td>导航起点与收尾</td>
+          <td>流程一、七</td>
+        </tr>
+        <tr>
+          <td>竞品分析</td>
+          <td>按关键词在供货网站侧做竞争研究；看类似款</td>
+          <td>每次「新建并运行分析」生成一份报告；<strong>不是</strong>搜本公司已采集商品库</td>
+          <td>上架前选品（可选）</td>
+          <td>流程一、二</td>
+        </tr>
+        <tr>
+          <td>选品洞察</td>
+          <td>把多次竞品分析结果汇总成热词、档位、报告列表</td>
+          <td>报告列表来自已完成的分析；部分图表为演示样例</td>
+          <td>竞品分析之后的汇总看板</td>
+          <td>流程二、七</td>
+        </tr>
+        <tr>
+          <td>链接直采</td>
+          <td>粘贴商品链接，预览后入库</td>
+          <td>演示为模拟抓取；正式版接后台任务</td>
+          <td>采集方式之一</td>
+          <td>流程一、三</td>
+        </tr>
+        <tr>
+          <td>批量采集</td>
+          <td>按榜单一次采多款</td>
+          <td>演示任务进度；需供货站登录状态</td>
+          <td>采集方式之一</td>
+          <td>流程三</td>
+        </tr>
+        <tr>
+          <td>采集箱</td>
+          <td>待加工商品清单：筛选、导出、进入加工</td>
+          <td>插件、直采、批量等入口都汇总到这里</td>
+          <td>采集汇聚点</td>
+          <td>流程一、三、七</td>
+        </tr>
+        <tr>
+          <td>商品加工工作台</td>
+          <td>改标题/SKU/图/物流；跑加工流程；带入竞品结论</td>
+          <td>保存商品资料；智能段落为演示输出</td>
+          <td>核心加工</td>
+          <td>流程一、二、四、七</td>
+        </tr>
+        <tr>
+          <td>类目模板</td>
+          <td>按服装、灯具、定制柜等选加工模板</td>
+          <td>系统预置目录</td>
+          <td>加工前配置</td>
+          <td>流程四</td>
+        </tr>
+        <tr>
+          <td>模板管理</td>
+          <td>维护颜色尺码规则、印花加价、引流款</td>
+          <td>可编辑保存</td>
+          <td>加工前配置</td>
+          <td>流程四</td>
+        </tr>
+        <tr>
+          <td>规则库</td>
+          <td>各国售价倍数、违禁词</td>
+          <td>可配置规则与默认违禁表</td>
+          <td>加工前配置</td>
+          <td>流程四</td>
+        </tr>
+        <tr>
+          <td>发布中心</td>
+          <td>发布任务列表；<strong>生成填表</strong>给插件用</td>
+          <td>生成填表为正式能力；另有仅改状态的演示按钮</td>
+          <td>本平台准备好上架数据</td>
+          <td>流程一、五</td>
+        </tr>
+        <tr>
+          <td>平台集成</td>
+          <td>展示各国卖货平台对接计划</td>
+          <td>说明性页面</td>
+          <td>多站能力介绍</td>
+          <td>流程五</td>
+        </tr>
+        <tr>
+          <td>团队</td>
+          <td>成员与分工（演示）</td>
+          <td>示例人员</td>
+          <td>协作预留</td>
+          <td>流程六</td>
+        </tr>
+        <tr>
+          <td>设置</td>
+          <td>下插件、复制连接令牌、大模型、主题、流程图</td>
+          <td>令牌用于插件连接后台</td>
+          <td>插件与系统配置</td>
+          <td>流程一、五、六</td>
+        </tr>
+        <tr>
+          <td>浏览器插件 · 连接</td>
+          <td>绑定本公司后台地址与令牌</td>
+          <td>测连通、同步供货站登录</td>
+          <td>插件与后台握手</td>
+          <td>流程三、五</td>
+        </tr>
+        <tr>
+          <td>浏览器插件 · 采集</td>
+          <td>在供货网站商品页抓取并上传</td>
+          <td>标准商品字段上传至采集箱</td>
+          <td>供货站 → 本平台</td>
+          <td>流程三</td>
+        </tr>
+        <tr>
+          <td>浏览器插件 · 发布</td>
+          <td>在卖货平台卖家页填入已生成的字段</td>
+          <td>读取发布中心生成的填表数据</td>
+          <td>本平台 → 卖货平台</td>
+          <td>流程五</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>表三 · 业务阶段与演示对照</h2>
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>业务阶段</th>
+          <th>主要发生在哪</th>
+          <th>要达成的业务结果</th>
+          <th>演示时经过哪些页面</th>
+          <th>哪套流程会重点讲</th>
+          <th>阶段结束时的产出</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>选品与研究</td>
+          <td>供货网站上的市场信息，在本平台查看与汇总</td>
+          <td>弄清热词、价格带、类似在售款；结论能用于写本款标题和描述</td>
+          <td>
+            <strong>竞品分析</strong>（按关键词出报告，主操作）→
+            <strong>选品洞察</strong>（看多次分析的汇总）→
+            <strong>商品加工工作台</strong>（勾选「带入本次竞品结论」）
+          </td>
+          <td>流程二重点；流程一简要带过；流程七点到即可</td>
+          <td>竞品分析报告；汇总看板；加工时的选品说明</td>
+        </tr>
+        <tr>
+          <td>采集入库</td>
+          <td>从供货网站进入本平台采集箱</td>
+          <td>把选定商品收进待加工清单，可筛选导出</td>
+          <td>
+            <strong>设置</strong>与<strong>插件 · 连接</strong>（先配好）→
+            <strong>插件 · 采集</strong>或<strong>链接直采</strong>或<strong>批量采集</strong>→
+            <strong>采集箱</strong>
+          </td>
+          <td>流程三重点；流程一用直采；流程七点到</td>
+          <td>采集箱中的原始商品记录</td>
+        </tr>
+        <tr>
+          <td>规则与模板配置</td>
+          <td>本平台</td>
+          <td>定好类目怎么生成 SKU、售价倍数、违禁词</td>
+          <td><strong>类目模板</strong> → <strong>模板管理</strong> → <strong>规则库</strong></td>
+          <td>流程四重点；流程七点到</td>
+          <td>模板与规则配置</td>
+        </tr>
+        <tr>
+          <td>商品加工</td>
+          <td>本平台</td>
+          <td>生成符合各国规则的标题、SKU、九图、物流与检查项</td>
+          <td><strong>采集箱</strong> → <strong>商品加工工作台</strong></td>
+          <td>流程四重点；流程一、二、七均涉及</td>
+          <td>加工完成、可发布的商品资料</td>
+        </tr>
+        <tr>
+          <td>生成上架数据</td>
+          <td>本平台</td>
+          <td>生成浏览器插件在卖货平台填表用的一套字段</td>
+          <td><strong>商品加工工作台</strong> → <strong>发布中心</strong>（生成填表）</td>
+          <td>流程五重点；流程一必讲</td>
+          <td>可供插件读取的填表数据</td>
+        </tr>
+        <tr>
+          <td>多国平台能力说明</td>
+          <td>本平台（规划说明）</td>
+          <td>让业务了解泰国、菲律宾、印尼等后续怎么接</td>
+          <td><strong>平台集成</strong></td>
+          <td>流程五</td>
+          <td>对接计划说明（演示为示例）</td>
+        </tr>
+        <tr>
+          <td>在卖货平台上架</td>
+          <td>Shopee/TikTok 等卖家后台</td>
+          <td>插件把字段填入新建商品页，减少手工复制</td>
+          <td><strong>设置</strong> → <strong>插件 · 连接</strong> → <strong>插件 · 发布</strong></td>
+          <td>流程五重点；流程一必讲；流程七点到</td>
+          <td>卖家后台草稿；插件侧字段对照预览</td>
+        </tr>
+        <tr>
+          <td>系统与协作</td>
+          <td>本平台</td>
+          <td>装好插件、配好令牌与大模型、了解分工</td>
+          <td><strong>登录</strong>、<strong>设置</strong>、<strong>团队</strong></td>
+          <td>流程六；各流程首尾</td>
+          <td>令牌、配置、示例团队成员</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>各套演示覆盖哪些业务阶段</h3>
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>演示流程</th>
+          <th>选品与研究</th>
+          <th>采集入库</th>
+          <th>规则与模板</th>
+          <th>商品加工</th>
+          <th>生成上架数据</th>
+          <th>在卖货平台上架</th>
+          <th>系统配置</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>一 业务主线</td><td>简要</td><td>●</td><td>—</td><td>●</td><td>●</td><td>●</td><td>登录</td></tr>
+        <tr><td>二 选品洞察</td><td>重点</td><td>—</td><td>—</td><td>带入结论</td><td>—</td><td>—</td><td>登录</td></tr>
+        <tr><td>三 采集入库</td><td>—</td><td>重点</td><td>—</td><td>—</td><td>—</td><td>—</td><td>配令牌</td></tr>
+        <tr><td>四 商品加工</td><td>—</td><td>入口</td><td>重点</td><td>重点</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>五 发布闭环</td><td>—</td><td>—</td><td>—</td><td>前置</td><td>重点</td><td>重点</td><td>配令牌</td></tr>
+        <tr><td>六 系统协作</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>重点</td></tr>
+        <tr><td>七 全功能点一遍</td><td>点到</td><td>点到</td><td>点到</td><td>点到</td><td>点到</td><td>点到</td><td>点到</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>演示未覆盖或仅点到为止的能力</h2>
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>能力说明（业务语言）</th>
+          <th>重要程度</th>
+          <th>当前演示情况</th>
+          <th>建议</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>在拼多多、抖音商品页用插件采集</td>
+          <td>近期需要</td>
+          <td class="tag-miss">七套流程均未单独演示</td>
+          <td>增一场「多供货站采集」或在采集专场口头说明</td>
+        </tr>
+        <tr>
+          <td>榜单批量采集接真实后台任务</td>
+          <td>可后排期</td>
+          <td class="tag-gap">流程三仅有界面与示例进度</td>
+          <td>接入后再录屏补一段</td>
+        </tr>
+        <tr>
+          <td>面料、功效与文案是否一致的自检</td>
+          <td>近期需要</td>
+          <td class="tag-gap">加工流程里有能力预留，未单独展示告警</td>
+          <td>加工页增加明显提示区</td>
+        </tr>
+        <tr>
+          <td>按本公司历史上架标题自动举例</td>
+          <td>可后排期</td>
+          <td class="tag-miss">无对应界面</td>
+          <td>架构讲解时口头说明</td>
+        </tr>
+        <tr>
+          <td>吊灯等「组合规格」类目的深配演示</td>
+          <td>近期需要</td>
+          <td class="tag-gap">目录有卡片，无专场</td>
+          <td>加工专场加 5 分钟吊灯示例</td>
+        </tr>
+        <tr>
+          <td>定制橱柜等「按尺寸加价」类目深配</td>
+          <td>可后排期</td>
+          <td class="tag-gap">同左</td>
+          <td>同上</td>
+        </tr>
+        <tr>
+          <td>泰国 TikTok、菲律宾 Shopee 真实自动填表</td>
+          <td>近期需要</td>
+          <td class="tag-gap">平台集成页为说明；实填以越南 Shopee 为主</td>
+          <td>多国实测后补发布专场</td>
+        </tr>
+        <tr>
+          <td>印尼等通过开放平台正式对接</td>
+          <td>远期</td>
+          <td class="tag-miss">仅展示配额示例</td>
+          <td>不对客户承诺本期上线</td>
+        </tr>
+        <tr>
+          <td>根据后台流量数据自动换词</td>
+          <td>可后排期</td>
+          <td class="tag-miss">无</td>
+          <td>列入需求池</td>
+        </tr>
+        <tr>
+          <td>订单、采购、仓储、客服、多店防关联</td>
+          <td>不在本产品范围</td>
+          <td class="tag-miss">明确不做</td>
+          <td>讲解时划清边界</td>
+        </tr>
+        <tr>
+          <td>竞品与选品数据真实抓取供货网站</td>
+          <td>架构上近期需要</td>
+          <td class="tag-gap">现为示例数据</td>
+          <td>选品专场说明「正式版接数据服务」</td>
+        </tr>
+        <tr>
+          <td>大模型输出接客户自有密钥后的真实改写</td>
+          <td>上线必备</td>
+          <td class="tag-gap">演示为示例文案</td>
+          <td>说明在设置中配置后即可切换</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="meta" style="margin-top: 24px;">
+    用浏览器打开本文件即可打印或投影。术语：本平台 = 电商助手后台；供货网站 = 选款采集来源；卖货平台 = 上架目标站。
+  </p>
+</body>
+</html>

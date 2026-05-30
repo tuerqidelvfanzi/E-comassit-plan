@@ -18,7 +18,21 @@ export function TemplatesV2Page() {
       title="类目模板"
       desc="A/B/C 品类 SKU 模式与系统 Prompt（目录 Mock + 用户模板 API）"
       milestone="v2.0"
-      actions={<SkuEncodingTip />}
+      actions={
+        <div className="flex flex-wrap gap-2">
+          <Link to="/app/templates/manage?new=1">
+            <Button type="button" size="sm">
+              新建模板
+            </Button>
+          </Link>
+          <Link to="/app/templates/manage">
+            <Button type="button" size="sm" variant="outline">
+              管理模板
+            </Button>
+          </Link>
+          <SkuEncodingTip />
+        </div>
+      }
     >
       <div className="flex flex-wrap gap-2">
         {(['all', 'A', 'B', 'C'] as const).map((m) => (
@@ -63,9 +77,14 @@ export function TemplatesV2Page() {
         <p className="mt-3 text-xs text-muted">
           在工作台选择模板并运行管线。编辑 SKU 配置请使用原有模板表单（设置内可跳转）。
         </p>
-        <Link to="/app/workbench/p1" className="mt-2 inline-block text-sm text-[var(--color-primary)]">
-          打开示例工作台 →
-        </Link>
+        <div className="mt-3 flex flex-wrap gap-3">
+          <Link to="/app/templates/manage" className="text-sm text-[var(--color-primary)]">
+            进入模板编辑器 →
+          </Link>
+          <Link to="/app/workbench/p1" className="text-sm text-[var(--color-primary)]">
+            示例工作台 →
+          </Link>
+        </div>
       </Card>
     </V2Shell>
   );

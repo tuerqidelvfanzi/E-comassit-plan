@@ -12,6 +12,7 @@ import type {
   TeamMember,
   TemplateCatalogItem,
   TargetLocale,
+  TitleOptimizationJob,
   V2Overview,
 } from './types';
 
@@ -86,6 +87,41 @@ const v2ApiHttp = {
   },
   listPipelineRuns(productId: string) {
     return v2Request<PipelineRunV2[]>(`/products/${productId}/pipeline-runs`);
+  },
+  listTitleOptimizationJobs() {
+    return v2Request<TitleOptimizationJob[]>('/title-optimization/jobs');
+  },
+  createTitleOptimizationJob(categoryName: string, tmallProductId: string) {
+    return v2Request<TitleOptimizationJob>('/title-optimization/jobs', {
+      method: 'POST',
+      body: JSON.stringify({ categoryName, tmallProductId }),
+    });
+  },
+  collectTitleSearchTerms(id: string) {
+    return v2Request<TitleOptimizationJob>(`/title-optimization/jobs/${id}/collect-search-terms`, {
+      method: 'POST',
+    });
+  },
+  generateTitleOptimization(id: string) {
+    return v2Request<TitleOptimizationJob>(`/title-optimization/jobs/${id}/generate-title`, {
+      method: 'POST',
+    });
+  },
+  fetchTitleOriginal(id: string) {
+    return v2Request<TitleOptimizationJob>(`/title-optimization/jobs/${id}/fetch-original`, {
+      method: 'POST',
+    });
+  },
+  compareTitleOptimization(id: string) {
+    return v2Request<TitleOptimizationJob>(`/title-optimization/jobs/${id}/compare`, {
+      method: 'POST',
+    });
+  },
+  applyTitleOptimization(id: string, confirmed: boolean) {
+    return v2Request<TitleOptimizationJob>(`/title-optimization/jobs/${id}/apply`, {
+      method: 'POST',
+      body: JSON.stringify({ confirmed }),
+    });
   },
 };
 

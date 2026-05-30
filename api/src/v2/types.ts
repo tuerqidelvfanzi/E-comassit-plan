@@ -182,3 +182,51 @@ export interface InsightsDashboardV2 {
   competitorReports: Array<{ id: string; keyword: string; updatedAt: string }>;
   topFeatures: string[];
 }
+
+/** FR-TO-* 天猫标题优化 V.0530 */
+export type TitleOptimizationStatus =
+  | 'created'
+  | 'search_terms_ready'
+  | 'title_generated'
+  | 'original_fetched'
+  | 'awaiting_confirm'
+  | 'applying'
+  | 'completed'
+  | 'cancelled'
+  | 'failed';
+
+export interface TitleSearchTermRow {
+  keyword: string;
+  metrics: string;
+}
+
+export interface TitleComparison {
+  originalTitle: string;
+  originalScore: string;
+  suggestedTitle: string;
+  suggestedScore: string;
+  wordsToRemove: string[];
+  wordsToAdd: string[];
+  otherSuggestions: string[];
+}
+
+export interface TitleOptimizationJob {
+  id: string;
+  categoryName: string;
+  tmallProductId: string;
+  status: TitleOptimizationStatus;
+  /** 1–7 对应需求文档步骤 */
+  currentStep: number;
+  workerNote?: string;
+  searchTerms?: TitleSearchTermRow[];
+  generatedTitle?: string;
+  originalTitle?: string;
+  originalScore?: string;
+  suggestedTitle?: string;
+  comparison?: TitleComparison;
+  appliedAt?: string;
+  verificationNote?: string;
+  lastError?: string;
+  createdAt: string;
+  updatedAt: string;
+}

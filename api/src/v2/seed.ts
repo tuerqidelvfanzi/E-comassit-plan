@@ -19,8 +19,8 @@ export function seedTemplateCatalog(): TemplateCatalogItem[] {
       category: '服装',
       locales: ['vi-VN', 'th-TH'],
       milestone: 'v2.0',
-      description: '颜色×尺码矩阵、六段 SKU（+B/+H）、白色钩子',
-      skuPreview: 'BF-0001-PR-WH-S+B',
+      description: '颜色×尺码矩阵、五段 SKU、白色钩子',
+      skuPreview: 'BF-0001-PR-WH-S',
     },
     {
       id: 'tpl-kids-a',
@@ -319,6 +319,7 @@ export function buildOverview(metrics: {
       { id: 'cabinet-c', label: 'C 类定制模板', milestone: 'v2.3', ready: true },
       { id: 'openapi', label: 'Open API 适配器', milestone: 'v2.3', ready: true },
       { id: 'team', label: '团队多用户（Mock）', milestone: 'v2.3', ready: true },
+      { id: 'title-optimization', label: '天猫标题优化 7 步', milestone: 'v2.0', ready: true },
     ],
   };
 }

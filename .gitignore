@@ -16,3 +16,9 @@ web/test-results/
 
 # oh-my-mermaid
 .omm/
+
+# 演示讲解 / 调研索引 / 本地核对表（与代码无直接耦合，不入 GitHub）
+docs/DEMO_PRESENTATION_FLOWS.md
+docs/LOCAL_DEMO_FLOW.html
+docs/original-research/
+docs/local/

@@ -4,6 +4,7 @@ import { jwtAuth } from '../middleware/auth.js';
 import { fail, ok } from '../lib/response.js';
 import { getDb } from '../db/index.js';
 import { v2Store } from './store.js';
+import { titleOptimizationStore } from './titleOptimizationStore.js';
 
 export function registerV2Routes(app: Hono) {
   app.get('/v2/overview', jwtAuth, (c) => {
@@ -115,5 +116,67 @@ export function registerV2Routes(app: Hono) {
 
   app.get('/v2/products/:id/pipeline-runs', jwtAuth, (c) => {
     return ok(c, v2Store.listPipelineRuns(c.get('user').id, c.req.param('id')));
+  });
+
+  app.get('/v2/title-optimization/jobs', jwtAuth, (c) => {
+    return ok(c, titleOptimizationStore.list(c.get('user').id));
+  });
+
+  app.post('/v2/title-optimization/jobs', jwtAuth, async (c) => {
+    const body = z
+      .object({
+        categoryName: z.string().min(1),
+        tmallProductId: z.string().min(1),
+      })
+      .safeParse(await c.req.json());
+    if (!body.success) return fail(c, 'INVALID_BODY');
+    const job = titleOptimizationStore.create(
+      c.get('user').id,
+      body.data.categoryName,
+      body.data.tmallProductId,
+    );
+    return ok(c, job, 201);
+  });
+
+  app.get('/v2/title-optimization/jobs/:id', jwtAuth, (c) => {
+    const job = titleOptimizationStore.get(c.get('user').id, c.req.param('id'));
+    if (!job) return fail(c, 'NOT_FOUND', 404, 404);
+    return ok(c, job);
+  });
+
+  app.post('/v2/title-optimization/jobs/:id/collect-search-terms', jwtAuth, (c) => {
+    const job = titleOptimizationStore.collectSearchTerms(c.get('user').id, c.req.param('id'));
+    if (!job) return fail(c, 'NOT_FOUND', 404, 404);
+    return ok(c, job);
+  });
+
+  app.post('/v2/title-optimization/jobs/:id/generate-title', jwtAuth, (c) => {
+    const job = titleOptimizationStore.generateTitle(c.get('user').id, c.req.param('id'));
+    if (!job) return fail(c, 'NOT_FOUND', 404, 404);
+    return ok(c, job);
+  });
+
+  app.post('/v2/title-optimization/jobs/:id/fetch-original', jwtAuth, (c) => {
+    const job = titleOptimizationStore.fetchOriginal(c.get('user').id, c.req.param('id'));
+    if (!job) return fail(c, 'NOT_FOUND', 404, 404);
+    return ok(c, job);
+  });
+
+  app.post('/v2/title-optimization/jobs/:id/compare', jwtAuth, (c) => {
+    const job = titleOptimizationStore.compare(c.get('user').id, c.req.param('id'));
+    if (!job) return fail(c, 'NOT_FOUND', 404, 404);
+    return ok(c, job);
+  });
+
+  app.post('/v2/title-optimization/jobs/:id/apply', jwtAuth, async (c) => {
+    const body = z.object({ confirmed: z.boolean() }).safeParse(await c.req.json());
+    if (!body.success) return fail(c, 'INVALID_BODY');
+    const job = titleOptimizationStore.apply(
+      c.get('user').id,
+      c.req.param('id'),
+      body.data.confirmed,
+    );
+    if (!job) return fail(c, 'NOT_FOUND', 404, 404);
+    return ok(c, job);
   });
 }

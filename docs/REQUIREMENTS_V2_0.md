@@ -311,6 +311,7 @@ flowchart LR
 |------|------|
 | [BUSINESS_FLOW_V2_0.md](./BUSINESS_FLOW_V2_0.md) | 源/处理/写入流程 |
 | [DEMO_V2_0.md](./DEMO_V2_0.md) | 验收演示步骤 |
+| [DEMO_PRESENTATION_FLOWS.md](./DEMO_PRESENTATION_FLOWS.md) | 多场景讲解 / 界面全覆盖 |
 | [SOURCES_V2_0.md](./SOURCES_V2_0.md) | 读了什么、缺什么 |
 | [original-research/README.md](./original-research/README.md) | 本地调研目录索引 |
 | [RESEARCH_V2_ORIGIN.md](./RESEARCH_V2_ORIGIN.md) | 网络调研 |

@@ -1,15 +1,22 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Card, Button, Input, Badge } from '../../components/ui';
 import { V2Shell } from '../components/V2Shell';
 import { validateTitle, countTitleChars, VIETNAM_TITLE_MAX } from '../../lib/listingTitle';
-import { useProduct, useTemplates } from '../../hooks/useAppQueries';
+import { useProduct, useTemplates, useUpdateProduct } from '../../hooks/useAppQueries';
 import {
   useV2PipelineRuns,
   useV2RunPipeline,
   useV2TemplateCatalog,
 } from '../hooks/useV2Queries';
 import type { TargetLocale } from '../types';
+import type { PackageDimensions } from '../../lib/api/types';
+import { InsightsAttachPanel } from '../../components/workbench/InsightsAttachPanel';
+import { CopyEditPanel } from '../../components/workbench/CopyEditPanel';
+import { LogisticsPanel } from '../../components/workbench/LogisticsPanel';
+import { ImageNineGridPanel } from '../../components/workbench/ImageNineGridPanel';
+import { ImageTasksPanel } from '../../components/workbench/ImageTasksPanel';
+import { FabricCheckBanner } from '../../components/workbench/FabricCheckBanner';
 
 const SHOPEE_VN_STEPS = [
   '选择店铺',
@@ -27,6 +34,8 @@ const SHOPEE_VN_STEPS = [
   '确认上架',
 ] as const;
 
+const DEFAULT_PACKAGE: PackageDimensions = { length: 10, width: 5, height: 10 };
+
 export function WorkbenchV2Page() {
   const { id = '' } = useParams();
   const { data: product, isLoading } = useProduct(id);
@@ -34,12 +43,19 @@ export function WorkbenchV2Page() {
   const { data: templates = [] } = useTemplates();
   const { data: runs = [] } = useV2PipelineRuns(id);
   const runPipeline = useV2RunPipeline(id);
+  const updateProduct = useUpdateProduct();
 
   const [locale, setLocale] = useState<TargetLocale>('vi-VN');
   const [templateId, setTemplateId] = useState('tpl-tshirt-a');
   const [adhocPrompt, setAdhocPrompt] = useState('');
   const [selectedOutput, setSelectedOutput] = useState<'exposure' | 'conversion'>('exposure');
   const [editTitle, setEditTitle] = useState('');
+  const [editShortDesc, setEditShortDesc] = useState('');
+  const [editLongDesc, setEditLongDesc] = useState('');
+  const [weightGrams, setWeightGrams] = useState(220);
+  const [packageDims, setPackageDims] = useState<PackageDimensions>(DEFAULT_PACKAGE);
+  const [imageMsg, setImageMsg] = useState('');
+  const [saveMsg, setSaveMsg] = useState('');
   const [vnSteps, setVnSteps] = useState<boolean[]>(() => SHOPEE_VN_STEPS.map(() => false));
 
   const lastRun = runs[0];
@@ -47,12 +63,61 @@ export function WorkbenchV2Page() {
     selectedOutput === 'exposure' ? lastRun?.exposure : lastRun?.conversion;
 
   const displayTitle = editTitle || output?.title || '';
+
+  useEffect(() => {
+    if (!product) return;
+    setEditLongDesc(product.description ?? '');
+    const proc = product.processed;
+    if (proc) {
+      setEditTitle(proc.conversion.title ?? proc.exposure.title ?? product.title);
+      setEditShortDesc(proc.conversion.shortDescription ?? proc.exposure.shortDescription ?? '');
+    }
+  }, [product?.id]);
+
+  useEffect(() => {
+    if (output?.title && !editTitle) setEditTitle(output.title);
+    if (output?.shortDescription) setEditShortDesc(output.shortDescription);
+  }, [output?.title, output?.shortDescription]);
+
   const titleValidation = useMemo(() => {
     if (locale !== 'vi-VN' || !displayTitle) return null;
     return validateTitle(displayTitle);
   }, [locale, displayTitle]);
 
   const checklistFromRun = lastRun?.shopeeVnChecklist;
+
+  async function handleSave() {
+    if (!product) return;
+    await updateProduct.mutateAsync({
+      id: product.id,
+      patch: {
+        description: editLongDesc,
+        processed: product.processed
+          ? {
+              ...product.processed,
+              exposure: {
+                ...product.processed.exposure,
+                title: selectedOutput === 'exposure' ? displayTitle : product.processed.exposure.title,
+                shortDescription:
+                  selectedOutput === 'exposure' ? editShortDesc : product.processed.exposure.shortDescription,
+              },
+              conversion: {
+                ...product.processed.conversion,
+                title: selectedOutput === 'conversion' ? displayTitle : product.processed.conversion.title,
+                shortDescription:
+                  selectedOutput === 'conversion' ? editShortDesc : product.processed.conversion.shortDescription,
+              },
+            }
+          : undefined,
+        attributes: {
+          ...(product.attributes ?? {}),
+          weightGrams,
+          packageDimensions: packageDims,
+        },
+      },
+    });
+    setSaveMsg('已保存草稿（演示）');
+  }
 
   if (isLoading) {
     return (
@@ -76,24 +141,35 @@ export function WorkbenchV2Page() {
   return (
     <V2Shell
       title="处理工作台"
-      desc="处理层：规则段 + AI 段 · 双栏对比 · 越南 20 字 / 六段 SKU"
+      desc="演示完整：洞察挂载 · 文案/违禁 · 9 图 · 物流 · 管线 · 五段 SKU"
       milestone="v2.0"
       actions={
-        <Link to="/app/inbox">
-          <Button type="button" variant="outline" size="sm">
-            采集箱
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" size="sm" onClick={handleSave} disabled={updateProduct.isPending}>
+            保存编辑
           </Button>
-        </Link>
+          <Link to="/app/inbox">
+            <Button type="button" variant="outline" size="sm">
+              采集箱
+            </Button>
+          </Link>
+        </div>
       }
     >
-      <Card className="border-dashed border-[var(--color-primary)]/40 bg-[var(--color-surface)]">
+      {saveMsg ? (
+        <Card className="mb-4 border-[var(--color-primary)]">
+          <p className="text-sm text-[var(--color-primary)]">{saveMsg}</p>
+        </Card>
+      ) : null}
+
+      <FabricCheckBanner product={product} title={displayTitle} description={editLongDesc} />
+
+      <Card className="mt-4 border-dashed border-[var(--color-primary)]/40">
         <p className="text-sm text-muted">
-          <strong className="text-[var(--color-fg)]">处理层说明：</strong>
-          竞品/找同类在源平台（{product.source}）完成；本页对采集箱商品做加工，可引用
-          <Link to="/app/competitors" className="mx-1 text-[var(--color-primary)]">
-            竞品洞察
+          源平台 <strong>{product.source}</strong> · 处理层加工 ·{' '}
+          <Link to="/app/competitors" className="text-[var(--color-primary)]">
+            竞品/找同类
           </Link>
-          后发布至目标市场。
         </p>
       </Card>
 
@@ -107,29 +183,19 @@ export function WorkbenchV2Page() {
               <p className="text-muted">
                 {product.source} · ¥{product.priceCny}
               </p>
-              <a
-                href={product.sourceUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[var(--color-primary)]"
-              >
+              <a href={product.sourceUrl} target="_blank" rel="noreferrer" className="text-[var(--color-primary)]">
                 源链接
               </a>
             </div>
           </div>
         </Card>
-
         <Card>
-          <h2 className="font-medium">处理后（目标市场预览）</h2>
-          {output ? (
-            <div className="mt-3 text-sm">
-              <p className="font-medium">{displayTitle || '—'}</p>
-              <p className="mt-1 text-muted">{output.shortDescription}</p>
-              <p className="mt-2 font-medium">{output.priceLabel}</p>
-            </div>
-          ) : (
-            <p className="mt-3 text-sm text-muted">运行管线后显示</p>
-          )}
+          <h2 className="font-medium">处理后（目标市场）</h2>
+          <div className="mt-3 text-sm">
+            <p className="font-medium">{displayTitle || '—'}</p>
+            <p className="mt-1 text-muted">{editShortDesc || output?.shortDescription || '—'}</p>
+            <p className="mt-2 font-medium">{output?.priceLabel ?? '—'}</p>
+          </div>
         </Card>
       </div>
 
@@ -170,14 +236,15 @@ export function WorkbenchV2Page() {
               </select>
             </label>
             <label>
-              <span className="text-muted">临时 Prompt（模糊段）</span>
-              <Input
-                className="mt-1"
+              <span className="text-muted">临时 Prompt</span>
+              <textarea
+                className="mt-1 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-2 text-sm"
+                rows={3}
                 value={adhocPrompt}
                 onChange={(e) => setAdhocPrompt(e.target.value)}
-                placeholder="仅当前商品生效"
               />
             </label>
+            <InsightsAttachPanel value={adhocPrompt} onChange={setAdhocPrompt} />
           </div>
           <Button
             type="button"
@@ -189,6 +256,7 @@ export function WorkbenchV2Page() {
                 {
                   onSuccess: (res) => {
                     setEditTitle(res.run.exposure.title);
+                    setEditShortDesc(res.run.exposure.shortDescription);
                     if (res.run.shopeeVnChecklist) {
                       setVnSteps(res.run.shopeeVnChecklist.map((s) => s.done));
                     }
@@ -203,7 +271,7 @@ export function WorkbenchV2Page() {
 
         {locale === 'vi-VN' ? (
           <Card>
-            <h2 className="font-medium">越南 Shopee · 13 步清单</h2>
+            <h2 className="font-medium">越南 Shopee · 13 步</h2>
             <ul className="mt-3 max-h-64 space-y-1 overflow-y-auto text-sm">
               {SHOPEE_VN_STEPS.map((label, i) => {
                 const done = checklistFromRun?.[i]?.done ?? vnSteps[i];
@@ -228,12 +296,71 @@ export function WorkbenchV2Page() {
               })}
             </ul>
           </Card>
-        ) : null}
+        ) : (
+          <Card>
+            <h2 className="font-medium">物流（演示）</h2>
+            <div className="mt-3">
+              <LogisticsPanel
+                weightGrams={weightGrams}
+                packageDims={packageDims}
+                onWeight={setWeightGrams}
+                onDims={setPackageDims}
+              />
+            </div>
+          </Card>
+        )}
       </div>
+
+      <Card className="mt-4">
+        <h2 className="font-medium">文案编辑 · 违禁扫描</h2>
+        <div className="mt-3">
+          <CopyEditPanel
+            locale={locale}
+            title={displayTitle}
+            shortDesc={editShortDesc}
+            longDesc={editLongDesc}
+            onTitle={setEditTitle}
+            onShortDesc={setEditShortDesc}
+            onLongDesc={setEditLongDesc}
+          />
+        </div>
+      </Card>
+
+      {locale === 'vi-VN' ? (
+        <Card className="mt-4">
+          <h2 className="font-medium">物流信息</h2>
+          <div className="mt-3">
+            <LogisticsPanel
+              weightGrams={weightGrams}
+              packageDims={packageDims}
+              onWeight={setWeightGrams}
+              onDims={setPackageDims}
+            />
+          </div>
+        </Card>
+      ) : null}
+
+      <Card className="mt-4">
+        <h2 className="font-medium">图片 · 9 槽位</h2>
+        <div className="mt-3">
+          <ImageNineGridPanel product={product} onMessage={setImageMsg} />
+          {imageMsg ? <p className="mt-2 text-xs text-[var(--color-primary)]">{imageMsg}</p> : null}
+        </div>
+      </Card>
+
+      {product ? (
+        <div className="mt-4">
+          <ImageTasksPanel
+            imageUrls={(product.images ?? []).map((i) =>
+              typeof i === 'string' ? i : i.url,
+            )}
+          />
+        </div>
+      ) : null}
 
       {lastRun ? (
         <>
-          <Card>
+          <Card className="mt-4">
             <div className="flex flex-wrap gap-2">
               <Button
                 type="button"
@@ -242,6 +369,7 @@ export function WorkbenchV2Page() {
                 onClick={() => {
                   setSelectedOutput('exposure');
                   setEditTitle(lastRun.exposure.title);
+                  setEditShortDesc(lastRun.exposure.shortDescription);
                 }}
               >
                 高曝光
@@ -253,49 +381,11 @@ export function WorkbenchV2Page() {
                 onClick={() => {
                   setSelectedOutput('conversion');
                   setEditTitle(lastRun.conversion.title);
+                  setEditShortDesc(lastRun.conversion.shortDescription);
                 }}
               >
                 高转化
               </Button>
-            </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div>
-                <p className="text-xs text-muted">标题</p>
-                <Input
-                  className="mt-1"
-                  value={displayTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                />
-                {locale === 'vi-VN' ? (
-                  <p
-                    className={`mt-1 text-xs ${
-                      titleValidation && !titleValidation.ok
-                        ? 'text-red-600'
-                        : 'text-muted'
-                    }`}
-                  >
-                    {countTitleChars(displayTitle)} / {VIETNAM_TITLE_MAX} 字符
-                    {titleValidation?.issues.map((issue) => (
-                      <span key={issue.code} className="ml-2 block">
-                        {issue.message}
-                      </span>
-                    ))}
-                  </p>
-                ) : null}
-              </div>
-              <div>
-                <p className="text-xs text-muted">短描述</p>
-                <p className="mt-1 text-sm">{output?.shortDescription}</p>
-                {locale === 'vi-VN' && output?.shortDescription ? (
-                  <p className="mt-1 text-xs text-muted">
-                    短描述 {countTitleChars(output.shortDescription)} / {VIETNAM_TITLE_MAX} 字
-                  </p>
-                ) : null}
-              </div>
-              <div>
-                <p className="text-xs text-muted">价格展示</p>
-                <p className="mt-1 text-sm font-medium">{output?.priceLabel}</p>
-              </div>
             </div>
             {lastRun.warnings.length > 0 ? (
               <ul className="mt-3 text-xs text-amber-700">
@@ -306,8 +396,8 @@ export function WorkbenchV2Page() {
             ) : null}
           </Card>
 
-          <Card>
-            <h2 className="font-medium">SKU（六段编码 · +B/+H）</h2>
+          <Card className="mt-4">
+            <h2 className="font-medium">SKU（五段 · ADR-001）</h2>
             <table className="mt-2 w-full text-left text-sm">
               <thead>
                 <tr className="text-muted">
@@ -322,13 +412,7 @@ export function WorkbenchV2Page() {
                 {lastRun.skus.map((s) => (
                   <tr key={s.skuCode} className="border-t border-[var(--color-border)]">
                     <td className="py-2 font-mono text-xs">{s.skuCode}</td>
-                    <td className="py-2">
-                      {s.printVariant ? (
-                        <Badge tone="ok">+{s.printVariant}</Badge>
-                      ) : (
-                        '—'
-                      )}
-                    </td>
+                    <td className="py-2">{s.printVariant ? <Badge tone="ok">+{s.printVariant}</Badge> : '—'}</td>
                     <td className="py-2">{s.color}</td>
                     <td className="py-2">{s.size}</td>
                     <td className="py-2">
@@ -339,37 +423,23 @@ export function WorkbenchV2Page() {
               </tbody>
             </table>
           </Card>
-
-          <Card>
-            <h2 className="font-medium">图片处理（9 张策略 · Mock）</h2>
-            <p className="mt-1 text-xs text-muted">主图白底 + 模特正面；共 9 张槽位（演示未展开网格）</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              <Button type="button" size="sm" variant="outline">
-                消除笔
-              </Button>
-              <Button type="button" size="sm" variant="outline">
-                翻译覆盖（越南语）
-              </Button>
-              <Badge tone="warn">Mock：可接 v1 image-jobs</Badge>
-            </div>
-          </Card>
-
-          <div className="flex gap-2">
-            <Link to="/app/publish">
-              <Button type="button">前往发布中心</Button>
-            </Link>
-            <Link to="/app/competitors">
-              <Button type="button" variant="outline">
-                查看源平台洞察
-              </Button>
-            </Link>
-          </div>
         </>
       ) : (
-        <Card>
-          <p className="text-sm text-muted">运行管线后展示双指标、六段 SKU 与越南清单</p>
+        <Card className="mt-4">
+          <p className="text-sm text-muted">运行管线后展示 SKU 表</p>
         </Card>
       )}
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Link to="/app/publish">
+          <Button type="button">发布中心（生成填表）</Button>
+        </Link>
+        <Link to="/app/competitors">
+          <Button type="button" variant="outline">
+            竞品洞察
+          </Button>
+        </Link>
+      </div>
     </V2Shell>
   );
 }

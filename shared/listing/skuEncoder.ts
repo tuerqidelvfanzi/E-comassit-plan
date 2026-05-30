@@ -1,9 +1,9 @@
 /**
- * 服装-T恤 SKU 六段编码（需求文档：谷歌报告2 + 上品实操PPT）
- * 格式：{PREFIX}-{SEQUENCE}-{SIDE}-{COLOR}-{SIZE}+{后缀}
- * 示例：BF-0001-PR-WH-S+B (白底黑花) / BF-0001-PR-WH-S-H (黑底白花)
- * +B = 白底黑花 (White base + Black print)
- * +H = 黑底白花 (Black base + White print)
+ * 服装-T恤 SKU 五段编码（PRD v2.0 / ADR-001）
+ * 格式：{PREFIX}-{SEQUENCE:4}-{SIDE}-{COLOR}-{SIZE}
+ * 示例：BF-0001-PR-WH-S
+ * 白色钩子：{PREFIX}-9999-P-WH-{SIZE}
+ * 印花后缀 +B/+H：v2.1 可选（attributes 或 encodeSku printVariant），v2.0 主码不含后缀
  */
 
 export const SKU_DEFAULT_PREFIX = 'BF';
@@ -76,7 +76,7 @@ export type ParsedSku = {
   isDummyHook: boolean;
 };
 
-/** 六段格式正则：支持 +B / +H 后缀 */
+/** 五段主码；兼容解析历史 +B/+H 后缀（v2.1） */
 const SKU_PATTERN = /^([A-Z0-9]+)-(\d{4})-(P|R|PR)-([A-Z]{2})-([A-Z0-9]+)(\+[BH])?$/;
 
 export function resolveColorCode(color: string): string | undefined {

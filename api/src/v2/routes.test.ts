@@ -10,5 +10,6 @@ describe('v2 mock routes', () => {
     const paths = app.routes.map((r) => r.path);
     expect(paths).toContain('/v2/overview');
     expect(paths).toContain('/v2/competitor-jobs');
+    expect(paths).toContain('/v2/title-optimization/jobs');
   });
 });

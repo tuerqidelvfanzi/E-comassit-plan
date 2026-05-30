@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Card, Button, Input } from '../../components/ui';
+import { BANNED_TERMS } from '../../lib/bannedTerms';
 import { V2Shell } from '../components/V2Shell';
+import { PlatformRulesMatrix } from '../components/PlatformRulesMatrix';
 import { useRules } from '../../hooks/useAppQueries';
 import { api } from '../../lib/api';
 import { useQueryClient } from '@tanstack/react-query';
@@ -63,6 +65,21 @@ export function RulesV2Page() {
           </tbody>
         </table>
       </Card>
+
+      <Card>
+        <h2 className="font-medium">违禁词库（F-P-R05 · 演示）</h2>
+        <p className="mt-1 text-xs text-muted">工作台文案区实时扫描；完整列表如下</p>
+        <p className="mt-2 flex flex-wrap gap-1 text-xs">
+          {BANNED_TERMS.slice(0, 12).map((t) => (
+            <span key={t} className="rounded bg-[var(--color-muted)] px-1.5 py-0.5">
+              {t}
+            </span>
+          ))}
+          <span className="text-muted">…共 {BANNED_TERMS.length} 项</span>
+        </p>
+      </Card>
+
+      <PlatformRulesMatrix />
 
       <Card>
         <h2 className="font-medium">默认市场倍率（Mock 参考）</h2>

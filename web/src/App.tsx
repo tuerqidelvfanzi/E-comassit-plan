@@ -10,8 +10,10 @@ import {
   BatchCollectV2Page,
   WorkbenchV2Page,
   TemplatesV2Page,
+  TemplatesManageV2Page,
   RulesV2Page,
   InsightsV2Page,
+  TitleOptimizationPage,
   PublishV2Page,
   IntegrationsPage,
   TeamPage,
@@ -36,8 +38,10 @@ export default function App() {
         <Route path="batch-collect" element={<BatchCollectV2Page />} />
         <Route path="workbench/:id" element={<WorkbenchV2Page />} />
         <Route path="templates" element={<TemplatesV2Page />} />
+        <Route path="templates/manage" element={<TemplatesManageV2Page />} />
         <Route path="rules" element={<RulesV2Page />} />
         <Route path="insights" element={<InsightsV2Page />} />
+        <Route path="title-optimization" element={<TitleOptimizationPage />} />
         <Route path="publish" element={<PublishV2Page />} />
         <Route path="integrations" element={<IntegrationsPage />} />
         <Route path="team" element={<TeamPage />} />

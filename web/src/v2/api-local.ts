@@ -10,6 +10,9 @@ import type {
   TargetLocale,
   TeamMember,
   TemplateCatalogItem,
+  TitleComparison,
+  TitleOptimizationJob,
+  TitleSearchTermRow,
   V2Overview,
 } from './types';
 
@@ -77,6 +80,7 @@ let competitors: CompetitorJob[] = [
 
 let localRuns: PipelineRunV2[] = [];
 let linkJobs: LinkCollectJob[] = [];
+let titleJobs: TitleOptimizationJob[] = [];
 let publishTasks: PublishTaskV2[] = [
   {
     id: 'pub-l1',
@@ -109,6 +113,7 @@ export const v2ApiLocal = {
         { id: 'pipeline', label: 'AI 管线 Mock', milestone: 'v2.0', ready: true },
         { id: 'competitor', label: '竞品分析', milestone: 'v2.1', ready: true },
         { id: 'openapi', label: 'Open API', milestone: 'v2.3', ready: true },
+        { id: 'title-optimization', label: '天猫标题优化 7 步', milestone: 'v2.0', ready: true },
       ],
     };
   },
@@ -270,18 +275,16 @@ export const v2ApiLocal = {
       },
       skus: [
         {
-          skuCode: 'BF-0001-PR-WH-S+B',
+          skuCode: 'BF-0001-PR-WH-S',
           color: 'WH',
           size: 'S',
-          printVariant: 'B',
           price: 400,
           stock: 50,
         },
         {
-          skuCode: 'BF-0002-PR-BK-M+H',
+          skuCode: 'BF-0002-PR-BK-M',
           color: 'BK',
           size: 'M',
-          printVariant: 'H',
           price: 400,
           stock: 50,
         },
@@ -303,7 +306,101 @@ export const v2ApiLocal = {
     await delay();
     return localRuns.filter((r) => r.productId === productId);
   },
+  async listTitleOptimizationJobs() {
+    await delay();
+    return titleJobs;
+  },
+  async createTitleOptimizationJob(categoryName: string, tmallProductId: string) {
+    await delay();
+    const now = new Date().toISOString();
+    const job: TitleOptimizationJob = {
+      id: `tto-${Date.now()}`,
+      categoryName,
+      tmallProductId,
+      status: 'created',
+      currentStep: 1,
+      workerNote: '本地 Mock：正式环境由 Worker 连接生意参谋与天猫卖家中心。',
+      createdAt: now,
+      updatedAt: now,
+    };
+    titleJobs = [job, ...titleJobs];
+    return job;
+  },
+  async collectTitleSearchTerms(id: string) {
+    await delay(600);
+    const job = titleJobs.find((j) => j.id === id);
+    if (!job) throw new Error('NOT_FOUND');
+    job.searchTerms = localMockSearchTerms(job.categoryName);
+    job.status = 'search_terms_ready';
+    job.currentStep = 2;
+    job.updatedAt = new Date().toISOString();
+    return job;
+  },
+  async generateTitleOptimization(id: string) {
+    await delay(800);
+    const job = titleJobs.find((j) => j.id === id);
+    if (!job) throw new Error('NOT_FOUND');
+    if (!job.searchTerms?.length) job.searchTerms = localMockSearchTerms(job.categoryName);
+    job.generatedTitle = `${job.categoryName}${job.searchTerms[0]?.keyword ?? ''}家用节能`;
+    job.status = 'title_generated';
+    job.currentStep = 3;
+    job.updatedAt = new Date().toISOString();
+    return job;
+  },
+  async fetchTitleOriginal(id: string) {
+    await delay(500);
+    const job = titleJobs.find((j) => j.id === id);
+    if (!job) throw new Error('NOT_FOUND');
+    job.originalTitle = `【厂家直销】${job.categoryName}包邮`;
+    job.originalScore = '人气分 3.2万';
+    job.status = 'original_fetched';
+    job.currentStep = 4;
+    job.updatedAt = new Date().toISOString();
+    return job;
+  },
+  async compareTitleOptimization(id: string) {
+    await delay(500);
+    const job = titleJobs.find((j) => j.id === id);
+    if (!job) throw new Error('NOT_FOUND');
+    const comparison: TitleComparison = {
+      originalTitle: job.originalTitle ?? '原标题',
+      originalScore: '人气分 3.2万',
+      suggestedTitle: job.generatedTitle ?? '建议标题',
+      suggestedScore: '人气分 5.8万（预估）',
+      wordsToRemove: ['包邮', '厂家直销'],
+      wordsToAdd: ['静音', '节能'],
+      otherSuggestions: ['核心词前置', '删除促销承诺词'],
+    };
+    job.comparison = comparison;
+    job.status = 'awaiting_confirm';
+    job.currentStep = 5;
+    job.updatedAt = new Date().toISOString();
+    return job;
+  },
+  async applyTitleOptimization(id: string, confirmed: boolean) {
+    await delay(700);
+    const job = titleJobs.find((j) => j.id === id);
+    if (!job) throw new Error('NOT_FOUND');
+    if (!confirmed) {
+      job.status = 'cancelled';
+      job.updatedAt = new Date().toISOString();
+      return job;
+    }
+    job.status = 'completed';
+    job.currentStep = 7;
+    job.appliedAt = new Date().toISOString();
+    job.verificationNote = '本地 Mock：已模拟天猫后台标题更换成功。';
+    job.updatedAt = new Date().toISOString();
+    return job;
+  },
 };
+
+function localMockSearchTerms(categoryName: string): TitleSearchTermRow[] {
+  return [
+    { keyword: `${categoryName} 静音`, metrics: '搜索人气 12.8万 · 7天' },
+    { keyword: `${categoryName} 家用`, metrics: '搜索人气 9.2万 · 7天' },
+  ];
+}
 
 function keywordSlice(k: string) {
   return k.slice(0, 4) || '热词';

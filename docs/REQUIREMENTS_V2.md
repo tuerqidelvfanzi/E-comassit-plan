@@ -34,6 +34,7 @@
 | [BEST_PRACTICES_RESEARCH.md](./BEST_PRACTICES_RESEARCH.md) | 行业调研 |
 | [DEEP_RESEARCH_V2.md](./DEEP_RESEARCH_V2.md) | 行业 ERP 对标与平台规则 |
 | [requirements-tracker/](./requirements-tracker/) | 字段/UI 核对（随实现更新） |
+| [TITLE_OPTIMIZATION_REQUIREMENTS.md](./TITLE_OPTIMIZATION_REQUIREMENTS.md) | 天猫标题优化7步流程（采集→生成→对比→更换） |
 
 ### 0.3 术语
 
@@ -438,7 +439,46 @@ draft → pending → filling → completed | failed
 
 ---
 
-### 5.6 规则库与设置
+### 5.6 标题优化（天猫 V.0530）
+
+> 详见 [TITLE_OPTIMIZATION_REQUIREMENTS.md](./TITLE_OPTIMIZATION_REQUIREMENTS.md)；以下为 v2.0 集成要点。
+
+#### FR-TO-01 搜索词采集（P1）
+
+- 模拟登录天猫"生意参谋" → 市场 → 搜索排行 → 指定类目 → 7天数据。
+- 输出：搜索词 + 统计值，持久化供标题生成使用。
+- 技术：Playwright Worker；失败可降级为手工导入 CSV。
+
+#### FR-TO-02 标题生成（P0）
+
+- 输入：搜索词排行 + 系统 Prompt（类目风格）+ 商品原始信息。
+- LLM 生成优化标题，输出结构化 JSON（含评分预估）。
+- 与 §5.3 FR-P-05 标题规则联动：越南 ≤20 字、泰国 ≤220 字。
+
+#### FR-TO-03 标题对比分析（P0）
+
+- 对比原始标题 vs 建议标题，给出：
+  - 删除词 / 加入词
+  - 人气分预估
+  - 改进建议列表
+- UI：双栏对比展示（原始 | 建议），支持人工微调。
+
+#### FR-TO-04 标题更换（P0）
+
+- 确认对话框（步骤六）→ 用户授权后执行。
+- 操作路径：天猫商家后台 → 商品 → 填写商品ID → 悬停编辑 → 提交。
+- 技术：Playwright Worker；选择器映射表独立维护。
+- 验证：每次修改后截图 + 文本读取确认成功。
+
+#### FR-TO-05 页面结构探索与试错（P2）
+
+- 自动探索：chrome-devtools 观察页面结构，定位编辑入口。
+- 试错学习：失败时调整选择器、触发事件、编辑模式入口。
+- 沉淀复盘：生成"精准操作指令"供后续复用。
+
+---
+
+### 5.7 规则库与设置
 
 #### FR-R-01 规则库（P1）
 
@@ -613,6 +653,7 @@ draft → pending → filling → completed | failed
 | FR-C-* | 采集 |
 | FR-I-* | 洞察/竞品 |
 | FR-P-* | 处理 |
+| FR-TO-* | 标题优化（天猫） |
 | FR-T-* | 模板 |
 | FR-U-* | 发布 |
 | FR-R-* / FR-S-* | 规则/设置 |

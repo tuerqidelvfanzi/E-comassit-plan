@@ -58,7 +58,7 @@ const COLOR_TIPS = 'WH=白色(White), BK=黑色(Black), RD=红色(Red), BL=蓝�
 // Hook配置tips
 const HOOK_TIPS = '白色钩子用于单款式商品，生成固定SKU如"BF-9999-P-WH-S"，价格400/库存5/重量220g';
 
-export function TemplatesPage() {
+export function TemplatesPage({ embedded = false }: { embedded?: boolean }) {
   const { data: templates = [], isLoading } = useTemplates();
   const qc = useQueryClient();
   const [editing, setEditing] = useState<TemplateItem | null>(null);
@@ -161,17 +161,23 @@ export function TemplatesPage() {
     });
   };
 
+  const createButton = (
+    <Button id="tpl-create-trigger" type="button" onClick={createNewTemplate}>
+      + 新建模板
+    </Button>
+  );
+
   return (
     <>
-      <PageHeader
-        title="类目模板"
-        desc="累积式类目 Prompt / SKU编码规则"
-        action={
-          <Button onClick={createNewTemplate}>
-            + 新建模板
-          </Button>
-        }
-      />
+      {embedded ? (
+        <div className="mb-4 flex justify-end">{createButton}</div>
+      ) : (
+        <PageHeader
+          title="类目模板"
+          desc="累积式类目 Prompt / SKU编码规则"
+          action={createButton}
+        />
+      )}
 
       {/* 模板编辑表单 */}
       {editing ? (
