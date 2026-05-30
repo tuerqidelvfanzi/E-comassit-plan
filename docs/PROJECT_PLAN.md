@@ -1,5 +1,6 @@
 # 电商助手（大航海）— 项目规划
 
+> **v2 功能需求**以 [REQUIREMENTS_V2.md](./REQUIREMENTS_V2.md) 为准；本文保留 v0.1 里程碑与会议背景。  
 > 技术底座：`frontend-stack-reference-pack`（React 19 + Vite 6 + Tailwind v4 + shadcn + React Query + Zustand）  
 > UI 参考：https://psa-b6i.pages.dev/  
 > 版本：v0.1 规划稿 · 2026-05-29

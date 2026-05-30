@@ -1,7 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { Package, LogOut } from 'lucide-react';
 import { PRODUCT_NAME } from '../lib/brand';
-import { navItems } from '../lib/mock';
+import { v2NavItems } from '../v2/nav';
 import { useAuth } from '../lib/auth';
 import { Button } from './ui';
 import { SettingsSectionBoundary } from './SettingsSectionBoundary';
@@ -23,7 +23,7 @@ export function AppLayout() {
           <span className="font-semibold">{PRODUCT_NAME}</span>
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-3">
-          {navItems.map((item) => (
+          {v2NavItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -36,7 +36,14 @@ export function AppLayout() {
                 }`
               }
             >
-              {item.label}
+              <span className="flex items-center justify-between gap-2">
+                {item.label}
+                {item.badge ? (
+                  <span className="rounded bg-[var(--color-muted)] px-1 text-[10px] text-muted">
+                    {item.badge}
+                  </span>
+                ) : null}
+              </span>
             </NavLink>
           ))}
         </nav>

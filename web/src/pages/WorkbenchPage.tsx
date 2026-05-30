@@ -252,6 +252,7 @@ export function WorkbenchPage() {
             title: editingTitle,
             shortDescription: editingShortDesc,
           },
+          ranAt: processed.ranAt,
         }
       : undefined;
 

@@ -24,7 +24,7 @@ docs/requirements-tracker/
 
 | 文档名称 | 核心发现 |
 |----------|----------|
-| 谷歌报告1.html | SKU编码需要6段（含印花后缀+B/+H） |
+| 谷歌报告1.html | SKU 印花后缀 +B/+H — **v2 见 REQUIREMENTS_V2 ADR-001（五段为主，六段延后）** |
 | 谷歌报告2.html | 需要双栏对比UI、AI面料检测 |
 | 上品实操PPT.pptx | 菲律宾固定500PHP、包裹尺寸10-5-10 |
 | 越南SHOPEE编品教程.pptx | 越南站13步流程、图片9张要求 |

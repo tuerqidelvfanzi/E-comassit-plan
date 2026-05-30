@@ -1,0 +1,12 @@
+export { DashboardV2Page } from './DashboardV2Page';
+export { CompetitorsPage } from './CompetitorsPage';
+export { InboxV2Page } from './InboxV2Page';
+export { LinkCollectPage } from './LinkCollectPage';
+export { BatchCollectV2Page } from './BatchCollectV2Page';
+export { WorkbenchV2Page } from './WorkbenchV2Page';
+export { TemplatesV2Page } from './TemplatesV2Page';
+export { RulesV2Page } from './RulesV2Page';
+export { InsightsV2Page } from './InsightsV2Page';
+export { PublishV2Page } from './PublishV2Page';
+export { IntegrationsPage } from './IntegrationsPage';
+export { TeamPage } from './TeamPage';

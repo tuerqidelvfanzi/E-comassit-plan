@@ -1,15 +1,21 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppLayout } from './components/AppLayout';
 import { LoginPage } from './pages/LoginPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { InboxPage } from './pages/InboxPage';
-import { WorkbenchPage } from './pages/WorkbenchPage';
-import { TemplatesPage } from './pages/TemplatesPage';
-import { RulesPage } from './pages/RulesPage';
-import { InsightsPage } from './pages/InsightsPage';
-import { PublishPage } from './pages/PublishPage';
 import { SettingsPage } from './pages/SettingsPage';
-import { BatchCollectPage } from './pages/BatchCollectPage';
+import {
+  DashboardV2Page,
+  CompetitorsPage,
+  InboxV2Page,
+  LinkCollectPage,
+  BatchCollectV2Page,
+  WorkbenchV2Page,
+  TemplatesV2Page,
+  RulesV2Page,
+  InsightsV2Page,
+  PublishV2Page,
+  IntegrationsPage,
+  TeamPage,
+} from './v2/pages';
 import { useAuth } from './lib/auth';
 
 export default function App() {
@@ -23,14 +29,18 @@ export default function App() {
         path="/app"
         element={isLoggedIn ? <AppLayout /> : <Navigate to="/login" replace />}
       >
-        <Route index element={<DashboardPage />} />
-        <Route path="inbox" element={<InboxPage />} />
-        <Route path="batch-collect" element={<BatchCollectPage />} />
-        <Route path="workbench/:id" element={<WorkbenchPage />} />
-        <Route path="templates" element={<TemplatesPage />} />
-        <Route path="rules" element={<RulesPage />} />
-        <Route path="insights" element={<InsightsPage />} />
-        <Route path="publish" element={<PublishPage />} />
+        <Route index element={<DashboardV2Page />} />
+        <Route path="competitors" element={<CompetitorsPage />} />
+        <Route path="inbox" element={<InboxV2Page />} />
+        <Route path="link-collect" element={<LinkCollectPage />} />
+        <Route path="batch-collect" element={<BatchCollectV2Page />} />
+        <Route path="workbench/:id" element={<WorkbenchV2Page />} />
+        <Route path="templates" element={<TemplatesV2Page />} />
+        <Route path="rules" element={<RulesV2Page />} />
+        <Route path="insights" element={<InsightsV2Page />} />
+        <Route path="publish" element={<PublishV2Page />} />
+        <Route path="integrations" element={<IntegrationsPage />} />
+        <Route path="team" element={<TeamPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
       <Route path="*" element={<Navigate to={isLoggedIn ? '/app' : '/login'} replace />} />

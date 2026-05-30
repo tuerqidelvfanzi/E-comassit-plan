@@ -30,6 +30,7 @@ import {
 } from './services/publishTasks.js';
 import { createImageJob, getImageJob, listImageJobs } from './services/imageJobs.js';
 import { encodeSku, encodeDummyHookSku } from './domain/listing.js';
+import { registerV2Routes } from './v2/routes.js';
 
 const app = new Hono().basePath(API_PREFIX);
 
@@ -653,5 +654,7 @@ app.get('/dashboard/metrics', jwtAuth, (c) => {
     publishedCount: map.published ?? 0,
   });
 });
+
+registerV2Routes(app);
 
 export { app };
