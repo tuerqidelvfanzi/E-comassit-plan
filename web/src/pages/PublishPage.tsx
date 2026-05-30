@@ -148,6 +148,41 @@ export function PublishPage() {
         </div>
       </Card>
 
+      {/* 越南Shopee 13步流程 */}
+      <Card className="mb-6 border-orange-200 bg-orange-50/50">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-medium text-orange-700">🇻🇳 越南Shopee上品13步流程</h3>
+          <Badge tone="warn">Shopee越南站</Badge>
+        </div>
+        <div className="grid gap-2 md:grid-cols-4 lg:grid-cols-7 text-xs">
+          {[
+            { step: 1, title: '下载安装', desc: '店八方应用' },
+            { step: 2, title: '点击上货', desc: '进入采集箱' },
+            { step: 3, title: '编辑产品', desc: '进入链接' },
+            { step: 4, title: '编辑标题', desc: '≤20字符' },
+            { step: 5, title: '简易描述', desc: '删除违禁词' },
+            { step: 6, title: '详细描述', desc: '优化文案' },
+            { step: 7, title: '选择类目', desc: '正确类目' },
+            { step: 8, title: '编辑SKU', desc: '×3.5倍' },
+            { step: 9, title: '编辑图片', desc: '9张1:1' },
+            { step: 10, title: '编辑物流', desc: '10-5-10' },
+            { step: 11, title: '保存越南', desc: '保存修改' },
+            { step: 12, title: '一键翻译', desc: '越南语' },
+            { step: 13, title: '发布产品', desc: '完成上架' },
+          ].map((item) => (
+            <div key={item.step} className="flex items-start gap-2 p-2 bg-white rounded border border-orange-100">
+              <div className="w-5 h-5 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+                {item.step}
+              </div>
+              <div>
+                <p className="font-medium text-orange-800">{item.title}</p>
+                <p className="text-orange-500">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
       {/* 平台选择和操作 */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* 平台列表 */}

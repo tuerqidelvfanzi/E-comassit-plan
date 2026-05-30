@@ -731,17 +731,49 @@ export function WorkbenchPage() {
       {/* 图片处理区 */}
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <Card>
-          <h3 className="text-sm font-medium text-muted">主图 ({Array.isArray(p.images) ? p.images.length : 0})</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-muted">主图 ({Array.isArray(p.images) ? p.images.length : 0})</h3>
+            <span className="text-xs text-muted">越南站需9张 1:1 (800×800px)</span>
+          </div>
           <div className="mt-2 flex flex-wrap gap-2">
             {(Array.isArray(p.images) ? p.images : [p.thumb]).slice(0, 9).map((img, idx) => {
               const url = typeof img === 'string' ? img : img.url;
+              const isProcessed = (typeof img === 'object' && img?.status === 'processed') || false;
+              const hasWatermark = typeof img === 'object' && img?.hasWatermark;
               return (
-                <div key={idx} className="relative">
+                <div key={idx} className="relative group">
                   <img src={url} alt="" className="h-20 w-20 rounded object-cover" />
-                  {idx < 9 && <span className="absolute -top-1 -left-1 text-xs bg-[var(--color-primary)] text-white rounded-full w-4 h-4 flex items-center justify-center">{idx + 1}</span>}
+                  {idx < 9 && (
+                    <span className="absolute -top-1 -left-1 text-xs bg-[var(--color-primary)] text-white rounded-full w-4 h-4 flex items-center justify-center">
+                      {idx + 1}
+                    </span>
+                  )}
+                  {/* 状态指示器 */}
+                  {hasWatermark && (
+                    <span className="absolute -bottom-1 -right-1 text-xs bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center" title="含水印">
+                      💧
+                    </span>
+                  )}
+                  {isProcessed && (
+                    <span className="absolute -bottom-1 -right-1 text-xs bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center" title="已处理">
+                      ✓
+                    </span>
+                  )}
+                  {/* 尺寸提示 */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none">
+                    1:1 正方形 · 越南站需9张
+                  </div>
                 </div>
               );
             })}
+            {/* 填充空白格 */}
+            {Math.max(0, 9 - (Array.isArray(p.images) ? p.images.length : 1)) > 0 && (
+              Array.from({ length: Math.min(9, Math.max(0, 9 - (Array.isArray(p.images) ? p.images.length : 1))) }).map((_, i) => (
+                <div key={`empty-${i}`} className="h-20 w-20 rounded border-2 border-dashed border-muted flex items-center justify-center">
+                  <span className="text-muted text-xs">待上传</span>
+                </div>
+              ))
+            )}
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button variant="outline" onClick={handleWatermark}>
@@ -762,10 +794,39 @@ export function WorkbenchPage() {
                 }
               }}
             >
-              📏 图片放大
+              📏 图片放大 1:1
+            </Button>
+            <Button
+              variant="outline"
+              onClick={async () => {
+                try {
+                  await api.createImageJob(p.id, ['scan_text']);
+                  setImageMsg('正在检测中文字体残留...');
+                } catch {
+                  setImageMsg('检测失败');
+                }
+              }}
+            >
+              🔍 检测中文字体
             </Button>
           </div>
-          {imageMsg ? <p className="mt-2 text-xs text-[var(--color-primary)]">{imageMsg}</p> : null}
+          {imageMsg ? (
+            <div className={`mt-2 p-2 rounded text-xs ${imageMsg.includes('失败') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+              {imageMsg}
+            </div>
+          ) : null}
+          {/* 图片处理提示 */}
+          <div className="mt-3 p-2 bg-blue-50 rounded text-xs text-blue-700">
+            <p className="font-medium">📋 越南Shopee图片处理流程：</p>
+            <ol className="mt-1 space-y-0.5 text-blue-600">
+              <li>1. 挑选前9张图片</li>
+              <li>2. 修改尺寸为1:1（800×800px）</li>
+              <li>3. 用消除笔P掉敏感内容</li>
+              <li>4. 中→越图片翻译</li>
+              <li>5. 手动调整译图</li>
+              <li>6. 检查中文字体残留</li>
+            </ol>
+          </div>
         </Card>
         <Card>
           <h3 className="text-sm font-medium text-muted">AI生成结果</h3>

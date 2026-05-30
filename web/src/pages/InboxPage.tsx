@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PageHeader, Card, Badge, Button, Input } from '../components/ui';
 import { importCollectFromEncoded } from '../lib/collectImport';
@@ -9,6 +9,7 @@ import {
   useProducts,
   useRunPipeline,
 } from '../hooks/useAppQueries';
+import { api } from '../lib/api';
 import type { ProductStatus } from '../lib/api/types';
 
 const statusLabel: Record<ProductStatus, string> = {
@@ -34,10 +35,70 @@ export function InboxPage() {
   const [importMsg, setImportMsg] = useState('');
   const [filter, setFilter] = useState<ProductStatus | 'all'>('all');
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 筛选状态
   const [sourceFilter, setSourceFilter] = useState('all');
   const [keywordFilter, setKeywordFilter] = useState('');
+
+  // 处理图片上传
+  const handleImageUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const validFiles = Array.from(files).filter(f => validTypes.includes(f.type));
+
+    if (validFiles.length === 0) {
+      setImportMsg('请上传 JPG/PNG/WebP 格式图片');
+      return;
+    }
+
+    setUploading(true);
+    setUploadProgress(0);
+
+    try {
+      for (let i = 0; i < validFiles.length; i++) {
+        const file = validFiles[i];
+        const reader = new FileReader();
+
+        await new Promise<void>((resolve, reject) => {
+          reader.onload = async (e) => {
+            try {
+              const base64 = e.target?.result as string;
+              // 创建商品（简化版：使用文件名作为标题）
+              const title = file.name.replace(/\.[^/.]+$/, '').slice(0, 50);
+              await api.createProduct({
+                title,
+                source: 'upload',
+                sourceUrl: '',
+                priceCny: 0,
+                thumb: base64,
+                images: [base64],
+                targetLocale: 'vi-VN',
+              });
+              setUploadProgress(Math.round(((i + 1) / validFiles.length) * 100));
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
+          };
+          reader.onerror = () => reject(new Error('读取文件失败'));
+          reader.readAsDataURL(file);
+        });
+      }
+
+      invalidate();
+      setImportMsg(`成功上传 ${validFiles.length} 张图片`);
+    } catch (err) {
+      setImportMsg(`上传失败: ${err instanceof Error ? err.message : '未知错误'}`);
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
@@ -117,9 +178,25 @@ export function InboxPage() {
     <>
       <PageHeader
         title="采集箱"
-        desc="插件采集 / 链接采集 → 编辑 → 运行管线"
+        desc="插件采集 / 链接采集 / 图片上传 → 编辑 → 运行管线"
         action={
           <div className="flex flex-wrap gap-2">
+            {/* 图片上传按钮 */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              className="hidden"
+              onChange={(e) => handleImageUpload(e.target.files)}
+            />
+            <Button
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              {uploading ? `上传中 ${uploadProgress}%` : '📤 上传图片'}
+            </Button>
             <Button variant="outline" disabled={pipelineMut.isPending} onClick={batchProcess}>
               {pipelineMut.isPending ? '处理中…' : '批量处理'}
             </Button>
@@ -247,6 +324,8 @@ export function InboxPage() {
                 <th className="p-3">商品</th>
                 <th className="p-3">来源</th>
                 <th className="p-3">进价</th>
+                <th className="p-3">GMV</th>
+                <th className="p-3">CTR</th>
                 <th className="p-3">SKU数</th>
                 <th className="p-3">图片数</th>
                 <th className="p-3">采集时间</th>
@@ -278,6 +357,24 @@ export function InboxPage() {
                     <Badge tone="default">{p.source}</Badge>
                   </td>
                   <td className="p-3">¥{p.priceCny}</td>
+                  <td className="p-3 text-center">
+                    {/* GMV字段 - 从竞品数据获取 */}
+                    {(p as any).gmv ? (
+                      <span className="text-green-600 font-medium">${(p as any).gmv}</span>
+                    ) : (
+                      <span className="text-muted">-</span>
+                    )}
+                  </td>
+                  <td className="p-3 text-center">
+                    {/* CTR字段 - 从竞品数据获取 */}
+                    {(p as any).ctr ? (
+                      <span className={`font-medium ${(p as any).ctr > 5 ? 'text-green-600' : 'text-orange-500'}`}>
+                        {(p as any).ctr}%
+                      </span>
+                    ) : (
+                      <span className="text-muted">-</span>
+                    )}
+                  </td>
                   <td className="p-3 text-center">{p.skuCount ?? p.skus?.length ?? '-'}</td>
                   <td className="p-3 text-center">{p.imageCount ?? p.images?.length ?? '-'}</td>
                   <td className="p-3 text-xs text-muted">
