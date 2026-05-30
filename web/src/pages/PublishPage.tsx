@@ -35,6 +35,19 @@ export function PublishPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.publish }),
   });
 
+  const prepareMut = useMutation({
+    mutationFn: (id: string) => api.preparePublishTask(id),
+    onSuccess: (data) => {
+      qc.invalidateQueries({ queryKey: queryKeys.publish });
+      if (data.ok) {
+        alert(data.fillInstructions ?? '已生成填表数据，请在插件中填入草稿');
+      } else {
+        alert(`校验未通过：${data.validation.issues.join('；')}`);
+      }
+    },
+    onError: () => alert('生成填表数据失败'),
+  });
+
   return (
     <>
       <PageHeader
@@ -60,6 +73,7 @@ export function PublishPage() {
               <th className="p-3">平台</th>
               <th className="p-3">商品</th>
               <th className="p-3">状态</th>
+              <th className="p-3">校验</th>
               <th className="p-3">操作</th>
             </tr>
           </thead>
@@ -71,7 +85,17 @@ export function PublishPage() {
                 <td className="p-3">
                   <Badge tone={t.status === 'completed' ? 'ok' : 'warn'}>{t.status}</Badge>
                 </td>
-                <td className="p-3 flex gap-2">
+                <td className="p-3 text-xs text-muted">
+                  {t.validation ? (t.validation.ok ? '通过' : t.validation.issues.join('；')) : '—'}
+                </td>
+                <td className="p-3 flex flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    disabled={prepareMut.isPending}
+                    onClick={() => prepareMut.mutate(t.id)}
+                  >
+                    生成填表
+                  </Button>
                   <Button variant="outline" onClick={() => window.open(sellerUrls[t.platform], '_blank')}>
                     打开后台
                   </Button>

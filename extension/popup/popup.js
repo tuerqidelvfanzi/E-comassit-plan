@@ -72,10 +72,12 @@ document.getElementById('btn-upload').addEventListener('click', async () => {
     { type: 'UPLOAD_COLLECT', payload: lastCapture, appBase: base },
     (res) => {
       if (!res?.ok) {
-        alert('上传失败，请检查 B 站地址是否已登录并打开');
+        alert('上传失败，请检查 B 站地址、API 地址与插件令牌');
         return;
       }
-      if (res.viaBridge) {
+      if (res.viaApi) {
+        alert('已通过 API 写入采集箱');
+      } else if (res.viaBridge) {
         alert('已写入采集箱（当前已打开的 B 站标签页）');
       } else {
         alert('已打开采集箱页面完成导入');
@@ -159,20 +161,41 @@ document.getElementById('btn-publish').addEventListener('click', async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) return;
 
-  const stored = await chrome.storage.local.get(['lastCapture']);
-  const payload = lastCapture || stored.lastCapture;
-  if (!payload) {
-    alert('请先在商品页采集，或从采集箱选择可发布商品后再填入。');
-    return;
+  const apiBase = (apiBaseInput?.value?.trim() || 'http://127.0.0.1:8080').replace(/\/+$/, '');
+  const extToken = extTokenInput?.value?.trim();
+  let fillPayload = null;
+
+  if (extToken) {
+    try {
+      const res = await fetch(`${apiBase}/api/v1/extension/publish-fill?platform=${platform}`, {
+        headers: { 'X-Extension-Token': extToken },
+      });
+      const json = await res.json();
+      if (json.code === 0 && json.data?.fillPayload) {
+        fillPayload = { ...json.data.fillPayload, platform };
+      }
+    } catch {
+      /* fallback to local capture */
+    }
   }
 
-  const fillPayload = {
-    title: payload.title,
-    priceCny: payload.price?.amount ?? 0,
-    platform,
-  };
+  if (!fillPayload) {
+    const stored = await chrome.storage.local.get(['lastCapture']);
+    const payload = lastCapture || stored.lastCapture;
+    if (!payload) {
+      alert('请先在 B 站「发布中心」生成填表数据，或采集商品后再试。');
+      return;
+    }
+    fillPayload = {
+      title: payload.title,
+      priceCny: payload.price?.amount ?? 0,
+      platform,
+    };
+  }
 
-  const res = await chrome.tabs.sendMessage(tab.id, { type: 'FILL_DRAFT', payload: fillPayload }).catch(() => null);
+  const res = await chrome.tabs
+    .sendMessage(tab.id, { type: 'FILL_DRAFT', payload: fillPayload })
+    .catch(() => null);
   if (!res) {
     const names = { shopee: 'Shopee', tiktok: 'TikTok Shop', taobao: '淘宝' };
     alert(

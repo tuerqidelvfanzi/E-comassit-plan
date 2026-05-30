@@ -66,7 +66,20 @@ export function evaluateAdsPowerGate(
 }
 
 /** AI 图片 pipeline 配置 */
-export type AiImageJobType = 'watermark_remove' | 'model_generate' | 'translate_overlay';
+export type AiImageJobType = 'watermark_remove' | 'model_generate' | 'translate_overlay' | 'upscale';
+
+/** P1 Web UI 操作名 → 内部 JobType */
+export type AiImageOperation = 'dedupe_watermark' | 'upscale' | 'model_tryon';
+
+export const AI_OPERATION_TO_JOB: Record<AiImageOperation, AiImageJobType> = {
+  dedupe_watermark: 'watermark_remove',
+  upscale: 'upscale',
+  model_tryon: 'model_generate',
+};
+
+export function mapOperationsToJobTypes(operations: AiImageOperation[]): AiImageJobType[] {
+  return operations.map((op) => AI_OPERATION_TO_JOB[op]);
+}
 
 export type AiImagePipelineConfig = {
   jobType: AiImageJobType;
@@ -89,6 +102,11 @@ export const DEFAULT_AI_IMAGE_CONFIG: Record<AiImageJobType, AiImagePipelineConf
   translate_overlay: {
     jobType: 'translate_overlay',
     targetLocale: 'vi-VN',
+    outputSize: { width: 800, height: 800 },
+    provider: 'mock',
+  },
+  upscale: {
+    jobType: 'upscale',
     outputSize: { width: 800, height: 800 },
     provider: 'mock',
   },

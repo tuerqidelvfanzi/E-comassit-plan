@@ -22,6 +22,20 @@ export function migrate() {
   if (fs.existsSync(batchSchemaPath)) {
     db.exec(fs.readFileSync(batchSchemaPath, 'utf8'));
   }
+  const publishP1Path = path.join(__dirname, 'schema-publish-p1.sql');
+  if (fs.existsSync(publishP1Path)) {
+    for (const stmt of fs
+      .readFileSync(publishP1Path, 'utf8')
+      .split(';')
+      .map((s) => s.trim())
+      .filter(Boolean)) {
+      try {
+        db.exec(stmt);
+      } catch {
+        /* column/table may already exist */
+      }
+    }
+  }
   seedIfEmpty(db);
   db.close();
   return dbPath;

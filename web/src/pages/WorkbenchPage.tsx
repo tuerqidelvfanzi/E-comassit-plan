@@ -6,6 +6,7 @@ import {
   useRunPipeline,
   useTemplates,
   useUpdateProduct,
+  useInvalidateProducts,
 } from '../hooks/useAppQueries';
 import { api } from '../lib/api';
 
@@ -15,8 +16,10 @@ export function WorkbenchPage() {
   const { data: templates = [] } = useTemplates();
   const updateMut = useUpdateProduct();
   const pipelineMut = useRunPipeline();
+  const invalidate = useInvalidateProducts();
   const [promptNote, setPromptNote] = useState('');
   const [templateId, setTemplateId] = useState('');
+  const [imageMsg, setImageMsg] = useState('');
 
   if (isLoading) {
     return <PageHeader title="处理工作台" desc="加载中…" />;
@@ -131,6 +134,31 @@ export function WorkbenchPage() {
         </Card>
       </div>
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <h3 className="text-sm font-medium text-muted">主图 ({p.images?.length ?? 0})</h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {(p.images ?? [p.thumb]).slice(0, 6).map((url) => (
+              <img key={url} src={url} alt="" className="h-16 w-16 rounded object-cover" />
+            ))}
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={async () => {
+                try {
+                  const job = await api.createImageJob(p.id, ['dedupe_watermark', 'upscale']);
+                  invalidate();
+                  setImageMsg(`图片任务完成，新增 ${job.resultUrls?.length ?? 0} 张`);
+                } catch {
+                  setImageMsg('图片处理失败');
+                }
+              }}
+            >
+              AI 去水印 + 放大
+            </Button>
+          </div>
+          {imageMsg ? <p className="mt-2 text-xs text-[var(--color-primary)]">{imageMsg}</p> : null}
+        </Card>
         <Card>
           <h3 className="text-sm font-medium text-muted">高曝光</h3>
           {processed ? (

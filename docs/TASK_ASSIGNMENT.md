@@ -16,8 +16,8 @@
 | A3 | 淘宝/天猫适配器字段补全 | 待测 | `adapters/taobao.js` |
 | A4 | Popup 预览（层/图数） | ✅ | `popup/popup.js` |
 | A5 | 上传采集箱（demoImport） | ✅ | 打开 B 站 URL |
-| A6 | Extension Token + `POST collect-jobs` | 待做 | `background/service-worker.js` |
-| A7 | 发布草稿填表（1 平台） | 待做 | Phase 2 |
+| A6 | Extension Token + `POST collect-jobs` | ✅ | `background/service-worker.js` |
+| A7 | 发布草稿填表（1 平台） | ✅ 原型 | `content/publish-fill.js` · 淘宝 |
 | A8 | 演示 ZIP 与安装说明 | ✅ | `npm run zip:extension` |
 
 **不负责**：`web/` 页面与样式（除非契约 PR）。
@@ -38,8 +38,8 @@
 | B2 | 工作台 raw 快照/主图 | ✅ 原型 | `WorkbenchPage.tsx` |
 | B3 | 大模型设置 | ✅ | `LlmSettings.tsx` |
 | B4 | 主题 / 插件下载 / 流程 | ✅ | `SettingsPage.tsx` |
-| B5 | `collect-jobs` API（mock→真） | 待做 | 对齐 `API_OUTLINE.md` |
-| B6 | 采集箱接 API 替代 demoImport | 待做 | 依赖 A6 |
+| B5 | `collect-jobs` API（mock→真） | ✅ | `api/src/app.ts` |
+| B6 | 采集箱接 API 替代 demoImport | ✅ | `collectImport.ts` + React Query |
 | B7 | 批量采集任务 UI | 待做 | Phase 2，依赖 Worker |
 | B8 | GitHub Pages 部署验收 | 持续 | CI `deploy-pages` |
 

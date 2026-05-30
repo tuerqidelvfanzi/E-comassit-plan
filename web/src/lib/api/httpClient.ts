@@ -4,7 +4,9 @@ import type {
   BatchCollectJob,
   CookieJarInfo,
   DashboardMetrics,
+  ImageJob,
   InsightState,
+  PreparePublishResult,
   Product,
   PublishTask,
   RuleItem,
@@ -151,6 +153,21 @@ export const httpApi = {
       method: 'PATCH',
       body: JSON.stringify(patch),
     });
+  },
+
+  preparePublishTask(id: string) {
+    return request<PreparePublishResult>(`/publish-tasks/${id}/prepare`, { method: 'POST' });
+  },
+
+  createImageJob(productId: string, operations: ImageJob['operations']) {
+    return request<ImageJob>(`/products/${productId}/image-jobs`, {
+      method: 'POST',
+      body: JSON.stringify({ operations }),
+    });
+  },
+
+  listImageJobs(productId: string) {
+    return request<ImageJob[]>(`/products/${productId}/image-jobs`);
   },
 
   getExtensionToken() {

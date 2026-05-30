@@ -18,6 +18,8 @@ export type {
   LinkCatcherEntry,
   AdsPowerGateResult,
   AiImagePipelineConfig,
+  AiImageOperation,
+  AiImageJobStatus,
   BillingHook,
 } from './listing/contracts.js';
 export * from './listing/productFilters.js';

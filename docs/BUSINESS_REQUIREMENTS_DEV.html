@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>电商商品采集优化搬家系统 - 开发级需求文档</title>
+</head>
+<body>
+<h1>电商商品采集优化搬家系统 - 开发级需求文档</h1>
+<p>> 版本：v1.1 | 日期：2026-05-30 | 状态：需求确认</p>
+<hr>
+<h2>一、业务背景与目标</h2>
+<h3>1.1 三个核心功能</h3>
+<tr><td> 功能 </td><td> 说明 </td></tr>
+<tr><td>------</td><td>------</td></tr>
+<tr><td> 选品 </td><td> 从源平台采集商品数据 </td></tr>
+<tr><td> 优化 </td><td> LLM+模板本地化优化 </td></tr>
+<tr><td> 搬家 </td><td> 浏览器插件自动填表发布 </td></tr>
+<h3>1.2 目标用户</h3>
+<li>跨境买家/小微个体卖家</li>
+<li>目标市场：东南亚（越南、泰国、菲律宾、印尼）</li>
+<li>目标平台：TikTok Shop、Shopee</li>
+<h2>二、完整业务流程</h2>
+<p>选品 -> 采集 -> 优化 -> 搬家</p>
+<p>1. 选品阶段：从抖音商城、淘宝、拼多多等筛选爆款</p>
+<p>2. 采集阶段：浏览器插件采集图片(9-12张)、SKU(颜色x尺码)</p>
+<p>3. 优化阶段：LLM处理标题描述、价格计算、本地化翻译</p>
+<p>4. 搬家阶段：插件自动填表到目标平台草稿箱</p>
+<hr>
+<h2>三、越南Shopee上品流程</h2>
+<h3>3.1 整体流程</h3>
+<p>1. 启动店八方应用 -> 登录账号</p>
+<p>2. 点击上货 -> 进入采集箱</p>
+<p>3. 编辑未发布的产品链接</p>
+<p>4. 编辑产品标题（越南语，<=20字符）</p>
+<p>5. 编辑简易描述（删除国内标识）</p>
+<p>6. 编详细描述（优化文案）</p>
+<p>7. 选择产品类目（必填项）</p>
+<p>8. 编辑SKU（售价x350%，库存50）</p>
+<p>9. 编辑产品图片（9张，翻译+消除笔）</p>
+<p>10. 编辑物流信息</p>
+<p>11. 保存修改越南</p>
+<p>12. 一键翻译越南语</p>
+<p>13. 发布产品</p>
+<h3>3.2 标题规则</h3>
+<p>越南站限制字符为20字，汉字需要删减到10-9字以内。</p>
+<p>规则：</p>
+<p>1. 保留最重要的字符，如可爱蓝色小熊简写成蓝色/熊</p>
+<p>2. 删除其他多余的描述</p>
+<p>3. 规格翻译字数太多可改成A款B款C款</p>
+<p>4. 每个不同类型字符用/分开</p>
+<p>5. 一般有两个规格，都要注意修改</p>
+<p>6. 超出20字符可用其他翻译工具</p>
+<h3>3.3 SKU编辑规则</h3>
+<p>售价编辑：点击售价批量 -> 使用公式 -> 当前价格 x350%</p>
+<p>库存编辑：点击库存批量 -> 统一设置为50</p>
+<h3>3.4 图片处理规则</h3>
+<p>需要保留：外观、参数、安装步骤、尺寸、使用场景图片（共九张）</p>
+<p>需要删除：厂家介绍、关于我们、证书资质、运输售后、包邮、免费开票、品牌标识</p>
+<p>图片处理流程：</p>
+<p>1. 挑选前9张图片修改尺寸1:1（800*800）</p>
+<p>2. 用消除笔P掉敏感内容（终身质保、免费退货、LOGO、水印）</p>
+<p>3. 点击图片翻译，选择中->越进行翻译</p>
+<p>4. 手动调整译图，优化图片面板整洁</p>
+<p>5. 检查是否还有中文字体残留</p>
+<hr>
+<h2>四、泰国TikTok上品流程</h2>
+<h3>4.1 整体流程</h3>
+<p>1. 产品管理 -> 增加新产品</p>
+<p>2. 上传主图（最少5张）</p>
+<p>3. 编辑标题（参考Tk同行）</p>
+<p>4. 选择类目（T-shirts）</p>
+<p>5. 选择品牌（无品牌）</p>
+<p>6. 设置变体（颜色+尺码）</p>
+<p>7. 设置SKU编码</p>
+<p>8. 设置规格模板</p>
+<p>9. 上传详情图</p>
+<p>10. 发布产品</p>
+<h3>4.2 SKU编码规则（五部分）</h3>
+<p>格式：{PREFIX}-{SEQUENCE}-{SIDE}-{COLOR}-{SIZE}</p>
+<p>示例：BF-0001-PR-WH-BK-S</p>
+<p>各部分说明：</p>
+<p>1. PREFIX（名字）：店铺名前缀，如BF T-shirt -> BF</p>
+<p>2. SEQUENCE（编号）：0001-1000</p>
+<p>3. SIDE（正反面）：P=正面有图案，R=背面有图案，PR=正反面都有</p>
+<p>4. COLOR（颜色）：WH=白色，BK=黑色</p>
+<p>5. SIZE（尺码）：S、M、L、XL、XXL、XXXL</p>
+<h3>4.3 颜色编码表</h3>
+<tr><td> 颜色 </td><td> 编码 </td></tr>
+<tr><td>------</td><td>------</td></tr>
+<tr><td> 白色 </td><td> WH </td></tr>
+<tr><td> 黑色 </td><td> BK </td></tr>
+<tr><td> 红色 </td><td> RD </td></tr>
+<tr><td> 蓝色 </td><td> BL </td></tr>
+<tr><td> 绿色 </td><td> GR </td></tr>
+<tr><td> 黄色 </td><td> YL </td></tr>
+<tr><td> 粉色 </td><td> PK </td></tr>
+<tr><td> 紫色 </td><td> PU </td></tr>
+<tr><td> 橙色 </td><td> OR </td></tr>
+<tr><td> 灰色 </td><td> GY </td></tr>
+<h3>4.4 白色钩子</h3>
+<p>当商品只有一个款式时需要添加白色钩子：</p>
+<li>颜色名称：empty</li>
+<li>SKU格式：{PREFIX}-9999-P-WH-{SIZE}</li>
+<li>价格：400</li>
+<li>数量：5</li>
+<li>重量：220</li>
+<hr>
+<h2>五、数据字段定义</h2>
+<h3>5.1 Product</h3>
+<li>id: 唯一ID</li>
+<li>title: 原标题</li>
+<li>description: 原描述</li>
+<li>source: 来源平台(taobao|tmall|pinduoduo|1688|douyin)</li>
+<li>sourceUrl: 原商品链接</li>
+<li>priceCny: 原价(人民币)</li>
+<li>images[]: 图片列表</li>
+<li>skus[]: SKU变体列表</li>
+<li>attributes[]: 属性列表</li>
+<li>status: raw|processing|ready|published</li>
+<li>targetLocale: 目标语言(vi-VN|th-TH|id-ID|fil-PH)</li>
+<li>categoryId: 类目模板ID</li>
+<li>hasVariants: 是否有变体</li>
+<li>processed: 处理结果</li>
+<h3>5.2 ProductImage</h3>
+<li>id: 图片ID</li>
+<li>url: 原图URL</li>
+<li>localPath: 本地存储路径</li>
+<li>type: main|detail|sku</li>
+<li>sort: 排序</li>
+<li>hasWatermark: 是否有水印</li>
+<li>priceTag: 是否含价格标签</li>
+<li>sensitiveContent: 敏感内容列表</li>
+<li>status: pending|downloaded|processed|translated</li>
+<h3>5.3 ProductSku</h3>
+<li>id: SKU ID</li>
+<li>name: SKU名称</li>
+<li>color: 颜色</li>
+<li>size: 尺码</li>
+<li>price: 价格</li>
+<li>stock: 库存</li>
+<li>skuCode: SKU编码</li>
+<li>weight: 重量(克)</li>
+<li>patternSuffix: P|R|PR（正反面）</li>
+<li>isDummyHook: 是否白色钩子</li>
+<h3>5.4 ProcessedResult</h3>
+<li>exposure: 高曝光向输出</li>
+<li>conversion: 高转化向输出</li>
+<li>selectedOutput: 选中的输出</li>
+<li>ranAt: 处理时间</li>
+<li>templateId: 模板ID</li>
+<li>modelUsed: 使用的模型</li>
+<h3>5.5 ProcessedOutput</h3>
+<li>title: 优化后标题</li>
+<li>shortDescription: 简短描述（越南站20字限制）</li>
+<li>description: 优化后描述</li>
+<li>priceLabel: 价格标签</li>
+<li>charCount: 标题字符数</li>
+<hr>
+<h2>六、类目模板定义</h2>
+<h3>6.1 模板类型</h3>
+<tr><td> 模板ID </td><td> 名称 </td><td> 分类 </td><td> 特殊字段 </td></tr>
+<tr><td>--------</td><td>------</td><td>------</td><td>----------</td></tr>
+<tr><td> tpl-clothing-tshirt </td><td> 服装-T恤 </td><td> clothing-tshirt </td><td> SKU五部分编码 </td></tr>
+<tr><td> tpl-clothing-general </td><td> 服装-通用 </td><td> clothing-general </td><td> 面料属性 </td></tr>
+<tr><td> tpl-kitchenware </td><td> 厨具 </td><td> kitchenware </td><td> 材质/尺寸 </td></tr>
+<tr><td> tpl-lighting </td><td> 灯具 </td><td> lighting </td><td> 电压/保修期 </td></tr>
+<tr><td> tpl-beauty </td><td> 美妆 </td><td> beauty </td><td> 规格/保质期 </td></tr>
+<tr><td> tpl-electronics </td><td> 3C电子 </td><td> electronics </td><td> 型号/参数 </td></tr>
+<tr><td> tpl-home </td><td> 家居 </td><td> home </td><td> 尺寸/材质 </td></tr>
+<tr><td> tpl-other </td><td> 通用模板 </td><td> other </td><td> 无 </td></tr>
+<h3>6.2 服装-T恤模板</h3>
+<p>**SKU配置**：</p>
+<li>prefix: 店铺名前缀（如BF）</li>
+<li>sequenceStart: 编号起始（如1）</li>
+<li>colors: 颜色列表（WH白色/BK黑色/PK粉色等）</li>
+<li>sizes: 尺码列表（S/M/L/XL/XXL/XXXL）</li>
+<li>sides: 正反面（P/R/PR）</li>
+<p>**白色钩子配置**：</p>
+<li>enabled: true</li>
+<li>colorName: empty</li>
+<li>price: 400</li>
+<li>stock: 5</li>
+<li>weight: 220</li>
+<h3>6.3 越南Shopee模板</h3>
+<li>价格公式：x3.5</li>
+<li>标题限制：20字符</li>
+<li>默认库存：50</li>
+<hr>
+<h2>七、价格计算公式</h2>
+<h3>7.1 东南亚市场倍率</h3>
+<tr><td> 国家 </td><td> 平台 </td><td> 倍率 </td><td> 公式 </td></tr>
+<tr><td>------</td><td>------</td><td>------</td><td>------</td></tr>
+<tr><td> 越南 </td><td> Shopee </td><td> 350% </td><td> 售价 = 原价 x 3.5 </td></tr>
+<tr><td> 泰国 </td><td> TikTok </td><td> 250% </td><td> 售价 = 原价 x 2.5 </td></tr>
+<tr><td> 菲律宾 </td><td> Shopee </td><td> 固定500 </td><td> 售价 = 500 </td></tr>
+<h3>7.2 库存设置</h3>
+<tr><td> 国家 </td><td> 默认库存 </td></tr>
+<tr><td>------</td><td>----------</td></tr>
+<tr><td> 越南 </td><td> 50 </td></tr>
+<tr><td> 菲律宾 </td><td> 800 </td></tr>
+<h3>7.3 重量设置</h3>
+<tr><td> 国家 </td><td> 默认重量(克) </td></tr>
+<tr><td>------</td><td>-------------</td></tr>
+<tr><td> 越南 </td><td> 220 </td></tr>
+<tr><td> 菲律宾 </td><td> 220 </td></tr>
+<hr>
+<h2>八、违禁内容检查清单</h2>
+<h3>8.1 图片敏感内容</h3>
+<p>需用消除笔处理掉的内容：</p>
+<li>终身质保、免费退货、包邮</li>
+<li>免费开票、商家LOGO、水印</li>
+<li>厂家介绍、关于我们、证书资质</li>
+<li>运输售后内容</li>
+<h3>8.2 标题/描述敏感内容</h3>
+<p>品牌类（防侵权）：</p>
+<p>耐克/Nike, 阿迪达斯/Adidas, 迪士尼/Disney, LV, Gucci, Chanel, 爱马仕, 苹果, 三星, 华为, NASA（除非联名授权）</p>
+<p>国内相关标识（东南亚需删除）：</p>
+<p>3C认证、产地、发货地、品牌名称（除非无品牌）</p>
+<hr>
+<h2>九、types.ts 修改清单</h2>
+<h3>9.1 新增/扩展类型</h3>
+<p>1. TargetLocale扩展：新增id-ID, fil-PH</p>
+<p>2. Product扩展：新增hasVariants, skuCount, imageCount, categoryId</p>
+<p>3. ProcessedOutput扩展：新增shortDescription（越南站20字限制）, charCount</p>
+<p>4. SkuConfig新增：prefix, sequenceStart, colors, sizes, sides, dummyHook</p>
+<p>5. ProductSku扩展：新增weight, patternSuffix, isDummyHook</p>
+<p>6. ProductImage扩展：新增sensitiveContent</p>
+<hr>
+<h2>十、待开发功能清单</h2>
+<h3>P0 核心闭环</h3>
+<tr><td> 功能 </td><td> 页面 </td><td> 说明 </td></tr>
+<tr><td>------</td><td>------</td><td>------</td></tr>
+<tr><td> 商品采集 </td><td> Extension </td><td> 从1688/淘宝/拼多多采集 </td></tr>
+<tr><td> 采集箱 </td><td> InboxPage </td><td> 展示+筛选+批量操作 </td></tr>
+<tr><td> 工作台 </td><td> WorkbenchPage </td><td> LLM处理+结果展示 </td></tr>
+<tr><td> 发布任务 </td><td> PublishPage </td><td> 创建+查看状态 </td></tr>
+<tr><td> 插件填表 </td><td> Extension </td><td> 自动填入目标平台 </td></tr>
+<h3>P1 完善功能</h3>
+<tr><td> 功能 </td><td> 页面 </td><td> 说明 </td></tr>
+<tr><td>------</td><td>------</td><td>------</td></tr>
+<tr><td> 模板管理 </td><td> TemplatesPage </td><td> 完整CRUD模板（含SKU配置） </td></tr>
+<tr><td> SKU管理 </td><td> WorkbenchPage </td><td> 变体编辑+编码生成 </td></tr>
+<tr><td> 图片处理 </td><td> WorkbenchPage </td><td> 图片列表+消除笔+翻译 </td></tr>
+<tr><td> 批量采集 </td><td> BatchCollectPage </td><td> 榜单批量采集 </td></tr>
+<hr>
+<h2>附录：上品流程图</h2>
+<h3>Shopee越南站流程</h3>
+<p>1. 启动店八方应用 -> 登录账号</p>
+<p>2. 点击上货 -> 进入采集箱</p>
+<p>3. 编辑未发布的产品链接</p>
+<p>4. 编辑产品标题（越南语，<=20字符）</p>
+<p>5. 编辑简易描述（删除国内标识）</p>
+<p>6. 编详细描述（优化文案）</p>
+<p>7. 选择产品类目（必填项）</p>
+<p>8. 编辑SKU（售价x350%，库存50）</p>
+<p>9. 编辑产品图片（9张，翻译+消除笔）</p>
+<p>10. 编辑物流信息</p>
+<p>11. 保存修改越南</p>
+<p>12. 一键翻译越南语</p>
+<p>13. 发布产品</p>
+<h3>TikTok泰国流程</h3>
+<p>1. 产品管理 -> 增加新产品</p>
+<p>2. 上传主图（>=5张）</p>
+<p>3. 编辑标题（参考Tk同行）</p>
+<p>4. 选择类目（T-shirts）</p>
+<p>5. 选择品牌（无品牌）</p>
+<p>6. 设置变体（颜色+尺码）</p>
+<p>7. 设置SKU编码（五部分）</p>
+<p>8. 设置规格模板</p>
+<p>9. 上传详情图（4张固定+补图）</p>
+<p>10. 发布产品</p>
+<hr>
+<p>*文档结束*</p>
+</body>
+</html>

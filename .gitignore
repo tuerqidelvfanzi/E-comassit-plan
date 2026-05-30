@@ -11,3 +11,8 @@ web/dist/
 api/node_modules/
 api/dist/
 api/data/
+web/test-results/
+.cursor-plugin/
+
+# oh-my-mermaid
+.omm/

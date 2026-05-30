@@ -70,6 +70,16 @@ export type PublishTaskStatus =
   | 'failed'
   | 'cancelled';
 
+export type PublishFillPayload = {
+  platform: 'tiktok' | 'taobao' | 'shopee';
+  title: string;
+  price: number;
+  currency: string;
+  stock: number;
+  weightGrams: number;
+  brand: string;
+};
+
 export type PublishTask = {
   id: string;
   platform: 'Shopee' | 'TikTok Shop' | '淘宝';
@@ -78,6 +88,29 @@ export type PublishTask = {
   status: PublishTaskStatus | 'pending' | 'completed' | 'failed';
   reason?: string;
   productId?: string;
+  fillPayload?: PublishFillPayload;
+  validation?: { ok: boolean; issues: string[] };
+  fillInstructions?: string;
+};
+
+export type PreparePublishResult = {
+  taskId: string;
+  ok: boolean;
+  validation: { ok: boolean; issues: string[] };
+  fillPayload: PublishFillPayload;
+  fillInstructions?: string;
+};
+
+export type ImageJob = {
+  id: string;
+  productId: string;
+  operations: Array<'dedupe_watermark' | 'upscale' | 'model_tryon'>;
+  status: 'queued' | 'running' | 'completed' | 'failed';
+  progress: number;
+  resultUrls?: string[];
+  error?: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type DashboardMetrics = {

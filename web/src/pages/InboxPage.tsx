@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PageHeader, Card, Badge, Button } from '../components/ui';
-import { decodeDemoImport } from '../lib/inboxStore';
+import { importCollectFromEncoded } from '../lib/collectImport';
 import { exportProductsCsv, exportProductsJson } from '../lib/exportUtils';
 import {
   useDeleteProduct,
@@ -30,15 +30,16 @@ export function InboxPage() {
   useEffect(() => {
     const payload = searchParams.get('demoImport');
     if (!payload) return;
-    const item = decodeDemoImport(payload);
-    if (item) {
-      invalidate();
-      setImportMsg(`已从插件导入：${item.title}`);
-    } else {
-      setImportMsg('导入失败，请重新上传。');
-    }
-    searchParams.delete('demoImport');
-    setSearchParams(searchParams, { replace: true });
+    void importCollectFromEncoded(payload).then((res) => {
+      if (res.ok) {
+        invalidate();
+        setImportMsg(`已从插件导入：${res.title}`);
+      } else {
+        setImportMsg(res.error ?? '导入失败，请重新上传。');
+      }
+      searchParams.delete('demoImport');
+      setSearchParams(searchParams, { replace: true });
+    });
   }, [searchParams, setSearchParams, invalidate]);
 
   const extensionCount = products.filter((p) => p.fromExtension).length;

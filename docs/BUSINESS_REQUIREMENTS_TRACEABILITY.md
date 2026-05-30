@@ -102,15 +102,15 @@
 
 | ID | BRD 需求 | 文档章节 | 代码路径 | 状态 |
 |----|----------|----------|----------|------|
-| BRD-10-P0-1 | 商品采集 Extension | BRD §10 | `extension/` | planned |
-| BRD-10-P0-2 | 采集箱 InboxPage | BRD §10 | `web/src/pages/InboxPage.tsx` | planned |
-| BRD-10-P0-3 | 工作台 WorkbenchPage | BRD §10 | `web/src/pages/WorkbenchPage.tsx` | planned |
-| BRD-10-P0-4 | 发布任务 PublishPage | BRD §10 | `web/src/pages/PublishPage.tsx` | planned |
-| BRD-10-P0-5 | 插件填表 | BRD §10 | `extension/content/publish-fill.js` | planned |
-| BRD-10-P1-1 | 模板管理 TemplatesPage | BRD §10 | `web/src/pages/TemplatesPage.tsx` | planned |
+| BRD-10-P0-1 | 商品采集 Extension | BRD §10 | `extension/` | done |
+| BRD-10-P0-2 | 采集箱 InboxPage | BRD §10 | `web/src/pages/InboxPage.tsx` | done |
+| BRD-10-P0-3 | 工作台 WorkbenchPage | BRD §10 | `web/src/pages/WorkbenchPage.tsx` | done |
+| BRD-10-P0-4 | 发布任务 PublishPage | BRD §10 | `web/src/pages/PublishPage.tsx` | done |
+| BRD-10-P0-5 | 插件填表 | BRD §10 | `extension/content/publish-fill.js` | done |
+| BRD-10-P1-1 | 模板管理 TemplatesPage | BRD §10 | `web/src/pages/TemplatesPage.tsx` | done |
 | BRD-10-P1-2 | SKU 变体编辑 | BRD §10 | WorkbenchPage + skuEncoder | planned |
-| BRD-10-P1-3 | 图片处理 UI | BRD §10 | WorkbenchPage | planned |
-| BRD-10-P1-4 | 批量采集 BatchCollectPage | BRD §10 | `web/src/pages/BatchCollectPage.tsx` | planned |
+| BRD-10-P1-3 | 图片处理 UI | BRD §10 | WorkbenchPage | done |
+| BRD-10-P1-4 | 批量采集 BatchCollectPage | BRD §10 | `web/src/pages/BatchCollectPage.tsx` | done |
 
 ---
 

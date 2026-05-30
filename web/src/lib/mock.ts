@@ -37,6 +37,7 @@ export interface PublishTask {
   title: string;
   status: 'pending' | 'completed' | 'failed';
   reason?: string;
+  productId?: string;
 }
 
 export const mockProducts: Product[] = [

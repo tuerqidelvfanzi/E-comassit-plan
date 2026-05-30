@@ -3,7 +3,9 @@ import type {
   BatchCollectJob,
   CookieJarInfo,
   DashboardMetrics,
+  ImageJob,
   InsightState,
+  PreparePublishResult,
   Product,
   PublishTask,
   RuleItem,
@@ -210,33 +212,90 @@ export const localApi = {
     productId?: string;
   }) {
     await delay(100);
-    const task: PublishTask = {
+    const task = {
       id: uid('pub'),
       platform: input.platform,
       title: input.title,
-      status: 'pending',
+      status: 'pending' as const,
       productId: input.productId,
     };
     savePublishTasks([task, ...getPublishTasks()]);
-    return task;
+    return task as PublishTask;
   },
 
   async updatePublishTask(id: string, patch: Partial<PublishTask>) {
     await delay(100);
-    const next = getPublishTasks().map((t) =>
-      t.id === id
-        ? {
-            ...t,
-            ...patch,
-            status:
-              patch.status === 'completed'
-                ? ('completed' as const)
-                : (patch.status ?? t.status),
-          }
-        : t,
-    );
+    const next = getPublishTasks().map((t) => {
+      if (t.id !== id) return t;
+      const status =
+        patch.status === 'completed' || patch.status === 'failed' || patch.status === 'pending'
+          ? patch.status
+          : t.status;
+      return { ...t, ...patch, status };
+    });
     savePublishTasks(next);
     return { updated: true };
+  },
+
+  async preparePublishTask(id: string): Promise<PreparePublishResult> {
+    await delay(200);
+    const task = getPublishTasks().find((t) => t.id === id);
+    if (!task) throw new Error('NOT_FOUND');
+    const product = task.productId ? (getProduct(task.productId) as Product | undefined) : undefined;
+    const title = product?.processed?.conversion?.title ?? product?.title ?? task.title;
+    const priceCny = product?.priceCny ?? 0;
+    const listPrice =
+      task.platform === 'TikTok Shop'
+        ? Math.round(priceCny * 5.2 * 1.8)
+        : Math.round(priceCny * 3500 * 2.5);
+    const fillPayload = {
+      platform: (task.platform === 'TikTok Shop'
+        ? 'tiktok'
+        : task.platform === '淘宝'
+          ? 'taobao'
+          : 'shopee') as 'tiktok' | 'taobao' | 'shopee',
+      title,
+      price: listPrice,
+      currency: task.platform === 'TikTok Shop' ? 'THB' : 'VND',
+      stock: task.platform === 'TikTok Shop' ? 5 : 50,
+      weightGrams: 220,
+      brand: 'No Brand',
+    };
+    return {
+      taskId: id,
+      ok: true,
+      validation: { ok: true, issues: [] },
+      fillPayload,
+      fillInstructions: `标题「${title}」· 价格 ${listPrice}`,
+    };
+  },
+
+  async createImageJob(productId: string, operations: ImageJob['operations']): Promise<ImageJob> {
+    await delay(400);
+    const p = getProduct(productId);
+    if (!p) throw new Error('NOT_FOUND');
+    const suffix = operations.join('-');
+    const urls = [
+      `https://placehold.co/800x800/e2e8f0/64748b?text=${encodeURIComponent(`${productId}-${suffix}-1`)}`,
+    ];
+    updateProduct(productId, { images: [...(p.images ?? []), ...urls] });
+    const now = new Date().toISOString();
+    return {
+      id: uid('imgjob'),
+      productId,
+      operations,
+      status: 'completed',
+      progress: 100,
+      resultUrls: urls,
+      createdAt: now,
+      updatedAt: now,
+    };
+  },
+
+  async listImageJobs(productId: string): Promise<ImageJob[]> {
+    await delay(50);
+    void productId;
+    return [];
   },
 
   async getExtensionToken() {

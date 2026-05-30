@@ -87,7 +87,12 @@
     const data = message.payload || {};
     const platform = data.platform || (isTaobaoSeller() ? 'taobao' : 'shopee');
     const title = data.title || data.processed?.conversion?.title || '';
-    const price = data.priceCny != null ? String(data.priceCny) : '';
+    const price =
+      data.price != null
+        ? String(data.price)
+        : data.priceCny != null
+          ? String(data.priceCny)
+          : '';
     const sel = selectorsFor(platform);
 
     const titleOk = fillInput(sel.title, title);

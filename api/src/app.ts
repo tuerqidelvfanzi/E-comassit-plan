@@ -15,7 +15,13 @@ import {
 } from './services/batchJobs.js';
 import { listCookieDomains, saveCookieJar, type StoredCookie } from './services/cookieJar.js';
 import { scheduleBatchJob } from './worker/batchCollect.js';
-import { loadTaobaoSellerSelectors } from './worker/selectors.js';
+import { loadAllSellerSelectors } from './worker/selectors.js';
+import {
+  getLatestFillPayload,
+  getPublishTask,
+  preparePublishTask,
+} from './services/publishTasks.js';
+import { createImageJob, getImageJob, listImageJobs } from './services/imageJobs.js';
 
 const app = new Hono().basePath(API_PREFIX);
 
@@ -73,12 +79,14 @@ app.post('/extension/token', jwtAuth, (c) => {
 });
 
 app.get('/extension/selectors', jwtAuth, (c) => {
-  const taobao = loadTaobaoSellerSelectors();
-  return ok(c, {
-    shopee: { title: ['input[name*="title" i]', 'textarea[name*="title" i]'], price: ['input[name*="price" i]'] },
-    taobao,
-    tiktok: { title: ['input[data-testid*="title" i]'], price: ['input[type="number"]'] },
-  });
+  return ok(c, loadAllSellerSelectors());
+});
+
+app.get('/extension/publish-fill', extensionAuth, (c) => {
+  const platform = c.req.query('platform') ?? 'tiktok';
+  const data = getLatestFillPayload(getDb(), c.get('user').id, platform);
+  if (!data) return fail(c, 'NO_PREPARED_TASK', 404, 404);
+  return ok(c, data);
 });
 
 app.post('/extension/cookies', extensionAuth, async (c) => {
@@ -178,7 +186,12 @@ app.post('/collect-jobs/batch/:id/run', jwtAuth, (c) => {
 app.get('/collect-adapters/:site', jwtAuth, (c) => {
   const site = c.req.param('site');
   if (site === 'taobao' || site === 'tmall') {
-    return ok(c, { site, version: '1.0.0', layers: ['L1', 'L2', 'L4'], sellerSelectors: loadTaobaoSellerSelectors() });
+    return ok(c, {
+      site,
+      version: '1.0.0',
+      layers: ['L1', 'L2', 'L4'],
+      sellerSelectors: loadAllSellerSelectors().taobao,
+    });
   }
   if (site === '1688') {
     return ok(c, { site, version: '1.0.0', layers: ['L1', 'L2', 'L4'] });
@@ -404,27 +417,23 @@ app.post('/insights/run', jwtAuth, (c) => {
 
 // —— Publish ——
 app.get('/publish-tasks', jwtAuth, (c) => {
+  const userId = c.get('user').id;
   const rows = getDb()
-    .prepare('SELECT * FROM publish_tasks WHERE user_id = ? ORDER BY created_at DESC')
-    .all(c.get('user').id) as Array<{
-    id: string;
-    platform: string;
-    title: string;
-    status: string;
-    reason: string | null;
-    product_id: string | null;
-  }>;
-  return ok(
-    c,
-    rows.map((r) => ({
-      id: r.id,
-      platform: r.platform,
-      title: r.title,
-      status: r.status,
-      reason: r.reason ?? undefined,
-      productId: r.product_id ?? undefined,
-    })),
-  );
+    .prepare('SELECT id FROM publish_tasks WHERE user_id = ? ORDER BY created_at DESC')
+    .all(userId) as Array<{ id: string }>;
+  return ok(c, rows.map((r) => getPublishTask(getDb(), userId, r.id)).filter(Boolean));
+});
+
+app.get('/publish-tasks/:id', jwtAuth, (c) => {
+  const task = getPublishTask(getDb(), c.get('user').id, c.req.param('id'));
+  if (!task) return fail(c, 'NOT_FOUND', 404, 404);
+  return ok(c, task);
+});
+
+app.post('/publish-tasks/:id/prepare', jwtAuth, (c) => {
+  const result = preparePublishTask(getDb(), c.get('user').id, c.req.param('id'));
+  if (!result) return fail(c, 'NOT_FOUND', 404, 404);
+  return ok(c, result);
 });
 
 app.post('/publish-tasks', jwtAuth, async (c) => {
@@ -463,6 +472,30 @@ app.patch('/publish-tasks/:id', jwtAuth, async (c) => {
     )
     .run(body.data.status ?? null, body.data.reason ?? null, now, c.req.param('id'), c.get('user').id);
   return ok(c, { updated: true });
+});
+
+app.post('/products/:id/image-jobs', jwtAuth, async (c) => {
+  const body = z
+    .object({
+      operations: z
+        .array(z.enum(['dedupe_watermark', 'upscale', 'model_tryon']))
+        .min(1),
+    })
+    .safeParse(await c.req.json());
+  if (!body.success) return fail(c, 'INVALID_BODY');
+  const job = createImageJob(getDb(), c.get('user').id, c.req.param('id'), body.data.operations);
+  if (!job) return fail(c, 'NOT_FOUND', 404, 404);
+  return ok(c, job, 201);
+});
+
+app.get('/products/:id/image-jobs', jwtAuth, (c) => {
+  return ok(c, listImageJobs(getDb(), c.get('user').id, c.req.param('id')));
+});
+
+app.get('/image-jobs/:id', jwtAuth, (c) => {
+  const job = getImageJob(getDb(), c.get('user').id, c.req.param('id'));
+  if (!job) return fail(c, 'NOT_FOUND', 404, 404);
+  return ok(c, job);
 });
 
 // Metrics helper
