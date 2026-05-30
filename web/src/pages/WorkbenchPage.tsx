@@ -443,14 +443,17 @@ export function WorkbenchPage() {
       {/* 图片处理区 */}
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <Card>
-          <h3 className="text-sm font-medium text-muted">主图 ({p.images?.length ?? 0})</h3>
+          <h3 className="text-sm font-medium text-muted">主图 ({Array.isArray(p.images) ? p.images.length : 0})</h3>
           <div className="mt-2 flex flex-wrap gap-2">
-            {(p.images ?? [p.thumb]).slice(0, 9).map((url, idx) => (
-              <div key={idx} className="relative">
-                <img src={url} alt="" className="h-20 w-20 rounded object-cover" />
-                {idx < 9 && <span className="absolute -top-1 -left-1 text-xs bg-[var(--color-primary)] text-white rounded-full w-4 h-4 flex items-center justify-center">{idx + 1}</span>}
-              </div>
-            ))}
+            {(Array.isArray(p.images) ? p.images : [p.thumb]).slice(0, 9).map((img, idx) => {
+              const url = typeof img === 'string' ? img : img.url;
+              return (
+                <div key={idx} className="relative">
+                  <img src={url} alt="" className="h-20 w-20 rounded object-cover" />
+                  {idx < 9 && <span className="absolute -top-1 -left-1 text-xs bg-[var(--color-primary)] text-white rounded-full w-4 h-4 flex items-center justify-center">{idx + 1}</span>}
+                </div>
+              );
+            })}
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button variant="outline" onClick={handleWatermark}>

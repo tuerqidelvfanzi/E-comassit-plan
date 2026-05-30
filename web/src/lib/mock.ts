@@ -10,6 +10,10 @@ export interface Product {
   category: string;
   thumb: string;
   targetLocale: 'vi-VN' | 'th-TH';
+  skuCount?: number;
+  imageCount?: number;
+  capturedAt?: string;
+  fromExtension?: boolean;
 }
 
 export interface TemplateItem {

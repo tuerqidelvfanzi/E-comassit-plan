@@ -248,7 +248,7 @@ export type PreparePublishResult = {
 export type ImageJob = {
   id: string;
   productId: string;
-  operations: Array<'dedupe_watermark' | 'upscale' | 'model_tryon'>;
+  operations: Array<'dedupe_watermark' | 'upscale' | 'model_tryon' | 'translate_overlay'>;
   status: 'queued' | 'running' | 'completed' | 'failed';
   progress: number;
   resultUrls?: string[];
