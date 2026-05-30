@@ -33,6 +33,7 @@ import {
   saveRules,
   saveTemplates,
   updateProduct,
+  upsertProduct,
 } from '../prototypeDb';
 import { runPipeline } from '../pipelineEngine';
 import type { TemplateItem as MockTemplate } from '../mock';
@@ -64,10 +65,66 @@ export const localApi = {
     return getMetrics();
   },
 
-  async getProducts(status?: string): Promise<Product[]> {
+  async getProducts(filters?: {
+    status?: string;
+    source?: string;
+    keyword?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }): Promise<Product[]> {
     await delay(80);
-    const all = getProducts() as Product[];
-    return status ? all.filter((p) => p.status === status) : all;
+    let all = getProducts() as Product[];
+    if (filters?.status) all = all.filter((p) => p.status === filters.status);
+    if (filters?.source) all = all.filter((p) => p.source === filters.source);
+    if (filters?.keyword) {
+      const kw = filters.keyword.toLowerCase();
+      all = all.filter((p) => p.title.toLowerCase().includes(kw));
+    }
+    if (filters?.dateFrom) {
+      const from = new Date(filters.dateFrom).getTime();
+      all = all.filter((p) => {
+        const t = new Date(p.capturedAt ?? p.createdAt ?? 0).getTime();
+        return t >= from;
+      });
+    }
+    if (filters?.dateTo) {
+      const to = new Date(filters.dateTo).getTime() + 86400000;
+      all = all.filter((p) => {
+        const t = new Date(p.capturedAt ?? p.createdAt ?? 0).getTime();
+        return t <= to;
+      });
+    }
+    return all;
+  },
+
+  async createProduct(input: {
+    title: string;
+    source: string;
+    sourceUrl?: string;
+    priceCny?: number;
+    thumb: string;
+    images?: string[];
+    targetLocale?: Product['targetLocale'];
+  }): Promise<Product> {
+    await delay(200);
+    const id = uid('prd');
+    const now = new Date().toISOString();
+    const product: Product = {
+      id,
+      title: input.title,
+      source: input.source,
+      sourceUrl: input.sourceUrl ?? '',
+      priceCny: input.priceCny ?? 0,
+      status: 'raw',
+      category: '上传',
+      thumb: input.thumb,
+      targetLocale: input.targetLocale ?? 'vi-VN',
+      images: input.images ?? [input.thumb],
+      capturedAt: now,
+      createdAt: now,
+    };
+    upsertProduct(product as Parameters<typeof upsertProduct>[0]);
+    return product;
   },
 
   async getProduct(id: string) {
@@ -117,7 +174,16 @@ export const localApi = {
 
   async getTemplates(): Promise<TemplateItem[]> {
     await delay(50);
-    return getTemplates().map((t) => ({ ...t, promptBody: '' }));
+    return getTemplates().map((t) => {
+      let extra: Partial<TemplateItem> = {};
+      try {
+        const raw = localStorage.getItem(`psa_tpl_sku_${t.id}`);
+        if (raw) extra = JSON.parse(raw) as TemplateItem;
+      } catch {
+        /* ignore */
+      }
+      return { ...t, promptBody: '', ...extra, id: t.id, name: t.name };
+    });
   },
 
   async saveTemplate(item: TemplateItem) {
@@ -133,6 +199,11 @@ export const localApi = {
     };
     const next = idx >= 0 ? list.map((t) => (t.id === item.id ? mock : t)) : [mock, ...list];
     saveTemplates(next);
+    try {
+      localStorage.setItem(`psa_tpl_sku_${item.id}`, JSON.stringify(item));
+    } catch {
+      /* ignore */
+    }
     return item;
   },
 

@@ -69,12 +69,17 @@ export function evaluateAdsPowerGate(
 export type AiImageJobType = 'watermark_remove' | 'model_generate' | 'translate_overlay' | 'upscale';
 
 /** P1 Web UI 操作名 → 内部 JobType */
-export type AiImageOperation = 'dedupe_watermark' | 'upscale' | 'model_tryon';
+export type AiImageOperation =
+  | 'dedupe_watermark'
+  | 'upscale'
+  | 'model_tryon'
+  | 'translate_overlay';
 
 export const AI_OPERATION_TO_JOB: Record<AiImageOperation, AiImageJobType> = {
   dedupe_watermark: 'watermark_remove',
   upscale: 'upscale',
   model_tryon: 'model_generate',
+  translate_overlay: 'translate_overlay',
 };
 
 export function mapOperationsToJobTypes(operations: AiImageOperation[]): AiImageJobType[] {

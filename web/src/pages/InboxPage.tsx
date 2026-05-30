@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PageHeader, Card, Badge, Button, Input } from '../components/ui';
 import { importCollectFromEncoded } from '../lib/collectImport';
@@ -103,36 +103,16 @@ export function InboxPage() {
   const [dateTo, setDateTo] = useState('');
 
   const invalidate = useInvalidateProducts();
-  const { data: products = [], isLoading } = useProducts(filter);
+  const { data: products = [], isLoading } = useProducts(filter, {
+    source: sourceFilter !== 'all' ? sourceFilter : undefined,
+    keyword: keywordFilter.trim() || undefined,
+    dateFrom: dateFrom || undefined,
+    dateTo: dateTo || undefined,
+  });
   const deleteMut = useDeleteProduct();
   const pipelineMut = useRunPipeline();
 
-  // 筛选后的商品列表
-  const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      // 来源筛选
-      if (sourceFilter !== 'all' && p.source !== sourceFilter) return false;
-
-      // 关键词筛选
-      if (keywordFilter && !p.title.toLowerCase().includes(keywordFilter.toLowerCase())) {
-        return false;
-      }
-
-      // 日期筛选
-      if (dateFrom && p.capturedAt) {
-        const captured = new Date(p.capturedAt).getTime();
-        const from = new Date(dateFrom).getTime();
-        if (captured < from) return false;
-      }
-      if (dateTo && p.capturedAt) {
-        const captured = new Date(p.capturedAt).getTime();
-        const to = new Date(dateTo).getTime() + 86400000; // 包含当天
-        if (captured > to) return false;
-      }
-
-      return true;
-    });
-  }, [products, sourceFilter, keywordFilter, dateFrom, dateTo]);
+  const filteredProducts = products;
 
   useEffect(() => {
     const payload = searchParams.get('demoImport');

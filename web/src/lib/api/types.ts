@@ -96,6 +96,8 @@ export type Product = {
   rawCapture?: unknown;
   processed?: ProcessedOutput;
   pipelineNote?: string;
+  /** 详细描述（存 attributes.description） */
+  description?: string;
   createdAt?: string;
   updatedAt?: string;
 };

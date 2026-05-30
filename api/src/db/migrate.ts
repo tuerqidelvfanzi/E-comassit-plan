@@ -51,6 +51,20 @@ export function migrate() {
       }
     }
   }
+  const templatesP2Path = path.join(__dirname, 'schema-templates-p2.sql');
+  if (fs.existsSync(templatesP2Path)) {
+    for (const stmt of fs
+      .readFileSync(templatesP2Path, 'utf8')
+      .split(';')
+      .map((s) => s.trim())
+      .filter(Boolean)) {
+      try {
+        db.exec(stmt);
+      } catch {
+        /* column may already exist */
+      }
+    }
+  }
   seedIfEmpty(db);
   db.close();
   return dbPath;

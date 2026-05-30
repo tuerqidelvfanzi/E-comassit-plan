@@ -6,7 +6,14 @@ import { API_PREFIX } from './config.js';
 import { getDb } from './db/index.js';
 import { extensionAuth, jwtAuth, signAccessToken, signRefreshToken } from './middleware/auth.js';
 import { fail, ok, uid } from './lib/response.js';
-import { getProduct, ingestCollect, listProducts, runProductPipeline } from './services/products.js';
+import {
+  createProduct,
+  getProduct,
+  ingestCollect,
+  listProducts,
+  patchProduct,
+  runProductPipeline,
+} from './services/products.js';
 import {
   batchJobToApi,
   createBatchJob,
@@ -203,7 +210,34 @@ app.get('/collect-adapters/:site', jwtAuth, (c) => {
 // —— Products ——
 app.get('/products', jwtAuth, (c) => {
   const status = c.req.query('status');
-  return ok(c, listProducts(getDb(), c.get('user').id, status));
+  const source = c.req.query('source');
+  const keyword = c.req.query('keyword');
+  const dateFrom = c.req.query('dateFrom');
+  const dateTo = c.req.query('dateTo');
+  return ok(c, listProducts(getDb(), c.get('user').id, {
+    status: status || undefined,
+    source: source || undefined,
+    keyword: keyword || undefined,
+    dateFrom: dateFrom || undefined,
+    dateTo: dateTo || undefined,
+  }));
+});
+
+app.post('/products', jwtAuth, async (c) => {
+  const body = z
+    .object({
+      title: z.string().min(1),
+      source: z.string().default('upload'),
+      sourceUrl: z.string().optional(),
+      priceCny: z.number().optional(),
+      thumb: z.string(),
+      images: z.array(z.string()).optional(),
+      targetLocale: z.enum(['vi-VN', 'th-TH', 'id-ID', 'fil-PH']).optional(),
+    })
+    .safeParse(await c.req.json());
+  if (!body.success) return fail(c, 'INVALID_BODY');
+  const product = createProduct(getDb(), c.get('user').id, body.data);
+  return ok(c, product, 201);
 });
 
 app.get('/products/:id', jwtAuth, (c) => {
@@ -217,40 +251,51 @@ app.patch('/products/:id', jwtAuth, async (c) => {
     .object({
       title: z.string().optional(),
       status: z.enum(['raw', 'processing', 'ready', 'published']).optional(),
-      targetLocale: z.enum(['vi-VN', 'th-TH']).optional(),
+      targetLocale: z.enum(['vi-VN', 'th-TH', 'id-ID', 'fil-PH']).optional(),
       priceCny: z.number().optional(),
       pipelineNote: z.string().optional(),
+      description: z.string().optional(),
+      categoryId: z.string().optional(),
+      skus: z.array(z.record(z.unknown())).optional(),
+      processed: z
+        .object({
+          exposure: z
+            .object({
+              title: z.string().optional(),
+              shortDescription: z.string().optional(),
+              priceLabel: z.string().optional(),
+            })
+            .optional(),
+          conversion: z
+            .object({
+              title: z.string().optional(),
+              shortDescription: z.string().optional(),
+              priceLabel: z.string().optional(),
+            })
+            .optional(),
+          selectedOutput: z.enum(['exposure', 'conversion']).optional(),
+        })
+        .optional(),
+      attributes: z
+        .object({
+          logistics: z
+            .object({
+              weightGrams: z.number().optional(),
+              packageDimensions: z
+                .object({ length: z.number(), width: z.number(), height: z.number() })
+                .optional(),
+            })
+            .optional(),
+        })
+        .optional(),
     })
     .safeParse(await c.req.json());
   if (!body.success) return fail(c, 'INVALID_BODY');
   const id = c.req.param('id');
   const userId = c.get('user').id;
-  const existing = getProduct(getDb(), userId, id);
-  if (!existing) return fail(c, 'NOT_FOUND', 404, 404);
-  const now = new Date().toISOString();
-  const d = body.data;
-  getDb()
-    .prepare(
-      `UPDATE products SET
-        title = COALESCE(?, title),
-        status = COALESCE(?, status),
-        target_locale = COALESCE(?, target_locale),
-        price_cny = COALESCE(?, price_cny),
-        pipeline_note = COALESCE(?, pipeline_note),
-        updated_at = ?
-      WHERE id = ? AND user_id = ?`,
-    )
-    .run(
-      d.title ?? null,
-      d.status ?? null,
-      d.targetLocale ?? null,
-      d.priceCny ?? null,
-      d.pipelineNote ?? null,
-      now,
-      id,
-      userId,
-    );
-  return ok(c, getProduct(getDb(), userId, id));
+  const updated = patchProduct(getDb(), userId, id, body.data);
+  if (!updated) return fail(c, 'NOT_FOUND', 404, 404);
+  return ok(c, updated);
 });
 
 app.delete('/products/:id', jwtAuth, (c) => {
@@ -296,6 +341,8 @@ app.get('/category-templates', jwtAuth, (c) => {
     note: string;
     language: string;
     prompt_body: string;
+    sku_config_json: string | null;
+    category_id: string | null;
   }>;
   return ok(
     c,
@@ -306,6 +353,8 @@ app.get('/category-templates', jwtAuth, (c) => {
       note: r.note,
       language: r.language,
       promptBody: r.prompt_body,
+      categoryId: r.category_id ?? undefined,
+      skuConfig: r.sku_config_json ? JSON.parse(r.sku_config_json) : undefined,
     })),
   );
 });
@@ -319,20 +368,37 @@ app.post('/category-templates', jwtAuth, async (c) => {
       note: z.string().default(''),
       language: z.string().default(''),
       promptBody: z.string().default(''),
+      categoryId: z.string().optional(),
+      skuConfig: z.record(z.unknown()).optional(),
     })
     .safeParse(await c.req.json());
   if (!body.success) return fail(c, 'INVALID_BODY');
   const userId = c.get('user').id;
   const id = body.data.id ?? uid('t');
   const now = new Date().toISOString();
+  const skuJson = body.data.skuConfig ? JSON.stringify(body.data.skuConfig) : null;
   getDb()
     .prepare(
-      `INSERT INTO category_templates (id, user_id, name, status, note, language, prompt_body, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO category_templates (id, user_id, name, status, note, language, prompt_body, sku_config_json, category_id, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET name=excluded.name, status=excluded.status, note=excluded.note,
-         language=excluded.language, prompt_body=excluded.prompt_body, updated_at=excluded.updated_at`,
+         language=excluded.language, prompt_body=excluded.prompt_body,
+         sku_config_json=excluded.sku_config_json, category_id=excluded.category_id,
+         updated_at=excluded.updated_at`,
     )
-    .run(id, userId, body.data.name, body.data.status, body.data.note, body.data.language, body.data.promptBody, now, now);
+    .run(
+      id,
+      userId,
+      body.data.name,
+      body.data.status,
+      body.data.note,
+      body.data.language,
+      body.data.promptBody,
+      skuJson,
+      body.data.categoryId ?? null,
+      now,
+      now,
+    );
   return ok(c, { id, ...body.data }, 201);
 });
 
@@ -551,7 +617,7 @@ app.post('/products/:id/image-jobs', jwtAuth, async (c) => {
   const body = z
     .object({
       operations: z
-        .array(z.enum(['dedupe_watermark', 'upscale', 'model_tryon']))
+        .array(z.enum(['dedupe_watermark', 'upscale', 'model_tryon', 'translate_overlay']))
         .min(1),
     })
     .safeParse(await c.req.json());

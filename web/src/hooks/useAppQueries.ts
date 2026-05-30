@@ -2,9 +2,17 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { Product, ProductStatus } from '../lib/api/types';
 
+export type ProductListFilters = {
+  status?: ProductStatus;
+  source?: string;
+  keyword?: string;
+  dateFrom?: string;
+  dateTo?: string;
+};
+
 export const queryKeys = {
   metrics: ['metrics'] as const,
-  products: (status?: string) => ['products', status] as const,
+  products: (filters?: ProductListFilters) => ['products', filters] as const,
   product: (id: string) => ['product', id] as const,
   templates: ['templates'] as const,
   rules: ['rules'] as const,
@@ -17,9 +25,18 @@ export function useMetrics() {
   return useQuery({ queryKey: queryKeys.metrics, queryFn: () => api.getMetrics() });
 }
 
-export function useProducts(status?: ProductStatus | 'all') {
-  const s = status === 'all' ? undefined : status;
-  return useQuery({ queryKey: queryKeys.products(s), queryFn: () => api.getProducts(s) });
+export function useProducts(
+  status?: ProductStatus | 'all',
+  extra?: Omit<ProductListFilters, 'status'>,
+) {
+  const filters: ProductListFilters = {
+    ...extra,
+    status: status === 'all' ? undefined : status,
+  };
+  return useQuery({
+    queryKey: queryKeys.products(filters),
+    queryFn: () => api.getProducts(filters),
+  });
 }
 
 export function useProduct(id: string) {

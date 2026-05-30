@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { PageHeader, Card, Badge, Button, Input } from '../components/ui';
 import {
@@ -9,7 +9,7 @@ import {
   useInvalidateProducts,
 } from '../hooks/useAppQueries';
 import { api } from '../lib/api';
-import type { ProductSku, PackageDimensions, CategoryTemplateId } from '../lib/api/types';
+import type { Product, ProductSku, PackageDimensions, CategoryTemplateId } from '../lib/api/types';
 
 // 越南站标题最大字符数
 const VIETNAM_TITLE_MAX = 20;
@@ -121,12 +121,19 @@ function formatSequence(n: number): string {
 }
 
 // 生成SKU编码（前端六段版，支持印花后缀）
-function encodeSkuWeb(prefix: string, sequence: number, color: string, size: string, printVariant?: string): string {
+function encodeSkuWeb(
+  prefix: string,
+  sequence: number,
+  side: string,
+  color: string,
+  size: string,
+  printVariant?: string,
+): string {
   const colorCode = resolveColorCode(color);
   const sizeCode = size.trim().toUpperCase();
   const seq = formatSequence(sequence);
   const variant = printVariant ? `+${printVariant}` : '';
-  return `${prefix}-${seq}-PR-${colorCode}-${sizeCode}${variant}`;
+  return `${prefix}-${seq}-${side}-${colorCode}-${sizeCode}${variant}`;
 }
 
 export function WorkbenchPage() {
@@ -191,25 +198,82 @@ export function WorkbenchPage() {
   const titleOk = titleChars <= VIETNAM_TITLE_MAX;
   const titleWarn = titleCjk > VIETNAM_CJK_RECOMMENDED;
 
-  // 生成SKU编码
+  // 生成SKU编码（演示：五段 + 可选印花后缀）
   const generateSkuCode = (sku: ProductSku, index: number) => {
     const activeTemplate = templates.find((t) => t.id === activeTpl);
     const prefix = activeTemplate?.skuConfig?.prefix ?? 'BF';
     const sequence = (activeTemplate?.skuConfig?.sequenceStart ?? 1) + index;
-    return encodeSkuWeb(prefix, sequence, sku.color || sku.colorCode || 'XX', sku.size);
+    const side = sku.patternSuffix ?? activeTemplate?.skuConfig?.sides?.[0] ?? 'PR';
+    return encodeSkuWeb(
+      prefix,
+      sequence,
+      side,
+      sku.color || sku.colorCode || 'XX',
+      sku.size,
+      sku.printVariant,
+    );
   };
+
+  useEffect(() => {
+    if (!p) return;
+    setEditingTitle(p.processed?.conversion.title ?? p.processed?.exposure.title ?? p.title);
+    setEditingShortDesc(
+      p.processed?.conversion.shortDescription ?? p.processed?.exposure.shortDescription ?? '',
+    );
+    setEditingDescription(p.description ?? '');
+    setEditingSkus(p.skus?.length ? [...p.skus] : []);
+    setEditingCategory((p.categoryId as CategoryTemplateId) || 'tpl-clothing-tshirt');
+    const logistics = (p.attributes as { logistics?: { weightGrams?: number; packageDimensions?: PackageDimensions } })
+      ?.logistics;
+    if (logistics?.weightGrams) {
+      setEditingLogistics({
+        weight: logistics.weightGrams,
+        dims: logistics.packageDimensions ?? DEFAULT_PACKAGE,
+      });
+    }
+  }, [p?.id, p?.updatedAt]);
 
   // 保存编辑
   const saveEdits = () => {
     if (!p) return;
-    updateMut.mutate({
-      id: p.id,
-      patch: {
-        title: editingTitle,
-        targetLocale: p.targetLocale,
+    const skusWithCodes = editingSkus.map((sku, idx) => ({
+      ...sku,
+      skuCode: generateSkuCode(sku, idx),
+      name: sku.name || `${sku.color}-${sku.size}`,
+    }));
+    const processedPatch = processed
+      ? {
+          exposure: {
+            ...processed.exposure,
+            shortDescription: editingShortDesc,
+          },
+          conversion: {
+            ...processed.conversion,
+            title: editingTitle,
+            shortDescription: editingShortDesc,
+          },
+        }
+      : undefined;
+
+    updateMut.mutate(
+      {
+        id: p.id,
+        patch: {
+          title: editingTitle,
+          description: editingDescription,
+          categoryId: editingCategory,
+          skus: skusWithCodes,
+          processed: processedPatch,
+          attributes: {
+            logistics: {
+              weightGrams: editingLogistics.weight,
+              packageDimensions: editingLogistics.dims,
+            },
+          },
+        },
       },
-    });
-    setIsEditing(false);
+      { onSuccess: () => setIsEditing(false) },
+    );
   };
 
   // 翻译图片
@@ -272,7 +336,7 @@ export function WorkbenchPage() {
               onChange={(e) =>
                 updateMut.mutate({
                   id: p.id,
-                  patch: { targetLocale: e.target.value as 'vi-VN' | 'th-TH' },
+                  patch: { targetLocale: e.target.value as Product['targetLocale'] },
                 })
               }
             >
@@ -798,13 +862,15 @@ export function WorkbenchPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={async () => {
-                try {
-                  await api.createImageJob(p.id, ['scan_text']);
-                  setImageMsg('正在检测中文字体残留...');
-                } catch {
-                  setImageMsg('检测失败');
-                }
+              onClick={() => {
+                const cjk = /[\u4e00-\u9fff]/;
+                const inTitle = cjk.test(editingTitle);
+                const inDesc = cjk.test(editingShortDesc + editingDescription);
+                setImageMsg(
+                  inTitle || inDesc
+                    ? '⚠️ 文案中仍含汉字，图片区请人工检查译图是否残留中文'
+                    : '✓ 文案区未发现汉字，请目视确认主图译图',
+                );
               }}
             >
               🔍 检测中文字体

@@ -68,9 +68,36 @@ export const httpApi = {
     return request<DashboardMetrics>('/dashboard/metrics');
   },
 
-  getProducts(status?: string) {
-    const q = status ? `?status=${encodeURIComponent(status)}` : '';
-    return request<Product[]>(`/products${q}`);
+  getProducts(filters?: {
+    status?: string;
+    source?: string;
+    keyword?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }) {
+    const params = new URLSearchParams();
+    if (filters?.status) params.set('status', filters.status);
+    if (filters?.source) params.set('source', filters.source);
+    if (filters?.keyword) params.set('keyword', filters.keyword);
+    if (filters?.dateFrom) params.set('dateFrom', filters.dateFrom);
+    if (filters?.dateTo) params.set('dateTo', filters.dateTo);
+    const q = params.toString();
+    return request<Product[]>(`/products${q ? `?${q}` : ''}`);
+  },
+
+  createProduct(input: {
+    title: string;
+    source: string;
+    sourceUrl?: string;
+    priceCny?: number;
+    thumb: string;
+    images?: string[];
+    targetLocale?: Product['targetLocale'];
+  }) {
+    return request<Product>('/products', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
   },
 
   getProduct(id: string) {

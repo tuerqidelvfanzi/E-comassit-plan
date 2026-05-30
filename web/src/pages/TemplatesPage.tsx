@@ -4,6 +4,7 @@ import { PageHeader, Card, Badge, Button, Input } from '../components/ui';
 import { api } from '../lib/api';
 import { queryKeys, useTemplates } from '../hooks/useAppQueries';
 import type { TemplateItem, SkuConfig, CategoryTemplateId } from '../lib/api/types';
+import { SkuEncodingTip } from '../components/SkuEncodingTip';
 
 // 默认颜色列表
 const DEFAULT_COLORS = [
@@ -224,7 +225,13 @@ export function TemplatesPage() {
           {/* SKU配置区域 */}
           <div className="border-t pt-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-medium">SKU编码配置</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-medium">SKU编码配置</h3>
+                <SkuEncodingTip
+                  categoryId={editing.categoryId}
+                  language={editing.language}
+                />
+              </div>
               <Button
                 variant="outline"
                 size="sm"
