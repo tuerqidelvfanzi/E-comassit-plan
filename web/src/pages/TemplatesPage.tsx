@@ -22,6 +22,12 @@ const DEFAULT_COLORS = [
 // 默认尺码列表
 const DEFAULT_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
+// 印花后缀选项
+const PRINT_VARIANT_OPTIONS = [
+  { value: 'B', label: '白底黑花 (+B)' },
+  { value: 'H', label: '黑底白花 (+H)' },
+] as const;
+
 // 类目选项
 const CATEGORY_OPTIONS: { value: CategoryTemplateId; label: string }[] = [
   { value: 'tpl-clothing-tshirt', label: '服装-T恤' },
@@ -41,6 +47,7 @@ const SKU_TIPS = {
   colors: '支持的颜色列表，选择商品实际有的颜色',
   sizes: '支持的尺码列表，T恤通常为S-XXXL',
   side: 'P=正面有图案，R=背面有图案，PR=正反面都有',
+  printVariant: '+B=白底黑花（黑字印在白底上），+H=黑底白花（白字印在黑底上）',
   dummyHook: '单款式商品需要添加白色钩子占位，增加曝光',
 };
 
@@ -64,6 +71,7 @@ export function TemplatesPage() {
     colors: ['WH', 'BK', 'PK'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
     sides: ['PR'],
+    printVariants: ['B', 'H'],
     dummyHook: {
       enabled: true,
       colorName: 'empty',
@@ -136,6 +144,19 @@ export function TemplatesPage() {
     setEditing({
       ...editing,
       skuConfig: { ...editing.skuConfig, sides: newSides.length > 0 ? newSides : sides },
+    });
+  };
+
+  // 切换印花后缀
+  const togglePrintVariant = (variant: 'B' | 'H') => {
+    if (!editing?.skuConfig) return;
+    const variants = editing.skuConfig.printVariants || [];
+    const newVariants = variants.includes(variant)
+      ? variants.filter((v) => v !== variant)
+      : [...variants, variant];
+    setEditing({
+      ...editing,
+      skuConfig: { ...editing.skuConfig, printVariants: newVariants },
     });
   };
 
@@ -371,6 +392,41 @@ export function TemplatesPage() {
                   )}
                 </div>
 
+                {/* 印花后缀 */}
+                <div>
+                  <div className="flex items-center gap-1">
+                    <label className="text-sm text-muted">印花后缀</label>
+                    <span
+                      className="text-xs text-[var(--color-primary)] cursor-help"
+                      title={SKU_TIPS.printVariant}
+                      onMouseEnter={() => setTooltip('printVariant')}
+                      onMouseLeave={() => setTooltip(null)}
+                    >
+                      ❓
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted mt-1">用于SKU六段编码，如 BF-0001-PR-WH-S+B</p>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {PRINT_VARIANT_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        className={`px-3 py-1 rounded text-sm border ${
+                          editing.skuConfig?.printVariants?.includes(opt.value)
+                            ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)]'
+                            : 'bg-[var(--color-surface)] border-[var(--color-border)]'
+                        }`}
+                        onClick={() => togglePrintVariant(opt.value)}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                  {tooltip === 'printVariant' && (
+                    <p className="mt-2 text-xs text-muted bg-[var(--color-surface)] p-2 rounded border">{SKU_TIPS.printVariant}</p>
+                  )}
+                </div>
+
                 {/* 白色钩子配置 */}
                 <div className="border-t pt-4">
                   <div className="flex items-center gap-1">
@@ -470,19 +526,22 @@ export function TemplatesPage() {
                 {/* SKU预览 */}
                 {editing.skuConfig && (
                   <div className="border-t pt-4">
-                    <p className="text-sm text-muted mb-2">SKU编码预览:</p>
+                    <p className="text-sm text-muted mb-2">SKU编码预览 (六段格式):</p>
                     <div className="flex flex-wrap gap-2">
-                      {editing.skuConfig.colors.slice(0, 3).map((color) =>
-                        editing.skuConfig!.sizes.slice(0, 3).map((size) => (
-                          <code key={`${color}-${size}`} className="text-xs bg-muted px-2 py-1 rounded">
-                            {editing.skuConfig!.prefix}-{String(editing.skuConfig!.sequenceStart).padStart(4, '0')}-{editing.skuConfig!.sides[0] || 'PR'}-{color}-{size}
-                          </code>
-                        ))
+                      {editing.skuConfig.colors.slice(0, 2).map((color) =>
+                        editing.skuConfig!.sizes.slice(0, 2).map((size) =>
+                          editing.skuConfig!.printVariants?.slice(0, 2).map((variant) => (
+                            <code key={`${color}-${size}-${variant}`} className="text-xs bg-muted px-2 py-1 rounded">
+                              {editing.skuConfig!.prefix}-{String(editing.skuConfig!.sequenceStart).padStart(4, '0')}-{editing.skuConfig!.sides[0] || 'PR'}-{color}-{size}+{variant}
+                            </code>
+                          ))
+                        )
                       )}
-                      {(editing.skuConfig.colors.length > 3 || editing.skuConfig.sizes.length > 3) && (
+                      {(editing.skuConfig.colors.length > 2 || editing.skuConfig.sizes.length > 2) && (
                         <span className="text-xs text-muted">...</span>
                       )}
                     </div>
+                    <p className="text-xs text-muted mt-2">格式：{editing.skuConfig.prefix}-序号-正反面-颜色-尺码+后缀</p>
                     {editing.skuConfig.dummyHook.enabled && (
                       <code className="mt-2 inline-block text-xs bg-muted px-2 py-1 rounded">
                         {editing.skuConfig.prefix}-9999-P-WH-{editing.skuConfig.sizes[0] || 'S'} (Hook)

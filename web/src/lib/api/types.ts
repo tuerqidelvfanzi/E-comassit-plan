@@ -31,8 +31,11 @@ export type ProductImage = {
 };
 
 /**
- * BRD v1.1 §5.3 ProductSku
+ * BRD v1.1 §5.3 ProductSku（六段编码支持）
+ * 印花后缀：B=白底黑花，H=黑底白花
  */
+export type PrintVariant = 'B' | 'H';
+
 export type ProductSku = {
   id?: string;
   name: string;
@@ -44,6 +47,8 @@ export type ProductSku = {
   weight?: number;
   skuCode?: string;
   patternSuffix?: 'P' | 'R' | 'PR';
+  /** 印花后缀：B=白底黑花，H=黑底白花 */
+  printVariant?: PrintVariant;
   isDummyHook?: boolean;
 };
 
@@ -117,13 +122,15 @@ export type DummyHookConfig = {
   weight: number;
 };
 
-/** SKU 配置（BRD §4.2 五段编码） */
+/** SKU 配置（BRD §4.2 六段编码，支持印花后缀） */
 export type SkuConfig = {
   prefix: string;
   sequenceStart: number;
   colors: string[];
   sizes: string[];
   sides: Array<'P' | 'R' | 'PR'>;
+  /** 支持的印花后缀：B=白底黑花，H=黑底白花 */
+  printVariants?: PrintVariant[];
   dummyHook: DummyHookConfig;
 };
 
@@ -172,6 +179,22 @@ export type LogisticsConfig = {
   shippingWeight: number;
   deliveryDays: number;
   freeReturn: boolean;
+  /** 包裹尺寸（cm）：长×宽×高，菲律宾固定 10-5-10 */
+  packageDimensions?: PackageDimensions;
+};
+
+export type PackageDimensions = {
+  length: number;
+  width: number;
+  height: number;
+};
+
+/** 各市场包裹尺寸默认值（需求文档：上品实操PPT） */
+export const DEFAULT_PACKAGE_DIMENSIONS: Record<TargetLocale, PackageDimensions> = {
+  'vi-VN': { length: 10, width: 5, height: 10 },
+  'th-TH': { length: 10, width: 5, height: 10 },
+  'id-ID': { length: 10, width: 5, height: 10 },
+  'fil-PH': { length: 10, width: 5, height: 10 },
 };
 
 export const LOGISTICS_DEFAULTS: LogisticsConfig = {

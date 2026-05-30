@@ -1,10 +1,21 @@
 /**
- * 服装-T恤 SKU 五段编码（BRD v1.1 §4.2）
- * 格式：{PREFIX}-{SEQUENCE}-{SIDE}-{COLOR}-{SIZE}
- * 示例：BF-0001-PR-WH-S
+ * 服装-T恤 SKU 六段编码（需求文档：谷歌报告2 + 上品实操PPT）
+ * 格式：{PREFIX}-{SEQUENCE}-{SIDE}-{COLOR}-{SIZE}+{后缀}
+ * 示例：BF-0001-PR-WH-S+B (白底黑花) / BF-0001-PR-WH-S-H (黑底白花)
+ * +B = 白底黑花 (White base + Black print)
+ * +H = 黑底白花 (Black base + White print)
  */
 
 export const SKU_DEFAULT_PREFIX = 'BF';
+
+/** 印花后缀：B=白底黑花，H=黑底白花 */
+export const PRINT_VARIANTS = ['B', 'H'] as const;
+export type PrintVariant = (typeof PRINT_VARIANTS)[number];
+
+export const PRINT_VARIANT_LABELS: Record<PrintVariant, string> = {
+  B: '白底黑花 (+B)',
+  H: '黑底白花 (+H)',
+};
 
 /** BRD §4.3 颜色编码表（2 字母） */
 export const COLOR_CODES: Record<string, string> = {
@@ -51,6 +62,8 @@ export type SkuEncodeInput = {
   side: PatternSide;
   color: string;
   size: string;
+  /** 印花后缀：B=白底黑花，H=黑底白花 */
+  printVariant?: PrintVariant;
 };
 
 export type ParsedSku = {
@@ -59,10 +72,12 @@ export type ParsedSku = {
   side: PatternSide;
   colorCode: string;
   size: string;
+  printVariant?: PrintVariant;
   isDummyHook: boolean;
 };
 
-const SKU_PATTERN = /^([A-Z0-9]+)-(\d{4})-(P|R|PR)-([A-Z]{2})-([A-Z0-9]+)$/;
+/** 六段格式正则：支持 +B / +H 后缀 */
+const SKU_PATTERN = /^([A-Z0-9]+)-(\d{4})-(P|R|PR)-([A-Z]{2})-([A-Z0-9]+)(\+[BH])?$/;
 
 export function resolveColorCode(color: string): string | undefined {
   const key = color.trim();
@@ -88,7 +103,8 @@ export function encodeSku(input: SkuEncodeInput): string {
     throw new Error(`INVALID_SIDE: ${input.side}`);
   }
   const seq = formatSequence(input.sequence);
-  return `${prefix}-${seq}-${input.side}-${colorCode}-${size}`;
+  const variantSuffix = input.printVariant ? `+${input.printVariant}` : '';
+  return `${prefix}-${seq}-${input.side}-${colorCode}-${size}${variantSuffix}`;
 }
 
 /** BRD §4.4 白色钩子：单款式占位变体 */
@@ -100,24 +116,23 @@ export function parseSku(code: string): ParsedSku | null {
   const m = code.trim().match(SKU_PATTERN);
   if (!m) return null;
   const sequence = Number(m[2]);
+  const printVariant = m[6] ? (m[6].replace('+', '') as PrintVariant) : undefined;
   return {
     prefix: m[1],
     sequence,
     side: m[3] as PatternSide,
     colorCode: m[4],
     size: m[5],
+    printVariant,
     isDummyHook: sequence === 9999 && m[3] === 'P' && m[4] === 'WH',
   };
 }
 
-/** @deprecated 旧版印花后缀，保留类型兼容 */
-export const PRINT_VARIANT_SUFFIX = {
-  blackOnWhite: 'H',
-  whiteOnBlack: 'B',
-} as const;
-
-export type PrintVariant = keyof typeof PRINT_VARIANT_SUFFIX;
-
-export function variantSuffixForPrint(_variant: PrintVariant): string {
-  return PRINT_VARIANT_SUFFIX.whiteOnBlack;
+/**
+ * 判断印花后缀类型
+ * @param variant B=白底黑花，H=黑底白花
+ */
+export function getPrintVariantLabel(variant?: PrintVariant): string {
+  if (!variant) return '';
+  return PRINT_VARIANT_LABELS[variant] || variant;
 }

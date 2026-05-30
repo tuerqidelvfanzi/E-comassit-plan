@@ -9,7 +9,7 @@ import {
   useInvalidateProducts,
 } from '../hooks/useAppQueries';
 import { api } from '../lib/api';
-import type { ProductSku } from '../lib/api/types';
+import type { ProductSku, PackageDimensions, CategoryTemplateId } from '../lib/api/types';
 
 // 越南站标题最大字符数
 const VIETNAM_TITLE_MAX = 20;
@@ -28,6 +28,76 @@ const COLOR_CODES: Record<string, string> = {
   '橙色': 'OR', 'orange': 'OR', 'OR': 'OR',
   '灰色': 'GY', 'gray': 'GY', 'GY': 'GY',
 };
+
+// 印花后缀选项
+const PRINT_VARIANT_OPTIONS = [
+  { value: 'B', label: '白底黑花 (+B)' },
+  { value: 'H', label: '黑底白花 (+H)' },
+] as const;
+
+// 类目选项
+const CATEGORY_OPTIONS: { value: CategoryTemplateId; label: string }[] = [
+  { value: 'tpl-clothing-tshirt', label: '服装-T恤' },
+  { value: 'tpl-clothing-general', label: '服装-通用' },
+  { value: 'tpl-kitchenware', label: '厨具' },
+  { value: 'tpl-lighting', label: '灯具' },
+  { value: 'tpl-beauty', label: '美妆' },
+  { value: 'tpl-electronics', label: '3C电子' },
+  { value: 'tpl-home', label: '家居' },
+  { value: 'tpl-other', label: '通用模板' },
+];
+
+// 默认包裹尺寸（菲律宾固定 10-5-10cm）
+const DEFAULT_PACKAGE: PackageDimensions = { length: 10, width: 5, height: 10 };
+
+// 违禁词列表（需求文档 §8.2 防侵权）
+const BANNED_TERMS = [
+  '耐克', 'Nike', '阿迪达斯', 'Adidas', '迪士尼', 'Disney', 'LV', '路易威登',
+  'Gucci', '古驰', 'Chanel', '香奈儿', '爱马仕', 'Hermès',
+  '苹果', 'Apple', '三星', 'Samsung', '华为', 'Huawei', 'NASA',
+  '3C认证', '产地', '发货地', '最便宜', '全网最低', '绝对', '100%正品',
+];
+
+// 扫描违禁词
+function scanBannedTerms(text: string): string[] {
+  if (!text) return [];
+  const found: string[] = [];
+  for (const term of BANNED_TERMS) {
+    if (text.includes(term)) {
+      found.push(term);
+    }
+  }
+  return found;
+}
+
+// 高亮违禁词
+function highlightBannedTerms(text: string): React.ReactNode {
+  if (!text) return null;
+  let result: React.ReactNode[] = [];
+  let remaining = text;
+  let lastIndex = 0;
+
+  for (const term of BANNED_TERMS) {
+    const index = remaining.indexOf(term);
+    if (index !== -1) {
+      if (index > lastIndex) {
+        result.push(remaining.slice(lastIndex, index));
+      }
+      result.push(
+        <mark key={term + index} className="bg-red-200 text-red-700 px-0.5 rounded">
+          {term}
+        </mark>
+      );
+      lastIndex = index + term.length;
+    }
+  }
+
+  if (lastIndex < remaining.length) {
+    result.push(remaining.slice(lastIndex));
+  }
+
+  return result.length > 0 ? result : text;
+}
 
 // 计算字符数（Unicode字符）
 function countChars(str: string): number {
@@ -50,12 +120,13 @@ function formatSequence(n: number): string {
   return String(Math.max(1, Math.min(1000, Math.floor(n)))).padStart(4, '0');
 }
 
-// 生成SKU编码（前端简化版）
-function encodeSkuWeb(prefix: string, sequence: number, color: string, size: string): string {
+// 生成SKU编码（前端六段版，支持印花后缀）
+function encodeSkuWeb(prefix: string, sequence: number, color: string, size: string, printVariant?: string): string {
   const colorCode = resolveColorCode(color);
   const sizeCode = size.trim().toUpperCase();
   const seq = formatSequence(sequence);
-  return `${prefix}-${seq}-PR-${colorCode}-${sizeCode}`;
+  const variant = printVariant ? `+${printVariant}` : '';
+  return `${prefix}-${seq}-PR-${colorCode}-${sizeCode}${variant}`;
 }
 
 export function WorkbenchPage() {
@@ -72,15 +143,23 @@ export function WorkbenchPage() {
   // 编辑状态
   const [editingTitle, setEditingTitle] = useState('');
   const [editingShortDesc, setEditingShortDesc] = useState('');
+  const [editingDescription, setEditingDescription] = useState('');
   const [editingSkus, setEditingSkus] = useState<ProductSku[]>([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<CategoryTemplateId>('tpl-other');
+  const [editingLogistics, setEditingLogistics] = useState<{ weight: number; dims: PackageDimensions }>({
+    weight: 220,
+    dims: DEFAULT_PACKAGE,
+  });
 
   // 初始化编辑状态
   const initEditing = () => {
     if (p) {
       setEditingTitle(p.processed?.conversion.title ?? p.processed?.exposure.title ?? p.title);
       setEditingShortDesc(p.processed?.conversion.shortDescription ?? p.processed?.exposure.shortDescription ?? '');
+      setEditingDescription(p.description || '');
       setEditingSkus(p.skus ? [...p.skus] : []);
+      setEditingCategory((p.categoryId as CategoryTemplateId) || 'tpl-other');
       setIsEditing(true);
     }
   };
@@ -285,9 +364,24 @@ export function WorkbenchPage() {
                 ⚠️ 汉字过多，建议压缩到{VIETNAM_CJK_RECOMMENDED}字以内
               </p>
             )}
+            {/* 违禁词检测 */}
+            {scanBannedTerms(editingTitle).length > 0 && (
+              <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded">
+                <p className="text-xs text-red-600 font-medium">⚠️ 标题含违禁词：</p>
+                <p className="text-xs text-red-500">
+                  {scanBannedTerms(editingTitle).join(', ')}
+                </p>
+              </div>
+            )}
           </div>
         ) : (
-          <p className="mt-2 text-sm">{editingTitle || processed?.conversion.title || processed?.exposure.title || p.title}</p>
+          <div className="mt-2">
+            {scanBannedTerms(editingTitle).length > 0 ? (
+              <p className="text-sm">{highlightBannedTerms(editingTitle || processed?.conversion.title || processed?.exposure.title || p.title)}</p>
+            ) : (
+              <p className="text-sm">{editingTitle || processed?.conversion.title || processed?.exposure.title || p.title}</p>
+            )}
+          </div>
         )}
 
         {/* 短描述 */}
@@ -309,6 +403,42 @@ export function WorkbenchPage() {
           ) : (
             <p className="mt-1 text-sm text-muted">{editingShortDesc || '-'}</p>
           )}
+          {/* 违禁词检测 */}
+          {isEditing && scanBannedTerms(editingShortDesc).length > 0 && (
+            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded">
+              <p className="text-xs text-red-600 font-medium">⚠️ 短描述含违禁词：</p>
+              <p className="text-xs text-red-500">
+                {scanBannedTerms(editingShortDesc).join(', ')}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* 详细描述 */}
+        <div className="mt-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium text-muted">详细描述（越南站13步流程：编详细描述）</h4>
+          </div>
+          {isEditing ? (
+            <textarea
+              className="mt-1 w-full rounded border border-[var(--color-border)] bg-[var(--color-surface)] p-2 text-sm"
+              rows={6}
+              value={editingDescription}
+              onChange={(e) => setEditingDescription(e.target.value)}
+              placeholder="输入详细描述，优化文案，删除品牌/产地/发货地/3C认证等违禁词..."
+            />
+          ) : (
+            <p className="mt-1 text-sm text-muted whitespace-pre-wrap">{editingDescription || '暂无详细描述'}</p>
+          )}
+          {/* 违禁词检测 */}
+          {isEditing && scanBannedTerms(editingDescription).length > 0 && (
+            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded">
+              <p className="text-xs text-red-600 font-medium">⚠️ 详细描述含违禁词：</p>
+              <p className="text-xs text-red-500">
+                {scanBannedTerms(editingDescription).join(', ')}
+              </p>
+            </div>
+          )}
         </div>
       </Card>
 
@@ -324,7 +454,7 @@ export function WorkbenchPage() {
                 // 添加一个空SKU
                 setEditingSkus([
                   ...editingSkus,
-                  { name: '', color: '', colorCode: '', size: '', price: p.priceCny, stock: 50 },
+                  { name: '', color: '', colorCode: '', size: '', price: p.priceCny, stock: 50, printVariant: 'B' },
                 ]);
               }}
             >
@@ -339,6 +469,7 @@ export function WorkbenchPage() {
                 <tr>
                   <th className="p-2">颜色</th>
                   <th className="p-2">尺码</th>
+                  <th className="p-2">印花</th>
                   <th className="p-2">价格</th>
                   <th className="p-2">库存</th>
                   <th className="p-2">SKU编码</th>
@@ -378,6 +509,25 @@ export function WorkbenchPage() {
                         />
                       ) : (
                         sku.size
+                      )}
+                    </td>
+                    <td className="p-2">
+                      {isEditing ? (
+                        <select
+                          className="w-24 rounded border p-1 text-sm"
+                          value={sku.printVariant || 'B'}
+                          onChange={(e) => {
+                            const updated = [...editingSkus];
+                            updated[idx] = { ...sku, printVariant: e.target.value as 'B' | 'H' };
+                            setEditingSkus(updated);
+                          }}
+                        >
+                          {PRINT_VARIANT_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span className="text-xs">{sku.printVariant ? `+${sku.printVariant}` : '-'}</span>
                       )}
                     </td>
                     <td className="p-2">
@@ -440,6 +590,144 @@ export function WorkbenchPage() {
         )}
       </Card>
 
+      {/* 类目和物流信息 */}
+      <Card className="mt-4">
+        <h3 className="font-medium mb-3">类目与物流</h3>
+        <div className="grid gap-4 md:grid-cols-2">
+          {/* 类目选择 */}
+          <div>
+            <label className="block text-sm text-muted mb-1">产品类目</label>
+            {isEditing ? (
+              <select
+                className="w-full rounded border border-[var(--color-border)] bg-[var(--color-surface)] p-2"
+                value={editingCategory}
+                onChange={(e) => setEditingCategory(e.target.value as CategoryTemplateId)}
+              >
+                {CATEGORY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            ) : (
+              <p className="text-sm">{CATEGORY_OPTIONS.find(c => c.value === p.categoryId)?.label || p.category || '未分类'}</p>
+            )}
+          </div>
+
+          {/* 重量 */}
+          <div>
+            <label className="block text-sm text-muted mb-1">重量 (g)</label>
+            {isEditing ? (
+              <input
+                className="w-full rounded border border-[var(--color-border)] bg-[var(--color-surface)] p-2"
+                type="number"
+                value={editingLogistics.weight}
+                onChange={(e) => setEditingLogistics({ ...editingLogistics, weight: Number(e.target.value) })}
+              />
+            ) : (
+              <p className="text-sm">{editingLogistics.weight}g</p>
+            )}
+          </div>
+        </div>
+
+        {/* 包裹尺寸 */}
+        <div className="mt-4">
+          <label className="block text-sm text-muted mb-1">包裹尺寸 (cm) - 长×宽×高</label>
+          <p className="text-xs text-muted mb-2">菲律宾固定 10-5-10cm</p>
+          {isEditing ? (
+            <div className="flex gap-2 items-center">
+              <input
+                className="w-20 rounded border border-[var(--color-border)] bg-[var(--color-surface)] p-2 text-sm"
+                type="number"
+                value={editingLogistics.dims.length}
+                onChange={(e) => setEditingLogistics({ ...editingLogistics, dims: { ...editingLogistics.dims, length: Number(e.target.value) } })}
+                placeholder="长"
+              />
+              <span>×</span>
+              <input
+                className="w-20 rounded border border-[var(--color-border)] bg-[var(--color-surface)] p-2 text-sm"
+                type="number"
+                value={editingLogistics.dims.width}
+                onChange={(e) => setEditingLogistics({ ...editingLogistics, dims: { ...editingLogistics.dims, width: Number(e.target.value) } })}
+                placeholder="宽"
+              />
+              <span>×</span>
+              <input
+                className="w-20 rounded border border-[var(--color-border)] bg-[var(--color-surface)] p-2 text-sm"
+                type="number"
+                value={editingLogistics.dims.height}
+                onChange={(e) => setEditingLogistics({ ...editingLogistics, dims: { ...editingLogistics.dims, height: Number(e.target.value) } })}
+                placeholder="高"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditingLogistics({ ...editingLogistics, dims: DEFAULT_PACKAGE })}
+              >
+                恢复默认 (10-5-10)
+              </Button>
+            </div>
+          ) : (
+            <p className="text-sm">{editingLogistics.dims.length}-{editingLogistics.dims.width}-{editingLogistics.dims.height} cm</p>
+          )}
+        </div>
+      </Card>
+
+      {/* 双栏对比视图 */}
+      <Card className="mt-4">
+        <h3 className="font-medium mb-3">📝 双栏对比预译 <span className="text-xs text-muted font-normal">（左：原图/原标题，右：译图/优化标题）</span></h3>
+        <div className="grid gap-4 lg:grid-cols-2">
+          {/* 左侧：原始数据 */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium text-red-600">📷 原始图片</h4>
+            <div className="grid grid-cols-3 gap-2">
+              {(Array.isArray(p.images) ? p.images : [p.thumb]).slice(0, 6).map((img, idx) => {
+                const url = typeof img === 'string' ? img : img.url;
+                return (
+                  <div key={idx} className="relative">
+                    <img src={url} alt="" className="h-24 w-full rounded object-cover" />
+                  </div>
+                );
+              })}
+            </div>
+            <div>
+              <p className="text-xs text-muted">原始标题</p>
+              <p className="text-sm font-medium">{p.title}</p>
+            </div>
+          </div>
+
+          {/* 右侧：处理后数据 */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium text-green-600">✨ 处理后（越南语本地化）</h4>
+            {processed ? (
+              <>
+                <div className="grid grid-cols-3 gap-2">
+                  {(Array.isArray(p.images) ? p.images : [p.thumb]).slice(0, 6).map((img, idx) => {
+                    const url = typeof img === 'string' ? img : img.url;
+                    return (
+                      <div key={idx} className="relative">
+                        <img src={url} alt="" className="h-24 w-full rounded object-cover opacity-80" />
+                        <span className="absolute bottom-0 left-0 right-0 bg-green-500/80 text-white text-xs text-center py-0.5 rounded-b">译</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div>
+                  <p className="text-xs text-muted">高曝光向</p>
+                  <p className="text-sm font-medium text-green-700">{processed.exposure.title}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted">高转化向</p>
+                  <p className="text-sm font-medium text-green-700">{processed.conversion.title}</p>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-8 text-muted">
+                <p>运行管线后显示优化结果</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </Card>
+
       {/* 图片处理区 */}
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <Card>
@@ -460,7 +748,7 @@ export function WorkbenchPage() {
               🖌️ 消除笔/去水印
             </Button>
             <Button variant="outline" onClick={handleTranslate}>
-              🌐 图片翻译
+              🌐 图片翻译（中→越）
             </Button>
             <Button
               variant="outline"
@@ -503,6 +791,36 @@ export function WorkbenchPage() {
           )}
         </Card>
       </div>
+
+      {/* 一键翻译越南语按钮 */}
+      {isEditing && (
+        <Card className="mt-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium">越南站13步流程</h3>
+              <p className="text-xs text-muted mt-1">越南Shopee上品：标题→描述→类目→SKU→图片→物流→保存→翻译→发布</p>
+            </div>
+            <Button
+              onClick={async () => {
+                // 一键翻译越南语
+                try {
+                  await api.createImageJob(p.id, ['translate_overlay']);
+                  pipelineMut.mutate({
+                    productId: p.id,
+                    templateId: activeTpl,
+                    adhocPrompt: `翻译成越南语，保持SEO优化，标题≤20字符`,
+                  });
+                  setImageMsg('已触发越南语翻译管线');
+                } catch {
+                  setImageMsg('翻译失败');
+                }
+              }}
+            >
+              🇻🇳 一键翻译越南语
+            </Button>
+          </div>
+        </Card>
+      )}
     </>
   );
 }
