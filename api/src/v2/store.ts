@@ -91,7 +91,7 @@ export const v2Store = {
     job.status = 'running';
     job.updatedAt = new Date().toISOString();
     job.status = 'done';
-    job.report = mockReport(job.keyword);
+    job.report = mockReport(job.keyword, job.sourcePlatform);
     job.updatedAt = new Date().toISOString();
     return job;
   },
@@ -204,10 +204,42 @@ export const v2Store = {
         priceLabel: locale === 'vi-VN' ? '₫95,000' : '฿249',
       },
       skus: [
-        { skuCode: 'BF-0001-PR-WH-S', color: 'WH', size: 'S', price: 400, stock: 50 },
-        { skuCode: 'BF-0002-PR-BK-M', color: 'BK', size: 'M', price: 400, stock: 50 },
+        {
+          skuCode: 'BF-0001-PR-WH-S+B',
+          color: 'WH',
+          size: 'S',
+          printVariant: 'B',
+          price: 400,
+          stock: 50,
+        },
+        {
+          skuCode: 'BF-0002-PR-BK-M+H',
+          color: 'BK',
+          size: 'M',
+          printVariant: 'H',
+          price: 400,
+          stock: 50,
+        },
         { skuCode: 'BF-9999-P-WH-L', color: 'WH', size: 'L', price: 400, stock: 5 },
       ],
+      shopeeVnChecklist:
+        locale === 'vi-VN'
+          ? [
+              { id: 'select_shop', label: '1. 选择店铺', done: true },
+              { id: 'create_product', label: '2. 创建商品', done: true },
+              { id: 'upload_images', label: '3. 上传 9 张图', done: false },
+              { id: 'title', label: '4. 标题 ≤20 字', done: false },
+              { id: 'category', label: '5. 类目', done: false },
+              { id: 'sku_price_stock', label: '6. SKU 价×3.5 库存50', done: true },
+              { id: 'short_desc', label: '7. 短描述', done: false },
+              { id: 'long_desc', label: '8. 长描述', done: false },
+              { id: 'shipping', label: '9. 物流模板', done: false },
+              { id: 'weight', label: '10. 重量 220g', done: true },
+              { id: 'package_size', label: '11. 包裹 10×5×10', done: true },
+              { id: 'publish', label: '12. 发布', done: false },
+              { id: 'confirm', label: '13. 确认上架', done: false },
+            ]
+          : undefined,
       warnings: adhocPrompt ? ['Mock：已合并临时提示词'] : [],
       ranAt: new Date().toISOString(),
     };

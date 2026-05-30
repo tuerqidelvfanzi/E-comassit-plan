@@ -62,6 +62,15 @@ let competitors: CompetitorJob[] = [
       sampleTitles: ['A04蓝熊卡通纯棉T恤'],
       gmvEstimate: 'Mock GMV',
       ctrEstimate: 'Mock CTR',
+      similarProducts: [
+        {
+          title: '儿童 纯棉 卡通短袖',
+          priceCny: 22.8,
+          salesHint: '月销 1.2万+',
+          sourceUrl: 'https://mock.taobao/item/sim-1',
+          thumb: 'https://placehold.co/64x64/3b82f6/white?text=1',
+        },
+      ],
     },
   },
 ];
@@ -181,6 +190,22 @@ export const v2ApiLocal = {
       sampleTitles: [`${job.keyword} 爆款样例`],
       gmvEstimate: 'Mock',
       ctrEstimate: 'Mock',
+      similarProducts: [
+        {
+          title: `${job.keyword} 类似款 A`,
+          priceCny: 21.5,
+          salesHint: '月销 5000+',
+          sourceUrl: `https://mock.${job.sourcePlatform}/sim-a`,
+          thumb: 'https://placehold.co/64x64',
+        },
+        {
+          title: `${job.keyword} 类似款 B`,
+          priceCny: 24.0,
+          salesHint: '月销 3200+',
+          sourceUrl: `https://mock.${job.sourcePlatform}/sim-b`,
+          thumb: 'https://placehold.co/64x64',
+        },
+      ],
     };
     job.updatedAt = new Date().toISOString();
     return job;
@@ -234,16 +259,40 @@ export const v2ApiLocal = {
       locale,
       mock: true,
       exposure: {
-        title: 'Mock 高曝光标题',
-        shortDescription: '短描述',
+        title: locale === 'vi-VN' ? 'A04蓝熊纯棉T恤' : 'Mock 高曝光',
+        shortDescription: locale === 'vi-VN' ? '纯棉透气童T' : '短描述',
         priceLabel: '₫99,000',
       },
       conversion: {
-        title: 'Mock 高转化标题',
-        shortDescription: '短描述2',
+        title: locale === 'vi-VN' ? '童T纯棉 蓝熊' : 'Mock 高转化',
+        shortDescription: '可爱印花',
         priceLabel: '₫95,000',
       },
-      skus: [{ skuCode: 'BF-0001-PR-WH-S', color: 'WH', size: 'S', price: 400, stock: 50 }],
+      skus: [
+        {
+          skuCode: 'BF-0001-PR-WH-S+B',
+          color: 'WH',
+          size: 'S',
+          printVariant: 'B',
+          price: 400,
+          stock: 50,
+        },
+        {
+          skuCode: 'BF-0002-PR-BK-M+H',
+          color: 'BK',
+          size: 'M',
+          printVariant: 'H',
+          price: 400,
+          stock: 50,
+        },
+      ],
+      shopeeVnChecklist:
+        locale === 'vi-VN'
+          ? [
+              { id: 'title', label: '4. 标题 ≤20 字', done: false },
+              { id: 'sku_price_stock', label: '6. SKU', done: true },
+            ]
+          : undefined,
       warnings: adhocPrompt ? ['已应用临时 Prompt'] : [],
       ranAt: new Date().toISOString(),
     };

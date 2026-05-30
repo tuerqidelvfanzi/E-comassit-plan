@@ -28,6 +28,13 @@ export interface CompetitorJob {
     sampleTitles: string[];
     gmvEstimate: string;
     ctrEstimate: string;
+    similarProducts?: Array<{
+      title: string;
+      priceCny: number;
+      salesHint: string;
+      sourceUrl: string;
+      thumb: string;
+    }>;
   };
 }
 
@@ -114,7 +121,15 @@ export interface PipelineRunV2 {
   mock: boolean;
   exposure: { title: string; shortDescription: string; priceLabel: string };
   conversion: { title: string; shortDescription: string; priceLabel: string };
-  skus: Array<{ skuCode: string; color: string; size: string; price: number; stock: number }>;
+  skus: Array<{
+    skuCode: string;
+    color: string;
+    size: string;
+    printVariant?: 'B' | 'H';
+    price: number;
+    stock: number;
+  }>;
+  shopeeVnChecklist?: Array<{ id: string; label: string; done: boolean }>;
   warnings: string[];
   ranAt: string;
 }

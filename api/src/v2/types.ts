@@ -23,6 +23,15 @@ export interface CompetitorJob {
   report?: CompetitorReport;
 }
 
+/** 源平台内「同类/类似」在售商品（未入库，供选品参考） */
+export interface SimilarProductItem {
+  title: string;
+  priceCny: number;
+  salesHint: string;
+  sourceUrl: string;
+  thumb: string;
+}
+
 export interface CompetitorReport {
   keywords: Array<{ word: string; count: number; score: number }>;
   priceRange: { min: number; max: number; currency: string };
@@ -31,6 +40,29 @@ export interface CompetitorReport {
   sampleTitles: string[];
   gmvEstimate: string;
   ctrEstimate: string;
+  /** 处理层·同源找类似款（Mock 爬虫） */
+  similarProducts: SimilarProductItem[];
+}
+
+export type ShopeeVnStepId =
+  | 'select_shop'
+  | 'create_product'
+  | 'upload_images'
+  | 'title'
+  | 'category'
+  | 'sku_price_stock'
+  | 'short_desc'
+  | 'long_desc'
+  | 'shipping'
+  | 'weight'
+  | 'package_size'
+  | 'publish'
+  | 'confirm';
+
+export interface ShopeeVnChecklistStep {
+  id: ShopeeVnStepId;
+  label: string;
+  done: boolean;
 }
 
 export interface LinkCollectJob {
@@ -81,9 +113,11 @@ export interface PipelineRunV2 {
     skuCode: string;
     color: string;
     size: string;
+    printVariant?: 'B' | 'H';
     price: number;
     stock: number;
   }>;
+  shopeeVnChecklist?: ShopeeVnChecklistStep[];
   warnings: string[];
   ranAt: string;
 }

@@ -19,8 +19,8 @@ export function seedTemplateCatalog(): TemplateCatalogItem[] {
       category: '服装',
       locales: ['vi-VN', 'th-TH'],
       milestone: 'v2.0',
-      description: '颜色×尺码矩阵、五段 SKU、白色钩子',
-      skuPreview: 'BF-0001-PR-WH-S',
+      description: '颜色×尺码矩阵、六段 SKU（+B/+H）、白色钩子',
+      skuPreview: 'BF-0001-PR-WH-S+B',
     },
     {
       id: 'tpl-kids-a',
@@ -182,7 +182,7 @@ export function seedCompetitorJobs(): CompetitorJob[] {
       status: 'done',
       createdAt: now,
       updatedAt: now,
-      report: mockReport('儿童 T恤 纯棉'),
+      report: mockReport('儿童 T恤 纯棉', '淘宝'),
     },
     {
       id: 'cmp-2',
@@ -195,7 +195,34 @@ export function seedCompetitorJobs(): CompetitorJob[] {
   ];
 }
 
-export function mockReport(keyword: string) {
+export function mockSimilarProducts(keyword: string, sourcePlatform: string) {
+  const base = keyword.split(/\s+/)[0] || '爆款';
+  return [
+    {
+      title: `${base} 卡通印花纯棉短袖`,
+      priceCny: 22.8,
+      salesHint: '月销 1.2万+',
+      sourceUrl: `https://mock.${sourcePlatform}/item/sim-1`,
+      thumb: 'https://placehold.co/64x64/3b82f6/white?text=1',
+    },
+    {
+      title: `韩版${base} 透气圆领T`,
+      priceCny: 19.9,
+      salesHint: '月销 8600+',
+      sourceUrl: `https://mock.${sourcePlatform}/item/sim-2`,
+      thumb: 'https://placehold.co/64x64/8b5cf6/white?text=2',
+    },
+    {
+      title: `A04蓝熊 ${base} 亲子款`,
+      priceCny: 28.5,
+      salesHint: '月销 5200+',
+      sourceUrl: `https://mock.${sourcePlatform}/item/sim-3`,
+      thumb: 'https://placehold.co/64x64/ec4899/white?text=3',
+    },
+  ];
+}
+
+export function mockReport(keyword: string, sourcePlatform = '淘宝') {
   return {
     keywords: [
       { word: '纯棉', count: 42, score: 96 },
@@ -213,6 +240,7 @@ export function mockReport(keyword: string) {
     ],
     gmvEstimate: '¥12万–18万 / 月（Mock）',
     ctrEstimate: '3.2%–4.8%（Mock）',
+    similarProducts: mockSimilarProducts(keyword, sourcePlatform),
   };
 }
 

@@ -1,6 +1,7 @@
 # v2 演示说明
 
-> 版本：v2.0–v2.3 全 Mock · GitHub Pages / 本地均可浏览
+> 版本：v2.0–v2.3 全 Mock · GitHub Pages / 本地均可浏览  
+> **验收逐步演示**：见 [DEMO_V2_0.md](./DEMO_V2_0.md) · **业务流程**：见 [BUSINESS_FLOW_V2_0.md](./BUSINESS_FLOW_V2_0.md)
 
 ## 登录
 
