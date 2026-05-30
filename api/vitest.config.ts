@@ -4,7 +4,7 @@ import path from 'node:path';
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['src/**/*.test.ts', '../shared/pipeline/**/*.test.ts'],
+    include: ['src/**/*.test.ts', '../shared/pipeline/**/*.test.ts', '../shared/listing/**/*.test.ts'],
   },
   resolve: {
     alias: {

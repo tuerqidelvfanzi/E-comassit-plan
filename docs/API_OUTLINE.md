@@ -64,6 +64,26 @@
 | GET | `/publish-tasks` | 队列 |
 | PATCH | `/publish-tasks/:id` | 插件回写状态 |
 
+### 发布（上架扩展 · 见 `LISTING_PUBLISH_IMPLEMENTATION.md`）
+
+| Method | Path | 阶段 | 说明 |
+|--------|------|------|------|
+| GET | `/publish-tasks/:id` | P1 | 任务详情（含 skus、images、logistics） |
+| POST | `/publish-tasks` | P1 | Body 扩展：`description`, `price`, `currency`, `images`, `skus`, `logistics`, `channel` |
+| PATCH | `/publish-tasks/:id` | P1 | status 增 `draft` \| `filling` \| `cancelled`；`reason`, `retryCount` |
+| POST | `/publish-tasks/:id/validate` | P1 | antiBan + SKU 校验，不写库 |
+| POST | `/products/:id/sku/encode` | P1 | 按模板批量生成 `skuCode` |
+| GET | `/extension/selectors` | P1 | 含 `tiktok` 完整选择器（`shared/selectors/tiktok-seller.json`） |
+| POST | `/link-catcher/enqueue` | P2 | Redis：手机端商品短链入队 |
+| GET | `/link-catcher/poll` | P2 | PC/插件轮询同步链接 |
+| POST | `/products/:id/images/watermark-remove` | P2 | AI 去水印异步任务 |
+| POST | `/products/:id/images/model-generate` | P2 | AI 模特图异步任务 |
+| POST | `/integrations/tiktok/oauth` | P2 | TikTok Open API 授权回调 |
+| GET | `/integrations/adspower/profiles` | P2 | ADS Power 指纹环境列表 |
+
+**PublishTask.status**（目标）：`draft` → `pending` → `filling` → `completed` \| `failed` \| `cancelled`  
+**Product.status**（不变）：`raw` \| `processing` \| `ready` \| `published` — UI 映射 ListingStatus：`pending` \| `draft` \| `reviewing` \| `live` \| `suspended`
+
 ## 插件
 
 | Method | Path | 说明 |

@@ -1,4 +1,19 @@
+/** B 站采集箱内部状态（DB / API 不变） */
 export type ProductStatus = 'raw' | 'processing' | 'ready' | 'published';
+
+/**
+ * 平台侧上架状态（BRD 扩展，UI 展示用）
+ * 映射：raw→pending, processing→draft, ready→reviewing, published→live
+ * @see docs/LISTING_PUBLISH_IMPLEMENTATION.md §3.1
+ */
+export type ListingStatus = 'pending' | 'draft' | 'reviewing' | 'live' | 'suspended';
+
+export const PRODUCT_TO_LISTING_STATUS: Record<ProductStatus, ListingStatus> = {
+  raw: 'pending',
+  processing: 'draft',
+  ready: 'reviewing',
+  published: 'live',
+};
 export type TargetLocale = 'vi-VN' | 'th-TH';
 
 export type ProcessedOutput = {
@@ -46,11 +61,21 @@ export type RuleItem = {
   group: 'pricing' | 'title' | 'safety' | 'translation';
 };
 
+/** 发布任务状态：现有 API 三态 + BRD 扩展 draft/filling/cancelled */
+export type PublishTaskStatus =
+  | 'draft'
+  | 'pending'
+  | 'filling'
+  | 'completed'
+  | 'failed'
+  | 'cancelled';
+
 export type PublishTask = {
   id: string;
   platform: 'Shopee' | 'TikTok Shop' | '淘宝';
   title: string;
-  status: 'pending' | 'completed' | 'failed';
+  /** 兼容现有 API；完整流转见 LISTING_PUBLISH_IMPLEMENTATION.md */
+  status: PublishTaskStatus | 'pending' | 'completed' | 'failed';
   reason?: string;
   productId?: string;
 };
