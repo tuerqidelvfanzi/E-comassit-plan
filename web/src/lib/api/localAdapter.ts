@@ -169,7 +169,7 @@ export const localApi = {
     await delay(50);
     const i = getInsight();
     return {
-      status: i.status,
+      status: i.status === 'running' ? 'analyzing' : i.status,
       keywords: i.keywords,
       topFeatures: i.topFeatures,
       updatedAt: i.updatedAt,
@@ -179,23 +179,27 @@ export const localApi = {
   async runInsight(): Promise<InsightState> {
     await delay(800);
     const keywords = [
-      { keyword: '纯棉', score: 92 },
-      { keyword: '透气', score: 88 },
+      { keyword: '纯棉', score: 96, trend: 'up' as const },
+      { keyword: '透气', score: 92, trend: 'up' as const },
+      { keyword: '夏季', score: 88, trend: 'stable' as const },
+      { keyword: '卡通', score: 85, trend: 'down' as const },
+      { keyword: '百搭', score: 82, trend: 'stable' as const },
     ];
-    const job = {
-      id: 'insight-1',
-      status: 'done' as const,
+    const result: InsightState = {
+      status: 'done',
       keywords,
-      topFeatures: ['主图：白底 + 模特正面'],
+      topFeatures: ['主图：白底 + 模特正面', '标题：年龄段 + 材质 + 场景'],
       updatedAt: new Date().toISOString(),
     };
-    saveInsight(job);
-    return {
-      status: job.status,
-      keywords: job.keywords,
-      topFeatures: job.topFeatures,
-      updatedAt: job.updatedAt,
-    };
+    // 更新 prototypeDb 中的数据
+    saveInsight({
+      id: 'insight-1',
+      status: 'done',
+      keywords,
+      topFeatures: result.topFeatures,
+      updatedAt: result.updatedAt!,
+    });
+    return result;
   },
 
   async getPublishTasks(): Promise<PublishTask[]> {

@@ -11,24 +11,26 @@ export function Card({ children, className = '' }: { children: ReactNode; classN
   );
 }
 
-export function Badge({ children, tone = 'default' }: { children: ReactNode; tone?: 'default' | 'ok' | 'warn' }) {
+export function Badge({ children, tone = 'default', className = '' }: { children: ReactNode; tone?: 'default' | 'ok' | 'warn'; className?: string }) {
   const colors =
     tone === 'ok'
       ? 'bg-[var(--color-success-soft)] text-[var(--color-success-fg)]'
       : tone === 'warn'
         ? 'bg-[var(--color-warn-soft)] text-[var(--color-warn-fg)]'
         : 'bg-[var(--color-badge-default-bg)] text-[var(--color-badge-default-fg)]';
-  return <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${colors}`}>{children}</span>;
+  return <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${colors} ${className}`}>{children}</span>;
 }
 
 export function Button({
   children,
   variant = 'primary',
+  size = 'md',
   className = '',
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'ghost' | 'outline' }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'ghost' | 'outline'; size?: 'sm' | 'md' | 'lg' }) {
+  const sizeClasses = size === 'sm' ? 'px-2 py-1 text-xs' : size === 'lg' ? 'px-6 py-3 text-base' : 'px-4 py-2 text-sm';
   const base =
-    'inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition disabled:opacity-50';
+    `inline-flex items-center justify-center rounded-lg font-medium transition disabled:opacity-50 ${sizeClasses}`;
   const styles =
     variant === 'primary'
       ? 'btn-primary bg-[var(--color-primary)] text-[var(--color-primary-fg)] hover:opacity-90'

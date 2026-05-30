@@ -265,10 +265,70 @@ export type DashboardMetrics = {
   publishedCount: number;
 };
 
+/**
+ * 选品洞察 - 竞品数据
+ */
+export type CompetitorProduct = {
+  id: string;
+  title: string;
+  thumbnail: string;
+  gmv: number; // 周GMV (USD)
+  ctr: number; // 点击率 %
+  sameProductCount: number; // 同款商品数
+  comments: number; // 评论数
+  dailyOrders: number; // 日均订单
+  price: number; // 价格 (CNY)
+  source: 'tiktok' | 'shopee';
+  trend: 'up' | 'stable' | 'down';
+};
+
+/**
+ * 选品洞察 - 转化率数据
+ */
+export type ConversionData = {
+  date: string;
+  orders: number;
+  views: number;
+  conversionRate: number;
+  newComments: number;
+};
+
+/**
+ * 选品洞察 - 毛利分析
+ */
+export type ProfitMargin = {
+  costPrice: number; // 成本价 (CNY)
+  sellPrice: number; // 售价 (VND/THB)
+  currency: 'VND' | 'THB';
+  profit: number; // 利润 (CNY)
+  margin: number; // 利润率 %
+};
+
+/**
+ * 选品洞察 - GMV/CTR 筛选配置
+ */
+export type GmvCtrFilter = {
+  minGmv: number; // 最低周GMV (USD)
+  minCtr: number; // 最低点击率 %
+  maxSameProduct: number; // 最大同款数
+  platform: 'tiktok' | 'shopee' | 'all';
+};
+
+/**
+ * 选品洞察状态 (扩展版)
+ */
 export type InsightState = {
-  status: string;
-  keywords: Array<{ keyword: string; score: number }>;
+  id?: string;
+  status: 'idle' | 'analyzing' | 'done' | 'error';
+  keywords: Array<{ keyword: string; score: number; trend?: 'up' | 'down' | 'stable' }>;
   topFeatures: string[];
+  // 新增字段
+  competitors?: CompetitorProduct[];
+  gmvFilter?: GmvCtrFilter;
+  conversionTrend?: ConversionData[];
+  profitMargins?: ProfitMargin[];
+  lastAnalysisTime?: string;
+  analyzedCount?: number;
   updatedAt?: string;
 };
 
