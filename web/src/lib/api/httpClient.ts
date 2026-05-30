@@ -10,6 +10,7 @@ import type {
   Product,
   PublishTask,
   RuleItem,
+  SkuConfig,
   TemplateItem,
 } from './types';
 
@@ -209,5 +210,41 @@ export const httpApi = {
 
   getCookieJars() {
     return request<CookieJarInfo[]>('/extension/cookies');
+  },
+
+  // SKU Encoding (BRD §4.2)
+  encodeSku(input: { prefix?: string; sequence: number; side: 'P' | 'R' | 'PR'; color: string; size: string }) {
+    return request<{ skuCode: string }>('/sku/encode', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  },
+
+  encodeSkuBatch(input: {
+    prefix?: string;
+    sequenceStart?: number;
+    colors: string[];
+    sizes: string[];
+    sides?: Array<'P' | 'R' | 'PR'>;
+  }) {
+    return request<{ skus: Array<{ skuCode: string; color: string; size: string; side: string }>; total: number }>(
+      '/sku/encode-batch',
+      { method: 'POST', body: JSON.stringify(input) },
+    );
+  },
+
+  getDummyHookSku(input?: { prefix?: string; size?: string }) {
+    return request<{
+      skuCode: string;
+      color: string;
+      size: string;
+      price: number;
+      stock: number;
+      weight: number;
+      isDummyHook: boolean;
+    }>('/sku/dummy-hook', {
+      method: 'POST',
+      body: JSON.stringify(input ?? {}),
+    });
   },
 };

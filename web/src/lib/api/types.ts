@@ -14,15 +14,55 @@ export const PRODUCT_TO_LISTING_STATUS: Record<ProductStatus, ListingStatus> = {
   ready: 'reviewing',
   published: 'live',
 };
-export type TargetLocale = 'vi-VN' | 'th-TH';
+export type TargetLocale = 'vi-VN' | 'th-TH' | 'id-ID' | 'fil-PH';
 
-export type ProcessedOutput = {
-  exposure: { title: string; priceLabel: string };
-  conversion: { title: string; priceLabel: string };
-  ranAt: string;
-  promptNote?: string;
+/**
+ * BRD v1.1 §5.2 ProductImage
+ */
+export type ProductImage = {
+  id?: string;
+  url: string;
+  type: 'main' | 'detail' | 'sku';
+  sort?: number;
+  hasWatermark?: boolean;
+  priceTag?: boolean;
+  sensitiveContent?: string[];
+  status?: 'pending' | 'downloaded' | 'processed' | 'translated';
 };
 
+/**
+ * BRD v1.1 §5.3 ProductSku
+ */
+export type ProductSku = {
+  id?: string;
+  name: string;
+  color: string;
+  colorCode?: string;
+  size: string;
+  price: number;
+  stock: number;
+  weight?: number;
+  skuCode?: string;
+  patternSuffix?: 'P' | 'R' | 'PR';
+  isDummyHook?: boolean;
+};
+
+/**
+ * BRD v1.1 §5.4 ProcessedOutput
+ */
+export type ProcessedOutput = {
+  exposure: { title: string; priceLabel: string; shortDescription?: string };
+  conversion: { title: string; priceLabel: string; shortDescription?: string };
+  selectedOutput?: 'exposure' | 'conversion';
+  ranAt: string;
+  promptNote?: string;
+  templateId?: string;
+  modelUsed?: string;
+};
+
+/**
+ * BRD v1.1 §5.1 Product (核心字段完整版)
+ */
 export type Product = {
   id: string;
   title: string;
@@ -31,18 +71,71 @@ export type Product = {
   priceCny: number;
   status: ProductStatus;
   category: string;
+  categoryId?: string;
   thumb: string;
   targetLocale: TargetLocale;
   capturedAt?: string;
   fromExtension?: boolean;
   extractLayer?: string;
   extractMethod?: string;
-  images?: string[];
-  skus?: unknown[];
+  /** 图片列表 */
+  images?: string[] | ProductImage[];
+  /** SKU 变体列表 */
+  skus?: ProductSku[];
+  /** 是否有变体 */
+  hasVariants?: boolean;
+  skuCount?: number;
+  imageCount?: number;
+  /** 商品属性 */
   attributes?: Record<string, unknown>;
   rawCapture?: unknown;
   processed?: ProcessedOutput;
   pipelineNote?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+/**
+ * BRD v1.1 §6 类目模板（完整版）
+ */
+export type CategoryTemplateId =
+  | 'tpl-clothing-tshirt'
+  | 'tpl-clothing-general'
+  | 'tpl-kitchenware'
+  | 'tpl-lighting'
+  | 'tpl-beauty'
+  | 'tpl-electronics'
+  | 'tpl-home'
+  | 'tpl-other';
+
+/** 白色钩子配置（BRD §4.4） */
+export type DummyHookConfig = {
+  enabled: boolean;
+  colorName: string;
+  price: number;
+  stock: number;
+  weight: number;
+};
+
+/** SKU 配置（BRD §4.2 五段编码） */
+export type SkuConfig = {
+  prefix: string;
+  sequenceStart: number;
+  colors: string[];
+  sizes: string[];
+  sides: Array<'P' | 'R' | 'PR'>;
+  dummyHook: DummyHookConfig;
+};
+
+/** 类目模板完整配置 */
+export type CategoryTemplateConfig = {
+  id: CategoryTemplateId;
+  name: string;
+  category: string;
+  skuConfig?: SkuConfig;
+  priceMultiplier?: number;
+  titleMaxChars?: number;
+  defaultStock?: number;
 };
 
 export type TemplateItem = {
@@ -52,6 +145,10 @@ export type TemplateItem = {
   note: string;
   language: string;
   promptBody?: string;
+  /** SKU 配置（仅服装类模板） */
+  skuConfig?: SkuConfig;
+  /** 模板分类 ID */
+  categoryId?: CategoryTemplateId;
 };
 
 export type RuleItem = {
@@ -70,6 +167,35 @@ export type PublishTaskStatus =
   | 'failed'
   | 'cancelled';
 
+/** 物流配置默认值 */
+export type LogisticsConfig = {
+  shippingWeight: number;
+  deliveryDays: number;
+  freeReturn: boolean;
+};
+
+export const LOGISTICS_DEFAULTS: LogisticsConfig = {
+  shippingWeight: 220,
+  deliveryDays: 3,
+  freeReturn: true,
+};
+
+/**
+ * BRD v1.1 §5.3 完整 SKU 填表数据
+ */
+export type PublishSku = {
+  skuCode: string;
+  color: string;
+  size: string;
+  price: number;
+  stock: number;
+  weight?: number;
+  isDummyHook?: boolean;
+};
+
+/**
+ * 发布填表 Payload（完整版）
+ */
 export type PublishFillPayload = {
   platform: 'tiktok' | 'taobao' | 'shopee';
   title: string;
@@ -78,6 +204,16 @@ export type PublishFillPayload = {
   stock: number;
   weightGrams: number;
   brand: string;
+  /** SKU 变体列表（BRD §5.3） */
+  skus?: PublishSku[];
+  /** 物流配置 */
+  logistics?: LogisticsConfig;
+  /** 简要描述 */
+  shortDescription?: string;
+  /** 详细描述 */
+  description?: string;
+  /** 主图 URLs */
+  imageUrls?: string[];
 };
 
 export type PublishTask = {
@@ -89,14 +225,22 @@ export type PublishTask = {
   reason?: string;
   productId?: string;
   fillPayload?: PublishFillPayload;
-  validation?: { ok: boolean; issues: string[] };
+  validation?: {
+    ok: boolean;
+    issues: string[];
+    antiBan?: { ok: boolean; issues: string[] };
+    title?: { ok: boolean; issues: string[] };
+  };
   fillInstructions?: string;
+  retryCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type PreparePublishResult = {
   taskId: string;
   ok: boolean;
-  validation: { ok: boolean; issues: string[] };
+  validation: PublishTask['validation'];
   fillPayload: PublishFillPayload;
   fillInstructions?: string;
 };

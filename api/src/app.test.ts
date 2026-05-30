@@ -169,4 +169,98 @@ describe('API integration', () => {
     expect(json.data.status).toBe('completed');
     expect(json.data.resultUrls?.length).toBeGreaterThan(0);
   });
+
+  describe('SKU encoding (BRD §4.2)', () => {
+    it('encodes single SKU with five-part code', async () => {
+      const { app } = await import('./app.js');
+      const loginRes = await app.fetch(
+        new Request('http://localhost/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: 'admin01', password: 'abcd234' }),
+        }),
+      );
+      const login = (await loginRes.json()) as { data: { accessToken: string } };
+      const res = await app.fetch(
+        new Request('http://localhost/api/v1/sku/encode', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${login.data.accessToken}`,
+          },
+          body: JSON.stringify({
+            prefix: 'BF',
+            sequence: 1,
+            side: 'PR',
+            color: 'WH',
+            size: 'M',
+          }),
+        }),
+      );
+      const json = (await res.json()) as { code: number; data: { skuCode: string } };
+      expect(json.code).toBe(0);
+      expect(json.data.skuCode).toBe('BF-0001-PR-WH-M');
+    });
+
+    it('encodes batch SKUs', async () => {
+      const { app } = await import('./app.js');
+      const loginRes = await app.fetch(
+        new Request('http://localhost/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: 'admin01', password: 'abcd234' }),
+        }),
+      );
+      const login = (await loginRes.json()) as { data: { accessToken: string } };
+      const res = await app.fetch(
+        new Request('http://localhost/api/v1/sku/encode-batch', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${login.data.accessToken}`,
+          },
+          body: JSON.stringify({
+            prefix: 'BF',
+            colors: ['WH', 'BK'],
+            sizes: ['S', 'M'],
+            sides: ['PR'],
+          }),
+        }),
+      );
+      const json = (await res.json()) as { code: number; data: { skus: unknown[]; total: number } };
+      expect(json.code).toBe(0);
+      expect(json.data.total).toBe(4); // 2 colors * 2 sizes * 1 side
+      expect((json.data.skus[0] as { skuCode: string }).skuCode).toMatch(/^BF-\d{4}-PR-/);
+    });
+
+    it('generates dummy hook SKU', async () => {
+      const { app } = await import('./app.js');
+      const loginRes = await app.fetch(
+        new Request('http://localhost/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: 'admin01', password: 'abcd234' }),
+        }),
+      );
+      const login = (await loginRes.json()) as { data: { accessToken: string } };
+      const res = await app.fetch(
+        new Request('http://localhost/api/v1/sku/dummy-hook', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${login.data.accessToken}`,
+          },
+          body: JSON.stringify({ prefix: 'BF', size: 'M' }),
+        }),
+      );
+      const json = (await res.json()) as {
+        code: number;
+        data: { skuCode: string; isDummyHook: boolean; color: string };
+      };
+      expect(json.code).toBe(0);
+      expect(json.data.skuCode).toBe('BF-9999-P-WH-M');
+      expect(json.data.isDummyHook).toBe(true);
+      expect(json.data.color).toBe('empty');
+    });
+  });
 });

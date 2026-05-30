@@ -36,6 +36,21 @@ export function migrate() {
       }
     }
   }
+  // P2: 核心数据字段补全
+  const productFieldsPath = path.join(__dirname, 'schema-product-fields.sql');
+  if (fs.existsSync(productFieldsPath)) {
+    for (const stmt of fs
+      .readFileSync(productFieldsPath, 'utf8')
+      .split(';')
+      .map((s) => s.trim())
+      .filter(Boolean)) {
+      try {
+        db.exec(stmt);
+      } catch {
+        /* column/table may already exist */
+      }
+    }
+  }
   seedIfEmpty(db);
   db.close();
   return dbPath;
@@ -90,11 +105,13 @@ function seedIfEmpty(db: Database.Database) {
   }
 
   const rules = [
-    ['r1', '越南 Shopee 定价', 'price_vnd = price_cny * 3500 * 2.5', 'pricing'],
-    ['r2', '泰国 THB 定价', 'price_thb = price_cny * 5.2 * 1.8', 'pricing'],
-    ['r3', '标题字数', 'len(title) <= 20', 'title'],
-    ['r4', '违禁词过滤', 'remove_black_words(title, description)', 'safety'],
-    ['r5', '自动翻译', 'translate(title, target_locale)', 'translation'],
+    ['r1', '越南 Shopee 定价', 'price_vnd = price_cny * 3.5', 'pricing'],
+    ['r2', '泰国 TikTok 定价', 'price_thb = price_cny * 2.5', 'pricing'],
+    ['r3', '菲律宾 Shopee 固定价', 'price_php = 500', 'pricing'],
+    ['r4', '标题字数(越南)', 'len(title) <= 20', 'title'],
+    ['r5', '违禁词过滤', 'check_blacklist(title, description)', 'safety'],
+    ['r6', '品牌检查', 'check_brand_names(title)', 'safety'],
+    ['r7', '自动翻译', 'translate(title, target_locale)', 'translation'],
   ];
   const insertRule = db.prepare(
     'INSERT INTO rule_items (id, user_id, name, expr, rule_group, created_at) VALUES (?, ?, ?, ?, ?, ?)',

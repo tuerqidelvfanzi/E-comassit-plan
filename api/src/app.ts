@@ -22,6 +22,7 @@ import {
   preparePublishTask,
 } from './services/publishTasks.js';
 import { createImageJob, getImageJob, listImageJobs } from './services/imageJobs.js';
+import { encodeSku, encodeDummyHookSku } from './domain/listing.js';
 
 const app = new Hono().basePath(API_PREFIX);
 
@@ -340,6 +341,78 @@ app.delete('/category-templates/:id', jwtAuth, (c) => {
     .prepare('DELETE FROM category_templates WHERE id = ? AND user_id = ?')
     .run(c.req.param('id'), c.get('user').id);
   return ok(c, { deleted: true });
+});
+
+// —— SKU Encoding (BRD §4.2) ——
+app.post('/sku/encode', jwtAuth, async (c) => {
+  const body = z
+    .object({
+      prefix: z.string().default('BF'),
+      sequence: z.number().int().min(1).max(1000),
+      side: z.enum(['P', 'R', 'PR']),
+      color: z.string(),
+      size: z.string(),
+    })
+    .safeParse(await c.req.json());
+  if (!body.success) return fail(c, 'INVALID_BODY');
+  const { prefix, sequence, side, color, size } = body.data;
+  const skuCode = encodeSku({ prefix, sequence, side, color, size });
+  return ok(c, { skuCode });
+});
+
+app.post('/sku/encode-batch', jwtAuth, async (c) => {
+  const body = z
+    .object({
+      prefix: z.string().default('BF'),
+      sequenceStart: z.number().int().min(1).default(1),
+      colors: z.array(z.string()),
+      sizes: z.array(z.string()),
+      sides: z.array(z.enum(['P', 'R', 'PR'])).default(['PR']),
+    })
+    .safeParse(await c.req.json());
+  if (!body.success) return fail(c, 'INVALID_BODY');
+  const { prefix, sequenceStart, colors, sizes, sides } = body.data;
+  const skus: Array<{ skuCode: string; color: string; size: string; side: string }> = [];
+  let seq = sequenceStart;
+  for (const color of colors) {
+    for (const size of sizes) {
+      for (const side of sides) {
+        try {
+          skus.push({
+            skuCode: encodeSku({ prefix, sequence: seq, side, color, size }),
+            color,
+            size,
+            side,
+          });
+        } catch {
+          // skip invalid combinations
+        }
+      }
+      seq++;
+    }
+  }
+  return ok(c, { skus, total: skus.length });
+});
+
+app.post('/sku/dummy-hook', jwtAuth, async (c) => {
+  const body = z
+    .object({
+      prefix: z.string().default('BF'),
+      size: z.string().default('M'),
+    })
+    .safeParse(await c.req.json());
+  if (!body.success) return fail(c, 'INVALID_BODY');
+  const { prefix, size } = body.data;
+  const skuCode = encodeDummyHookSku(prefix, size);
+  return ok(c, {
+    skuCode,
+    color: 'empty',
+    size,
+    price: 400,
+    stock: 5,
+    weight: 220,
+    isDummyHook: true,
+  });
 });
 
 // —— Rules ——

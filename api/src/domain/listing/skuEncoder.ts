@@ -53,6 +53,12 @@ export type SkuEncodeInput = {
   size: string;
 };
 
+export type SkuEncodeResult = {
+  success: boolean;
+  skuCode?: string;
+  error?: string;
+};
+
 export type ParsedSku = {
   prefix: string;
   sequence: number;
@@ -89,6 +95,16 @@ export function encodeSku(input: SkuEncodeInput): string {
   }
   const seq = formatSequence(input.sequence);
   return `${prefix}-${seq}-${input.side}-${colorCode}-${size}`;
+}
+
+/** 安全编码：返回结果对象而非抛出异常 */
+export function tryEncodeSku(input: SkuEncodeInput): SkuEncodeResult {
+  try {
+    const skuCode = encodeSku(input);
+    return { success: true, skuCode };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'UNKNOWN_ERROR' };
+  }
 }
 
 /** BRD §4.4 白色钩子：单款式占位变体 */

@@ -10,6 +10,20 @@ export function resolveApiMode(): 'http' | 'local' {
 
 export const api = resolveApiMode() === 'http' ? httpApi : localApi;
 
-export type { Product, TemplateItem, RuleItem, PublishTask, DashboardMetrics } from './types';
+export type {
+  Product,
+  ProductSku,
+  ProductImage,
+  ProcessedOutput,
+  TemplateItem,
+  SkuConfig,
+  RuleItem,
+  PublishTask,
+  PublishFillPayload,
+  PublishSku,
+  DashboardMetrics,
+  ImageJob,
+  TargetLocale,
+} from './types';
 export { getApiBaseUrl, getStoredToken, setStoredToken } from './httpClient';
 export { installExtensionBridge } from './extensionBridge';

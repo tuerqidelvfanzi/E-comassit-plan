@@ -30,28 +30,73 @@ export type PricingRule = {
   symbol: string;
 };
 
+/**
+ * BRD v1.1 §7.1 定价规则
+ * - 越南 Shopee: 原价 x 3.5
+ * - 泰国 TikTok: 原价 x 2.5
+ * - 菲律宾 Shopee: 固定 ₱500（见 marketPricing.ts fixedPrice）
+ */
 export const PRICING_RULES: PricingRule[] = [
-  { locale: 'vi-VN', multiplier: 3500 * 2.5, symbol: '₫' },
-  { locale: 'th-TH', multiplier: 5.2 * 1.8, symbol: '฿' },
+  { locale: 'vi-VN', multiplier: 3.5, symbol: '₫' },
+  { locale: 'th-TH', multiplier: 2.5, symbol: '฿' },
 ];
 
-const BLACKLIST = ['最好', '第一', '100%', '根治', '绝对'];
+/**
+ * BRD v1.1 §8 违禁内容检查清单
+ * - 品牌类（防侵权）：Nike/Adidas/Disney/LV/Gucci/Chanel/Hermes/Apple/Samsung/Huawei/NASA
+ * - 国内标识：3C认证/产地/发货地/品牌名称（除非无品牌）
+ * - 极限词：最好/第一/100%/根治/绝对/顶级/最强
+ * - 图片敏感：终身质保/免费退货/包邮/免费开票/厂家介绍/关于我们/证书资质/运输售后
+ */
+const BLACKLIST_BRAND = [
+  'Nike', 'Adidas', 'Disney', 'LV', 'Gucci', 'Chanel', '爱马仕', 'Hermes',
+  'Apple', 'Samsung', '华为', 'Huawei', 'NASA', '耐克', '阿迪达斯',
+];
+
+const BLACKLIST_EXTREME = [
+  '最好', '第一', '100%', '根治', '绝对', '顶级', '最强', '最佳',
+  '完美', '极致', '独家', '全网', '唯一', '无敌',
+];
+
+const BLACKLIST_IMAGE_TEXT = [
+  '终身质保', '免费退货', '包邮', '免费开票', '厂家介绍',
+  '关于我们', '证书资质', '运输售后', '终身包换',
+];
+
+export const BLACKLIST = [...BLACKLIST_BRAND, ...BLACKLIST_EXTREME];
+
+/** 检查文本是否包含违禁词 */
+export function checkBlacklist(text: string): string[] {
+  const found: string[] = [];
+  const lower = text.toLowerCase();
+  for (const word of BLACKLIST) {
+    if (lower.includes(word.toLowerCase())) {
+      found.push(word);
+    }
+  }
+  return found;
+}
 
 export function formatMoney(n: number) {
-  return Math.round(n).toLocaleString('en-US');
+  const rounded = Math.round(n);
+  return rounded.toLocaleString('en-US');
 }
 
 export function applyPricing(priceCny: number, locale: TargetLocale) {
   const rule = PRICING_RULES.find((r) => r.locale === locale) ?? PRICING_RULES[0];
-  return { label: `${rule.symbol}${formatMoney(priceCny * rule.multiplier)}`, rule };
+  const calculated = priceCny * rule.multiplier;
+  const label = `${rule.symbol}${formatMoney(calculated)}`;
+  return { label, calculated, rule };
 }
 
 export function stripBlacklist(text: string) {
   let out = text;
   for (const w of BLACKLIST) {
-    out = out.split(w).join('');
+    // 忽略大小写替换
+    const regex = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    out = out.replace(regex, '');
   }
-  return out.trim();
+  return out.trim().replace(/\s+/g, ' ');
 }
 
 export function truncateTitle(title: string, maxLen = 20) {
