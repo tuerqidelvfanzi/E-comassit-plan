@@ -7,57 +7,82 @@
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <header>
-      <strong>电商助手</strong>
-      <span class="badge demo">v0.5</span>
+    <header class="app-header">
+      <div class="brand">
+        <img src="../icons/icon48.png" alt="" width="28" height="28" class="logo" />
+        <div>
+          <strong>电商助手</strong>
+          <span class="ver">v0.6</span>
+        </div>
+      </div>
+      <span id="conn-status" class="status-pill">未连接</span>
     </header>
 
-    <section class="field">
-      <label for="app-base">后台地址</label>
-      <input id="app-base" type="url" placeholder="https://tuerqidelvfanzi.github.io/E-comassit-plan" />
-    </section>
-    <section class="field">
-      <label for="api-base">API 地址（可选）</label>
-      <input id="api-base" type="url" placeholder="http://127.0.0.1:8080" />
-    </section>
-    <section class="field">
-      <label for="ext-token">插件令牌（B 站设置中复制）</label>
-      <input id="ext-token" type="password" placeholder="psa_…" autocomplete="off" />
+    <nav class="tabs" role="tablist">
+      <button type="button" class="tab active" data-tab="connect">连接</button>
+      <button type="button" class="tab" data-tab="collect">采集</button>
+      <button type="button" class="tab" data-tab="publish">发布</button>
+    </nav>
+
+    <!-- 连接 -->
+    <section class="tab-panel active" id="panel-connect">
+      <p class="lead">配置 B 站 API 后，采集与填表数据走真库；未配置时走演示 Mock。</p>
+      <label class="field">
+        <span>后台地址</span>
+        <input id="app-base" type="url" placeholder="http://localhost:3004" />
+      </label>
+      <label class="field">
+        <span>API 地址</span>
+        <input id="api-base" type="url" placeholder="http://127.0.0.1:8080" />
+      </label>
+      <label class="field">
+        <span>插件令牌</span>
+        <input id="ext-token" type="password" placeholder="B 站设置 → 复制 psa_…" autocomplete="off" />
+      </label>
+      <button type="button" id="btn-test-api" class="btn secondary">测试 API 连接</button>
+      <p id="api-test-msg" class="msg"></p>
+      <button type="button" id="btn-sync-cookies" class="btn secondary">同步当前站 Cookie</button>
+      <p id="cookie-status" class="msg"></p>
     </section>
 
-    <section>
-      <h2>Cookie 同步（批量 Worker）</h2>
-      <p class="hint">在已登录淘宝/1688 后，将 Cookie 同步到 B 站 API，供批量 TOP10 采集使用。</p>
-      <button type="button" id="btn-sync-cookies" class="secondary">同步当前站 Cookie</button>
-      <p id="cookie-status" class="meta"></p>
+    <!-- 采集 -->
+    <section class="tab-panel" id="panel-collect" hidden>
+      <p class="lead">在 1688 / 淘宝 / 天猫 商品详情页采集，上传到采集箱。</p>
+      <button type="button" id="btn-capture" class="btn primary">采集当前页</button>
+      <button type="button" id="btn-link" class="btn secondary">粘贴链接采集</button>
+      <div class="preview hidden" id="preview">
+        <p class="preview-label">采集预览</p>
+        <p id="preview-title" class="preview-title"></p>
+        <p id="preview-meta" class="msg"></p>
+        <button type="button" id="btn-upload" class="btn primary">上传到采集箱</button>
+      </div>
     </section>
 
-    <section>
-      <p class="hint">步骤 2：在已登录的商品页采集</p>
-      <button type="button" id="btn-capture" class="primary">采集当前页</button>
-      <button type="button" id="btn-link" class="secondary">粘贴链接采集</button>
-    </section>
-
-    <section class="preview hidden" id="preview">
-      <h2>采集预览</h2>
-      <p id="preview-title"></p>
-      <p class="meta" id="preview-meta"></p>
-      <button type="button" id="btn-upload" class="primary">上传到采集箱</button>
-    </section>
-
-    <section>
-      <h2>步骤 4：发布草稿</h2>
-      <select id="platform">
-        <option value="shopee">Shopee 草稿</option>
-        <option value="tiktok">TikTok Shop 草稿</option>
-        <option value="taobao">淘宝草稿</option>
-      </select>
-      <button type="button" id="btn-publish" class="secondary">填入当前卖家后台页</button>
-      <p class="hint">步骤 5：在目标网站草稿页内点击「发布」</p>
+    <!-- 发布 -->
+    <section class="tab-panel" id="panel-publish" hidden>
+      <p class="lead">在 B 站「发布中心」生成填表后，打开卖家后台新建页，点此填入。</p>
+      <label class="field">
+        <span>目标平台</span>
+        <select id="platform">
+          <option value="shopee">Shopee 草稿</option>
+          <option value="tiktok">TikTok Shop 草稿</option>
+          <option value="taobao">淘宝草稿</option>
+        </select>
+      </label>
+      <button type="button" id="btn-load-fill" class="btn secondary">从 API 拉取填表数据</button>
+      <div id="fill-preview" class="fill-card hidden">
+        <p class="fill-card-title">填表载荷预览 <span class="mock-tag">MOCK 面板</span></p>
+        <dl class="fill-dl" id="fill-dl"></dl>
+      </div>
+      <button type="button" id="btn-publish" class="btn primary">填入当前卖家页（DOM + 预览）</button>
+      <button type="button" id="btn-mock-only" class="btn secondary">仅打开 Mock 预览面板</button>
+      <p class="hint">步骤：发布中心「生成填表」→ 打开卖家后台「新建商品」→ 点上方按钮 → 左侧预览核对 → 平台内发布。</p>
     </section>
 
     <footer>
-      <a id="link-inbox" href="#" target="_blank" rel="noopener">打开采集箱后台</a>
+      <a id="link-inbox" href="#" target="_blank" rel="noopener">打开采集箱</a>
+      <span>·</span>
+      <a id="link-publish" href="#" target="_blank" rel="noopener">发布中心</a>
     </footer>
     <script src="popup.js"></script>
   </body>

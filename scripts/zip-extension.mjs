@@ -8,6 +8,11 @@ const extDir = path.join(root, 'extension');
 const outDir = path.join(root, 'web', 'public', 'downloads');
 const zipPath = path.join(outDir, 'ecommerce-assistant-extension-demo.zip');
 
+const iconsDir = path.join(extDir, 'icons');
+if (!fs.existsSync(path.join(iconsDir, 'icon48.png'))) {
+  console.warn('extension/icons missing — run: python scripts/gen-extension-icons.py (or ensure icons/ exists)');
+}
+
 fs.mkdirSync(outDir, { recursive: true });
 if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
 

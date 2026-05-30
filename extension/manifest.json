@@ -1,11 +1,21 @@
 {
   "manifest_version": 3,
   "name": "电商助手",
-  "description": "演示版：1688/淘宝/天猫采集 → 后台采集箱 → 卖家草稿发布",
-  "version": "0.5.0",
+  "description": "演示版：采集 → B 站处理 → 卖家草稿 DOM 填入 + Mock 预览面板",
+  "version": "0.6.0",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "电商助手"
+    "default_title": "电商助手",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon48.png",
+      "48": "icons/icon48.png"
+    }
   },
   "background": {
     "service_worker": "background/service-worker.js"
@@ -13,6 +23,9 @@
   "permissions": ["activeTab", "storage", "tabs", "cookies"],
   "host_permissions": [
     "http://localhost:3004/*",
+    "http://127.0.0.1:3004/*",
+    "http://127.0.0.1:8080/*",
+    "http://localhost:8080/*",
     "https://tuerqidelvfanzi.github.io/*",
     "https://*.1688.com/*",
     "https://*.taobao.com/*",
@@ -20,9 +33,15 @@
     "https://*.yangkeduo.com/*",
     "https://seller.shopee.cn/*",
     "https://seller.shopee.com/*",
+    "https://*.shopee.cn/*",
+    "https://*.shopee.com/*",
     "https://sell.taobao.com/*",
+    "https://item.upload.taobao.com/*",
+    "https://publish.taobao.com/*",
+    "https://myseller.taobao.com/*",
     "https://seller.tiktokglobalshop.com/*",
-    "https://seller-us.tiktok.com/*"
+    "https://seller-us.tiktok.com/*",
+    "https://*.tiktokglobalshop.com/*"
   ],
   "content_scripts": [
     {
@@ -77,7 +96,12 @@
         "https://seller.tiktokglobalshop.com/*",
         "https://seller-us.tiktok.com/*"
       ],
-      "js": ["content/shared/selectors-taobao-seller.js", "content/publish-fill.js"],
+      "js": [
+        "content/shared/selectors-taobao-seller.js",
+        "content/shared/selectors-shopee-seller.js",
+        "content/shared/selectors-tiktok-seller.js",
+        "content/publish-fill.js"
+      ],
       "run_at": "document_idle"
     }
   ]

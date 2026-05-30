@@ -681,7 +681,7 @@ flowchart TB
   D --> E["fill_payload_json"]
   E --> F["卖家后台新建页"]
   F --> G["GET /extension/publish-fill"]
-  G --> H["publish-fill.js 填DOM"]
+  G --> H["publish-fill.js<br/>DOM + Mock 预览面板"]
   H --> I["PATCH completed"]
         </pre>
       </figure>
@@ -736,7 +736,7 @@ flowchart TB
       <h2>15. 现场演示清单</h2>
       <ul class="checklist">
         <li><span class="idx">1</span><span>双终端 + 登录 → API 模式</span></li>
-        <li><span class="idx">2</span><span>设置 → 令牌 → Popup 三项</span></li>
+        <li><span class="idx">2</span><span>设置 → 下载插件 v0.6 → Popup 三栏（连接/采集/发布）</span></li>
         <li><span class="idx">3</span><span>1688/淘宝采集上传 → 采集箱新行</span></li>
         <li><span class="idx">4</span><span>采集箱筛选 → 工作台编辑保存 → 运行管线 → ready</span></li>
         <li><span class="idx">4b</span><span>模板页配置 SKU 前缀/Hook → 工作台 SKU 编码预览</span></li>
