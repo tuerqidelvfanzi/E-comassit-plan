@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "电商助手",
   "description": "演示版：1688/淘宝/天猫采集 → 后台采集箱 → 卖家草稿发布",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "action": {
     "default_popup": "popup/popup.html",
     "default_title": "电商助手"
@@ -10,7 +10,7 @@
   "background": {
     "service_worker": "background/service-worker.js"
   },
-  "permissions": ["activeTab", "storage", "tabs"],
+  "permissions": ["activeTab", "storage", "tabs", "cookies"],
   "host_permissions": [
     "http://localhost:3004/*",
     "https://tuerqidelvfanzi.github.io/*",
@@ -71,10 +71,13 @@
         "https://seller.shopee.cn/*",
         "https://seller.shopee.com/*",
         "https://sell.taobao.com/*",
+        "https://item.upload.taobao.com/*",
+        "https://publish.taobao.com/*",
+        "https://myseller.taobao.com/*",
         "https://seller.tiktokglobalshop.com/*",
         "https://seller-us.tiktok.com/*"
       ],
-      "js": ["content/publish-fill.js"],
+      "js": ["content/shared/selectors-taobao-seller.js", "content/publish-fill.js"],
       "run_at": "document_idle"
     }
   ]

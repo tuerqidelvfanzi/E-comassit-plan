@@ -69,6 +69,24 @@ export type InsightJob = {
   updatedAt: string;
 };
 
+export type LocalBatchJob = {
+  id: string;
+  status: 'queued' | 'running' | 'done' | 'failed' | 'paused';
+  listUrl: string;
+  maxItems: number;
+  delayMsMin: number;
+  delayMsMax: number;
+  useCookies: boolean;
+  itemsDone: number;
+  itemsFailed: number;
+  results: Array<{ url: string; ok: boolean; productId?: string; error?: string }>;
+  auditLog: Array<Record<string, unknown>>;
+  error?: string | null;
+  createdAt: string;
+  startedAt?: string | null;
+  finishedAt?: string | null;
+};
+
 type DbShape = {
   version: 1;
   products: StoredProduct[];
@@ -79,6 +97,8 @@ type DbShape = {
   pipelineRuns: PipelineRun[];
   insight: InsightJob;
   extensionToken: string;
+  batchJobs: LocalBatchJob[];
+  cookieJars: Array<{ domain: string; updatedAt: string; consentAt: string }>;
 };
 
 function uid(prefix: string) {
@@ -102,6 +122,8 @@ function defaultDb(): DbShape {
       updatedAt: new Date().toISOString(),
     },
     extensionToken: generateToken(),
+    batchJobs: [],
+    cookieJars: [],
   };
 }
 
@@ -315,6 +337,26 @@ export function ingestNormalized(data: unknown): StoredProduct | null {
   upsertProduct(product);
   addCollectJob(job);
   return product;
+}
+
+export function getBatchJobs() {
+  return loadRaw().batchJobs;
+}
+
+export function saveBatchJobs(jobs: LocalBatchJob[]) {
+  const db = loadRaw();
+  db.batchJobs = jobs;
+  saveRaw(db);
+}
+
+export function getCookieJars() {
+  return loadRaw().cookieJars;
+}
+
+export function saveCookieJars(jars: Array<{ domain: string; updatedAt: string; consentAt: string }>) {
+  const db = loadRaw();
+  db.cookieJars = jars;
+  saveRaw(db);
 }
 
 export function resetPrototypeData() {

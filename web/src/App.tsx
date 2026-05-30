@@ -9,6 +9,7 @@ import { RulesPage } from './pages/RulesPage';
 import { InsightsPage } from './pages/InsightsPage';
 import { PublishPage } from './pages/PublishPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { BatchCollectPage } from './pages/BatchCollectPage';
 import { useAuth } from './lib/auth';
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
       >
         <Route index element={<DashboardPage />} />
         <Route path="inbox" element={<InboxPage />} />
+        <Route path="batch-collect" element={<BatchCollectPage />} />
         <Route path="workbench/:id" element={<WorkbenchPage />} />
         <Route path="templates" element={<TemplatesPage />} />
         <Route path="rules" element={<RulesPage />} />

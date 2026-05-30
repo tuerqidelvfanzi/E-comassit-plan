@@ -7,6 +7,15 @@ import { getDb } from './db/index.js';
 import { extensionAuth, jwtAuth, signAccessToken, signRefreshToken } from './middleware/auth.js';
 import { fail, ok, uid } from './lib/response.js';
 import { getProduct, ingestCollect, listProducts, runProductPipeline } from './services/products.js';
+import {
+  batchJobToApi,
+  createBatchJob,
+  getBatchJob,
+  listBatchJobs,
+} from './services/batchJobs.js';
+import { listCookieDomains, saveCookieJar, type StoredCookie } from './services/cookieJar.js';
+import { scheduleBatchJob } from './worker/batchCollect.js';
+import { loadTaobaoSellerSelectors } from './worker/selectors.js';
 
 const app = new Hono().basePath(API_PREFIX);
 
@@ -63,13 +72,40 @@ app.post('/extension/token', jwtAuth, (c) => {
   return ok(c, { token });
 });
 
-app.get('/extension/selectors', jwtAuth, (c) =>
-  ok(c, {
+app.get('/extension/selectors', jwtAuth, (c) => {
+  const taobao = loadTaobaoSellerSelectors();
+  return ok(c, {
     shopee: { title: ['input[name*="title" i]', 'textarea[name*="title" i]'], price: ['input[name*="price" i]'] },
-    taobao: { title: ['#title', 'input[placeholder*="标题" i]'], price: ['input[name*="price" i]'] },
+    taobao,
     tiktok: { title: ['input[data-testid*="title" i]'], price: ['input[type="number"]'] },
-  }),
-);
+  });
+});
+
+app.post('/extension/cookies', extensionAuth, async (c) => {
+  const body = z
+    .object({
+      domain: z.string(),
+      cookies: z.array(
+        z.object({
+          name: z.string(),
+          value: z.string(),
+          domain: z.string(),
+          path: z.string().optional(),
+          secure: z.boolean().optional(),
+          httpOnly: z.boolean().optional(),
+          sameSite: z.enum(['Strict', 'Lax', 'None']).optional(),
+          expirationDate: z.number().optional(),
+        }),
+      ),
+      consent: z.literal(true),
+    })
+    .safeParse(await c.req.json());
+  if (!body.success || !body.data.consent) return fail(c, 'CONSENT_REQUIRED');
+  saveCookieJar(getDb(), c.get('user').id, body.data.domain, body.data.cookies as StoredCookie[]);
+  return ok(c, { saved: true, domain: body.data.domain, count: body.data.cookies.length });
+});
+
+app.get('/extension/cookies', jwtAuth, (c) => ok(c, listCookieDomains(c.get('user').id)));
 
 // —— Collect ——
 app.post('/collect-jobs', extensionAuth, async (c) => {
@@ -88,6 +124,66 @@ app.get('/collect-jobs', jwtAuth, (c) => {
     .prepare('SELECT * FROM collect_jobs WHERE user_id = ? ORDER BY created_at DESC LIMIT 100')
     .all(c.get('user').id);
   return ok(c, rows);
+});
+
+app.post('/collect-jobs/batch', jwtAuth, async (c) => {
+  const body = z
+    .object({
+      listUrl: z.string().url(),
+      maxItems: z.number().int().min(1).max(20).optional(),
+      delayMsMin: z.number().int().min(100).max(5000).optional(),
+      delayMsMax: z.number().int().min(200).max(10000).optional(),
+      useCookies: z.boolean().optional(),
+      requireUserConfirm: z.boolean().optional(),
+      startImmediately: z.boolean().optional(),
+    })
+    .safeParse(await c.req.json());
+  if (!body.success) return fail(c, 'INVALID_BODY');
+  if (body.data.requireUserConfirm !== true) return fail(c, 'USER_CONFIRM_REQUIRED');
+
+  const job = createBatchJob(getDb(), c.get('user').id, {
+    listUrl: body.data.listUrl,
+    maxItems: body.data.maxItems,
+    delayMsMin: body.data.delayMsMin,
+    delayMsMax: body.data.delayMsMax,
+    useCookies: body.data.useCookies,
+    requireUserConfirm: true,
+  });
+
+  if (body.data.startImmediately !== false) {
+    scheduleBatchJob(job.id, c.get('user').id);
+  }
+
+  return ok(c, batchJobToApi(job), 201);
+});
+
+app.get('/collect-jobs/batch', jwtAuth, (c) => {
+  const jobs = listBatchJobs(getDb(), c.get('user').id).map(batchJobToApi);
+  return ok(c, jobs);
+});
+
+app.get('/collect-jobs/batch/:id', jwtAuth, (c) => {
+  const job = getBatchJob(getDb(), c.get('user').id, c.req.param('id'));
+  if (!job) return fail(c, 'NOT_FOUND', 404, 404);
+  return ok(c, batchJobToApi(job));
+});
+
+app.post('/collect-jobs/batch/:id/run', jwtAuth, (c) => {
+  const job = getBatchJob(getDb(), c.get('user').id, c.req.param('id'));
+  if (!job) return fail(c, 'NOT_FOUND', 404, 404);
+  scheduleBatchJob(job.id, c.get('user').id);
+  return ok(c, { scheduled: true, id: job.id });
+});
+
+app.get('/collect-adapters/:site', jwtAuth, (c) => {
+  const site = c.req.param('site');
+  if (site === 'taobao' || site === 'tmall') {
+    return ok(c, { site, version: '1.0.0', layers: ['L1', 'L2', 'L4'], sellerSelectors: loadTaobaoSellerSelectors() });
+  }
+  if (site === '1688') {
+    return ok(c, { site, version: '1.0.0', layers: ['L1', 'L2', 'L4'] });
+  }
+  return ok(c, { site, version: '1.0.0', layers: ['L4'] });
 });
 
 // —— Products ——

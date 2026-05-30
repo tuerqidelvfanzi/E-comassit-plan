@@ -1,5 +1,7 @@
 import type {
   AuthSession,
+  BatchCollectJob,
+  CookieJarInfo,
   DashboardMetrics,
   InsightState,
   Product,
@@ -10,6 +12,8 @@ import type {
 import {
   deleteProduct,
   getCollectJobs,
+  getBatchJobs,
+  getCookieJars,
   getExtensionToken,
   getInsight,
   getMetrics,
@@ -20,6 +24,8 @@ import {
   getTemplates,
   ingestNormalized,
   rotateExtensionToken,
+  saveBatchJobs,
+  saveCookieJars,
   saveInsight,
   savePublishTasks,
   saveRules,
@@ -241,5 +247,73 @@ export const localApi = {
   async rotateExtensionToken() {
     await delay(30);
     return { token: rotateExtensionToken() };
+  },
+
+  async createBatchCollect(input: {
+    listUrl: string;
+    maxItems?: number;
+    delayMsMin?: number;
+    delayMsMax?: number;
+    useCookies?: boolean;
+    requireUserConfirm: true;
+  }): Promise<BatchCollectJob> {
+    await delay(200);
+    const job: BatchCollectJob = {
+      id: uid('batch'),
+      status: 'queued',
+      listUrl: input.listUrl,
+      maxItems: Math.min(input.maxItems ?? 10, 10),
+      delayMsMin: input.delayMsMin ?? 250,
+      delayMsMax: input.delayMsMax ?? 2400,
+      useCookies: Boolean(input.useCookies),
+      itemsDone: 0,
+      itemsFailed: 0,
+      results: [],
+      auditLog: [{ event: 'queued', at: new Date().toISOString() }],
+      createdAt: new Date().toISOString(),
+    };
+    saveBatchJobs([job, ...getBatchJobs()]);
+    setTimeout(() => {
+      const jobs = getBatchJobs();
+      const j = jobs.find((x) => x.id === job.id);
+      if (!j) return;
+      const done = {
+        ...j,
+        status: 'done' as const,
+        itemsDone: 3,
+        itemsFailed: 0,
+        results: [
+          { url: `${input.listUrl}#1`, ok: true, productId: 'sim-1' },
+          { url: `${input.listUrl}#2`, ok: true, productId: 'sim-2' },
+          { url: `${input.listUrl}#3`, ok: true, productId: 'sim-3' },
+        ],
+        finishedAt: new Date().toISOString(),
+      };
+      saveBatchJobs(jobs.map((x) => (x.id === job.id ? done : x)));
+      window.dispatchEvent(new Event('psa-db-change'));
+    }, 2500);
+    return job;
+  },
+
+  async listBatchCollect(): Promise<BatchCollectJob[]> {
+    await delay(80);
+    return getBatchJobs() as BatchCollectJob[];
+  },
+
+  async getBatchCollect(id: string): Promise<BatchCollectJob> {
+    await delay(50);
+    const j = getBatchJobs().find((x) => x.id === id);
+    if (!j) throw new Error('NOT_FOUND');
+    return j as BatchCollectJob;
+  },
+
+  async runBatchCollect(id: string) {
+    await delay(100);
+    return { scheduled: true, id };
+  },
+
+  async getCookieJars(): Promise<CookieJarInfo[]> {
+    await delay(50);
+    return getCookieJars();
   },
 };

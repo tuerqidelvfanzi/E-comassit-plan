@@ -1,6 +1,8 @@
 import type {
   ApiEnvelope,
   AuthSession,
+  BatchCollectJob,
+  CookieJarInfo,
   DashboardMetrics,
   InsightState,
   Product,
@@ -157,5 +159,38 @@ export const httpApi = {
 
   rotateExtensionToken() {
     return request<{ token: string }>('/extension/token', { method: 'POST' });
+  },
+
+  createBatchCollect(input: {
+    listUrl: string;
+    maxItems?: number;
+    delayMsMin?: number;
+    delayMsMax?: number;
+    useCookies?: boolean;
+    requireUserConfirm: true;
+    startImmediately?: boolean;
+  }) {
+    return request<BatchCollectJob>('/collect-jobs/batch', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  },
+
+  listBatchCollect() {
+    return request<BatchCollectJob[]>('/collect-jobs/batch');
+  },
+
+  getBatchCollect(id: string) {
+    return request<BatchCollectJob>(`/collect-jobs/batch/${id}`);
+  },
+
+  runBatchCollect(id: string) {
+    return request<{ scheduled: boolean; id: string }>(`/collect-jobs/batch/${id}/run`, {
+      method: 'POST',
+    });
+  },
+
+  getCookieJars() {
+    return request<CookieJarInfo[]>('/extension/cookies');
   },
 };

@@ -42,6 +42,36 @@ describe('API integration', () => {
     expect(json.data.accessToken).toBeTruthy();
   });
 
+  it('creates batch collect job', async () => {
+    const { app } = await import('./app.js');
+    const loginRes = await app.fetch(
+      new Request('http://localhost/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'admin01', password: 'abcd234' }),
+      }),
+    );
+    const login = (await loginRes.json()) as { data: { accessToken: string } };
+    const res = await app.fetch(
+      new Request('http://localhost/api/v1/collect-jobs/batch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${login.data.accessToken}`,
+        },
+        body: JSON.stringify({
+          listUrl: 'https://s.taobao.com/search?q=test',
+          maxItems: 3,
+          requireUserConfirm: true,
+          startImmediately: false,
+        }),
+      }),
+    );
+    const json = (await res.json()) as { code: number; data: { id: string; status: string } };
+    expect(json.code).toBe(0);
+    expect(json.data.status).toBe('queued');
+  });
+
   it('collect job requires extension token', async () => {
     const { getDb } = await import('./db/index.js');
     const { app } = await import('./app.js');

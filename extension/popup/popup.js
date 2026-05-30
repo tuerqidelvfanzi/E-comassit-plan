@@ -100,8 +100,62 @@ document.getElementById('btn-link').addEventListener('click', () => {
   preview.classList.remove('hidden');
 });
 
+document.getElementById('btn-sync-cookies').addEventListener('click', async () => {
+  const statusEl = document.getElementById('cookie-status');
+  const apiBase = (apiBaseInput?.value?.trim() || 'http://127.0.0.1:8080').replace(/\/+$/, '');
+  const extToken = extTokenInput?.value?.trim();
+  if (!extToken) {
+    statusEl.textContent = '请先在 B 站「设置」复制插件令牌并粘贴到上方。';
+    return;
+  }
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const host = tab?.url ? new URL(tab.url).hostname : '';
+  let domain = 'taobao.com';
+  if (host.includes('1688')) domain = '1688.com';
+  else if (host.includes('tmall')) domain = 'tmall.com';
+  else if (!host.includes('taobao')) {
+    statusEl.textContent = '请在已登录的淘宝/天猫/1688 页面操作。';
+    return;
+  }
+  statusEl.textContent = '正在同步…';
+  const cookies = await chrome.cookies.getAll({ domain });
+  try {
+    const res = await fetch(`${apiBase}/api/v1/extension/cookies`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Extension-Token': extToken,
+      },
+      body: JSON.stringify({
+        domain,
+        consent: true,
+        cookies: cookies.map((c) => ({
+          name: c.name,
+          value: c.value,
+          domain: c.domain,
+          path: c.path,
+          secure: c.secure,
+          httpOnly: c.httpOnly,
+          sameSite: c.sameSite,
+          expirationDate: c.expirationDate,
+        })),
+      }),
+    });
+    const json = await res.json();
+    if (json.code === 0) {
+      statusEl.textContent = `已同步 ${json.data.count} 条 Cookie（${domain}）`;
+      await chrome.storage.local.set({ cookieSyncDomain: domain, cookieSyncAt: Date.now() });
+    } else {
+      statusEl.textContent = `失败：${json.message || res.status}`;
+    }
+  } catch (e) {
+    statusEl.textContent = `无法连接 API：${apiBase}`;
+  }
+});
+
 document.getElementById('btn-publish').addEventListener('click', async () => {
-  const platform = document.getElementById('platform').value;
+  const rawPlatform = document.getElementById('platform').value;
+  const platform = rawPlatform === 'tiktok' ? 'tiktok' : rawPlatform;
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) return;
 

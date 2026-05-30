@@ -5,7 +5,9 @@ RUN npm ci 2>/dev/null || npm install
 COPY shared /app/shared
 COPY api/tsconfig.json api/src ./
 RUN npm run build
+RUN npx playwright install chromium --with-deps || npx playwright install chromium
 ENV NODE_ENV=production
+ENV ENABLE_BATCH_WORKER=true
 ENV DATABASE_PATH=/data/app.db
 RUN mkdir -p /data
 EXPOSE 8080

@@ -76,6 +76,30 @@ export type AuthSession = {
   user: { id: string; username: string };
 };
 
+export type BatchCollectJob = {
+  id: string;
+  status: 'queued' | 'running' | 'done' | 'failed' | 'paused';
+  listUrl: string;
+  maxItems: number;
+  delayMsMin: number;
+  delayMsMax: number;
+  useCookies: boolean;
+  itemsDone: number;
+  itemsFailed: number;
+  results: Array<{ url: string; ok: boolean; productId?: string; error?: string }>;
+  auditLog: Array<Record<string, unknown>>;
+  error?: string | null;
+  createdAt: string;
+  startedAt?: string | null;
+  finishedAt?: string | null;
+};
+
+export type CookieJarInfo = {
+  domain: string;
+  updatedAt: string;
+  consentAt: string;
+};
+
 export type ApiEnvelope<T> = {
   code: number;
   message: string;

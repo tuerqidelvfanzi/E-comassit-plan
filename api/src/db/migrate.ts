@@ -18,6 +18,10 @@ export function migrate() {
   if (!schemaFile) throw new Error('schema.sql not found');
   const schema = fs.readFileSync(schemaFile, 'utf8');
   db.exec(schema);
+  const batchSchemaPath = path.join(__dirname, 'schema-batch.sql');
+  if (fs.existsSync(batchSchemaPath)) {
+    db.exec(fs.readFileSync(batchSchemaPath, 'utf8'));
+  }
   seedIfEmpty(db);
   db.close();
   return dbPath;

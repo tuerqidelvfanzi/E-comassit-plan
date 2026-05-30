@@ -9,7 +9,7 @@
   <body>
     <header>
       <strong>电商助手</strong>
-      <span class="badge demo">v0.4</span>
+      <span class="badge demo">v0.5</span>
     </header>
 
     <section class="field">
@@ -23,6 +23,13 @@
     <section class="field">
       <label for="ext-token">插件令牌（B 站设置中复制）</label>
       <input id="ext-token" type="password" placeholder="psa_…" autocomplete="off" />
+    </section>
+
+    <section>
+      <h2>Cookie 同步（批量 Worker）</h2>
+      <p class="hint">在已登录淘宝/1688 后，将 Cookie 同步到 B 站 API，供批量 TOP10 采集使用。</p>
+      <button type="button" id="btn-sync-cookies" class="secondary">同步当前站 Cookie</button>
+      <p id="cookie-status" class="meta"></p>
     </section>
 
     <section>

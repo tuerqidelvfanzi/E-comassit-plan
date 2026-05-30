@@ -138,6 +138,7 @@ export type NavItem = { to: string; label: string; end?: boolean };
 export const navItems: NavItem[] = [
   { to: '/app', label: '工作台', end: true },
   { to: '/app/inbox', label: '采集箱' },
+  { to: '/app/batch-collect', label: '批量采集' },
   { to: '/app/templates', label: '类目模板' },
   { to: '/app/rules', label: '规则库' },
   { to: '/app/insights', label: '选品洞察' },
