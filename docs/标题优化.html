@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>天猫标题优化 V.0530 - 可交互工作台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f7fa; min-height: 100vh; }
+    .app-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+    .app-header h1 { font-size: 1.8em; margin-bottom: 5px; }
+    .app-header p { font-size: 0.95em; opacity: 0.9; }
+    .main-container { display: flex; max-width: 1400px; margin: 0 auto; min-height: calc(100vh - 80px); }
+    .sidebar { width: 280px; background: white; border-right: 1px solid #e0e0e0; padding: 20px; overflow-y: auto; }
+    .sidebar-title { font-size: 1.1em; color: #333; margin-bottom: 16px; font-weight: 600; padding-bottom: 10px; border-bottom: 2px solid #667eea; }
+    .step-nav { display: flex; flex-direction: column; gap: 8px; }
+    .step-nav-item { display: flex; align-items: center; padding: 12px 16px; border-radius: 10px; cursor: pointer; transition: all 0.3s; border: 2px solid transparent; background: #f8f9fa; }
+    .step-nav-item:hover { background: #e8eaf6; }
+    .step-nav-item.active { background: #e8eaf6; border-color: #667eea; }
+    .step-nav-item.completed { background: #e8f5e9; border-color: #4caf50; }
+    .step-nav-item.current { background: #fff3e0; border-color: #ff9800; }
+    .step-nav-item .step-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; font-size: 0.9em; }
+    .step-nav-item .step-icon.pending { background: #e0e0e0; color: #999; }
+    .step-nav-item .step-icon.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .step-nav-item .step-icon.done { background: #4caf50; color: white; }
+    .step-nav-item .step-info { flex: 1; }
+    .step-nav-item .step-info .name { font-weight: 500; color: #333; font-size: 0.95em; }
+    .step-nav-item .step-info .status { font-size: 0.8em; color: #888; margin-top: 2px; }
+    .step-nav-item.completed .step-info .status { color: #4caf50; }
+    .step-nav-item.current .step-info .status { color: #ff9800; }
+    .content-area { flex: 1; padding: 24px; overflow-y: auto; }
+    .panel { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px; overflow: hidden; }
+    .panel-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .panel-header h2 { font-size: 1.3em; }
+    .panel-header .step-badge { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.85em; }
+    .panel-body { padding: 24px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 500; color: #333; margin-bottom: 8px; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em; transition: border-color 0.3s; font-family: inherit; }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+    .form-group textarea { min-height: 100px; resize: vertical; }
+    .form-hint { font-size: 0.85em; color: #888; margin-top: 6px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border-radius: 10px; font-size: 1em; font-weight: 500; cursor: pointer; transition: all 0.3s; border: none; }
+    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-secondary { background: #f0f0f0; color: #666; }
+    .btn-secondary:hover { background: #e0e0e0; }
+    .btn-success { background: #4caf50; color: white; }
+    .btn-success:hover { background: #43a047; }
+    .btn-danger { background: #f44336; color: white; }
+    .btn-warning { background: #ff9800; color: white; }
+    .btn-group { display: flex; gap: 12px; margin-top: 20px; }
+    .output-box { background: #1a1a2e; color: #0f0; padding: 20px; border-radius: 10px; font-family: "Consolas", monospace; font-size: 0.95em; line-height: 1.6; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+    .output-box.error { background: #2d1a1a; color: #f44336; }
+    .comparison-view { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .comparison-card { background: #f8f9fa; border-radius: 12px; padding: 16px; border: 2px solid #e0e0e0; }
+    .comparison-card.original { border-color: #f44336; }
+    .comparison-card.suggested { border-color: #4caf50; }
+    .comparison-card h4 { margin-bottom: 12px; font-size: 0.95em; }
+    .comparison-card.original h4 { color: #f44336; }
+    .comparison-card.suggested h4 { color: #4caf50; }
+    .comparison-card .title-text { font-size: 1.1em; color: #333; line-height: 1.6; }
+    .comparison-card .score { margin-top: 12px; font-size: 0.9em; color: #888; }
+    .diff-list { margin-top: 16px; }
+    .diff-item { padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; font-size: 0.95em; }
+    .diff-item.remove { background: #ffebee; color: #c62828; }
+    .diff-item.add { background: #e8f5e9; color: #2e7d32; }
+    .workflow-progress { display: flex; align-items: center; justify-content: space-between; padding: 20px; background: #f8f9fa; border-radius: 12px; margin-bottom: 20px; }
+    .workflow-step { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; }
+    .workflow-step::after { content: ""; position: absolute; top: 16px; left: 50%; width: 100%; height: 3px; background: #e0e0e0; z-index: 0; }
+    .workflow-step:last-child::after { display: none; }
+    .workflow-step.done::after { background: #4caf50; }
+    .workflow-step .circle { width: 32px; height: 32px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 1; color: white; }
+    .workflow-step.done .circle { background: #4caf50; }
+    .workflow-step.active .circle { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .workflow-step .label { margin-top: 8px; font-size: 0.8em; color: #888; text-align: center; }
+    .workflow-step.active .label { color: #667eea; font-weight: 500; }
+    .log-area { background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.9em; }
+    .log-entry { padding: 4px 0; border-bottom: 1px solid #f0f0f0; }
+    .log-entry.info { color: #2196f3; }
+    .log-entry.success { color: #4caf50; }
+    .log-entry.warning { color: #ff9800; }
+    .log-entry.error { color: #f44336; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 16px 24px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000; transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: #4caf50; }
+    .toast.error { background: #f44336; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
+    .modal-overlay.show { opacity: 1; visibility: visible; }
+    .modal { background: white; border-radius: 16px; padding: 24px; max-width: 500px; width: 90%; transform: scale(0.9); transition: transform 0.3s; }
+    .modal-overlay.show .modal { transform: scale(1); }
+    .modal h3 { margin-bottom: 16px; color: #333; }
+    .modal p { margin-bottom: 20px; color: #666; line-height: 1.6; }
+    .modal .btn-group { justify-content: flex-end; }
+    @media (max-width: 900px) { .main-container { flex-direction: column; } .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e0e0e0; max-height: 300px; } .step-nav { flex-direction: row; flex-wrap: wrap; } .step-nav-item { flex: 1 1 45%; } .comparison-view { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <h1>📊 天猫标题优化 V.0530</h1>
+    <p>7步完成商品标题优化与自动更换 · 可交互工作台</p>
+  </header>
+
+  <div class="main-container">
+    <aside class="sidebar">
+      <h3 class="sidebar-title">📋 任务步骤</h3>
+      <div class="step-nav">
+        <div class="step-nav-item current" data-step="1">
+          <div class="step-icon active">1</div>
+          <div class="step-info">
+            <div class="name">输入类目和商品ID</div>
+            <div class="status">进行中</div>
+          </div>
+        </div>
+        <div class="step-nav-item" data-step="2">
+          <div class="step-icon pending">2</div>
+          <div class="step-info">
+            <div class="name">抓取搜索词</div>
+            <div class="status">待执行</div>
+          </div>
+        </div>
+        <div class="step-nav-item" data-step="3">
+          <div class="step-icon pending">3</div>
+          <div class="step-info">
+            <div class="name">生成优化标题</div>
+            <div class="status">待执行</div>
+          </div>
+        </div>
+        <div class="step-nav-item" data-step="4">
+          <div class="step-icon pending">4</div>
+          <div class="step-info">
+            <div class="name">查找原始标题</div>
+            <div class="status">待执行</div>
+          </div>
+        </div>
+        <div class="step-nav-item" data-step="5">
+          <div class="step-icon pending">5</div>
+          <div class="step-info">
+            <div class="name">对比分析</div>
+            <div class="status">待执行</div>
+          </div>
+        </div>
+        <div class="step-nav-item" data-step="6">
+          <div class="step-icon pending">6</div>
+          <div class="step-info">
+            <div class="name">确认更换</div>
+            <div class="status">待执行</div>
+          </div>
+        </div>
+        <div class="step-nav-item" data-step="7">
+          <div class="step-icon pending">7</div>
+          <div class="step-info">
+            <div class="name">自动更换</div>
+            <div class="status">待执行</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content-area">
+      <!-- 步骤1: 输入 -->
+      <div class="panel" id="panel-1">
+        <div class="panel-header">
+          <h2>📥 步骤1：指定类目和商品ID</h2>
+          <span class="step-badge">当前步骤</span>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label>🏷️ 类目名称</label>
+            <input type="text" id="category" placeholder="例如：电风扇、T恤、连衣裙" value="T恤">
+            <div class="form-hint">输入商品所属的类目名称</div>
+          </div>
+          <div class="form-group">
+            <label>🆔 商品ID</label>
+            <input type="text" id="product-id" placeholder="例如：1053044184855" value="1053044184855">
+            <div class="form-hint">天猫商品ID，可在商品详情页URL中找到</div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="executeStep1()">▶ 开始执行</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 步骤2: 抓取搜索词 -->
+      <div class="panel" id="panel-2" style="display:none;">
+        <div class="panel-header">
+          <h2>🔍 步骤2：抓取搜索词统计</h2>
+          <span class="step-badge">待执行</span>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label>⏱️ 时间范围</label>
+            <select id="time-range">
+              <option value="7">最近7天</option>
+              <option value="14">最近14天</option>
+              <option value="30">最近30天</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>📊 页面数量</label>
+            <select id="page-count">
+              <option value="1">1页</option>
+              <option value="3" selected>3页</option>
+              <option value="5">5页</option>
+              <option value="10">10页</option>
+            </select>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="goToStep(1)">← 上一步</button>
+            <button class="btn btn-primary" onclick="executeStep2()">▶ 开始抓取</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 步骤3: 生成标题 -->
+      <div class="panel" id="panel-3" style="display:none;">
+        <div class="panel-header">
+          <h2>✨ 步骤3：生成优化标题</h2>
+          <span class="step-badge">待执行</span>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label>🎨 标题风格</label>
+            <select id="title-style">
+              <option value="hot">热门爆款风格</option>
+              <option value="refined">精致高端风格</option>
+              <option value="seo">SEO优化风格</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>🔢 标题数量</label>
+            <select id="title-count">
+              <option value="1" selected>生成1个标题</option>
+              <option value="3">生成3个标题</option>
+              <option value="5">生成5个标题</option>
+            </select>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="goToStep(2)">← 上一步</button>
+            <button class="btn btn-primary" onclick="executeStep3()">▶ AI生成标题</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 步骤4: 查找原始标题 -->
+      <div class="panel" id="panel-4" style="display:none;">
+        <div class="panel-header">
+          <h2>📖 步骤4：查找指定产品标题</h2>
+          <span class="step-badge">待执行</span>
+        </div>
+        <div class="panel-body">
+          <p style="color:#666;margin-bottom:16px;">根据商品ID查找当前标题，并进行评分分析</p>
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="goToStep(3)">← 上一步</button>
+            <button class="btn btn-primary" onclick="executeStep4()">🔍 查找原始标题</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 步骤5: 对比分析 -->
+      <div class="panel" id="panel-5" style="display:none;">
+        <div class="panel-header">
+          <h2>⚖️ 步骤5：对比新旧标题</h2>
+          <span class="step-badge">待执行</span>
+        </div>
+        <div class="panel-body">
+          <div class="comparison-view" id="comparison-view">
+            <div class="comparison-card original">
+              <h4>📕 原始标题</h4>
+              <div class="title-text" id="original-title-text">加载中...</div>
+              <div class="score">人气分：<span id="original-score">--</span></div>
+            </div>
+            <div class="comparison-card suggested">
+              <h4>📗 建议标题</h4>
+              <div class="title-text" id="suggested-title-text">加载中...</div>
+              <div class="score">预估人气分：<span id="suggested-score">--</span></div>
+            </div>
+          </div>
+          <div class="diff-list" id="diff-list"></div>
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="goToStep(4)">← 上一步</button>
+            <button class="btn btn-primary" onclick="executeStep5()">⚖️ 执行对比分析</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 步骤6: 确认更换 -->
+      <div class="panel" id="panel-6" style="display:none;">
+        <div class="panel-header">
+          <h2>❓ 步骤6：确认更换</h2>
+          <span class="step-badge">待确认</span>
+        </div>
+        <div class="panel-body">
+          <p style="color:#666;margin-bottom:16px;font-size:1.1em;">是否确认更换商品标题？</p>
+          <div class="output-box" id="confirm-preview">标题更换预览信息...</div>
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="goToStep(5)">← 上一步</button>
+            <button class="btn btn-danger" onclick="rejectChange()">✕ 取消</button>
+            <button class="btn btn-success" onclick="confirmChange()">✓ 确认更换</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 步骤7: 更换标题 -->
+      <div class="panel" id="panel-7" style="display:none;">
+        <div class="panel-header">
+          <h2>🚀 步骤7：更换标题</h2>
+          <span class="step-badge">执行中</span>
+        </div>
+        <div class="panel-body">
+          <div class="workflow-progress" id="workflow-progress">
+            <div class="workflow-step active"><div class="circle">1</div><div class="label">进入后台</div></div>
+            <div class="workflow-step"><div class="circle">2</div><div class="label">定位商品</div></div>
+            <div class="workflow-step"><div class="circle">3</div><div class="label">点击编辑</div></div>
+            <div class="workflow-step"><div class="circle">4</div><div class="label">粘贴标题</div></div>
+            <div class="workflow-step"><div class="circle">5</div><div class="label">提交保存</div></div>
+          </div>
+          <div class="log-area" id="exec-log">
+            <div class="log-entry info">[等待] 准备开始执行...</div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="goToStep(6)">← 上一步</button>
+            <button class="btn btn-success" onclick="executeStep7()">▶ 开始执行更换</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 完成面板 -->
+      <div class="panel" id="panel-complete" style="display:none;">
+        <div class="panel-header" style="background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);">
+          <h2>✅ 任务完成</h2>
+          <span class="step-badge">🎉</span>
+        </div>
+        <div class="panel-body">
+          <div style="text-align:center;padding:40px 0;">
+            <div style="font-size:4em;margin-bottom:20px;">🎊</div>
+            <h3 style="color:#333;margin-bottom:16px;">标题优化完成！</h3>
+            <p style="color:#666;margin-bottom:20px;">商品标题已成功更换为优化版本</p>
+            <div style="background:#e8f5e9;padding:20px;border-radius:12px;margin-bottom:20px;">
+              <div style="font-size:1.2em;color:#2e7d32;font-weight:500;" id="final-title"></div>
+            </div>
+          </div>
+          <div class="btn-group" style="justify-content:center;">
+            <button class="btn btn-primary" onclick="resetWorkflow()">🔄 开始新任务</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 确认对话框 -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal">
+      <h3 id="modal-title">确认操作</h3>
+      <p id="modal-message">确定要执行此操作吗？</p>
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+        <button class="btn btn-primary" id="modal-confirm-btn" onclick="modalConfirm()">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast提示 -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // 状态管理
+    const state = {
+      currentStep: 1,
+      category: '',
+      productId: '',
+      searchWords: [],
+      originalTitle: '',
+      generatedTitles: [],
+      suggestedTitle: '',
+      comparisonResult: null,
+      logs: []
+    };
+
+    // 显示提示
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show ' + type;
+      setTimeout(() => { toast.className = 'toast'; }, 3000);
+    }
+
+    // 更新导航状态
+    function updateNav() {
+      document.querySelectorAll('.step-nav-item').forEach((item, index) => {
+        const step = index + 1;
+        item.classList.remove('current', 'completed', 'active');
+        const icon = item.querySelector('.step-icon');
+        const status = item.querySelector('.status');
+
+        if (step < state.currentStep) {
+          item.classList.add('completed');
+          icon.className = 'step-icon done';
+          icon.textContent = '✓';
+          status.textContent = '已完成';
+        } else if (step === state.currentStep) {
+          item.classList.add('current');
+          icon.className = 'step-icon active';
+          icon.textContent = step;
+          status.textContent = '进行中';
+        } else {
+          icon.className = 'step-icon pending';
+          icon.textContent = step;
+          status.textContent = '待执行';
+        }
+      });
+    }
+
+    // 切换步骤显示
+    function showPanel(step) {
+      document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+      const panel = document.getElementById('panel-' + step);
+      if (panel) panel.style.display = 'block';
+    }
+
+    // 跳转到指定步骤
+    function goToStep(step) {
+      if (step >= 1 && step <= 7) {
+        state.currentStep = step;
+        updateNav();
+        showPanel(step);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // 添加日志
+    function addLog(message, type = 'info') {
+      const logArea = document.getElementById('exec-log');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry ' + type;
+      const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      entry.textContent = `[${time}] ${message}`;
+      logArea.appendChild(entry);
+      logArea.scrollTop = logArea.scrollHeight;
+    }
+
+    // 执行步骤1
+    function executeStep1() {
+      state.category = document.getElementById('category').value.trim();
+      state.productId = document.getElementById('product-id').value.trim();
+
+      if (!state.category) {
+        showToast('请输入类目名称', 'error');
+        return;
+      }
+      if (!state.productId) {
+        showToast('请输入商品ID', 'error');
+        return;
+      }
+
+      showToast('步骤1完成：已记录类目和商品ID', 'success');
+      setTimeout(() => goToStep(2), 500);
+    }
+
+    // 执行步骤2 - 模拟抓取
+    function executeStep2() {
+      const timeRange = document.getElementById('time-range').value;
+      const pageCount = document.getElementById('page-count').value;
+
+      addLog('正在连接天猫生意参谋...', 'info');
+      setTimeout(() => addLog('已登录账号', 'success'), 500);
+      setTimeout(() => addLog(`切换到类目：${state.category}`, 'info'), 1000);
+      setTimeout(() => addLog(`设置时间范围：最近${timeRange}天`, 'info'), 1500);
+      setTimeout(() => addLog(`正在抓取第1/${pageCount}页...`, 'info'), 2000);
+
+      // 模拟搜索词数据
+      state.searchWords = [
+        { word: '纯棉', count: 15680, trend: 'up' },
+        { word: '宽松', count: 12450, trend: 'up' },
+        { word: '夏季', count: 11200, trend: 'steady' },
+        { word: '潮流', count: 9850, trend: 'up' },
+        { word: '百搭', count: 8760, trend: 'down' },
+        { word: '韩版', count: 7200, trend: 'steady' },
+        { word: '修身', count: 6500, trend: 'down' },
+        { word: '透气', count: 5800, trend: 'up' }
+      ];
+
+      setTimeout(() => {
+        addLog(`抓取完成，共获取 ${state.searchWords.length} 个搜索词`, 'success');
+        showToast('步骤2完成：搜索词抓取成功', 'success');
+      }, 2500);
+
+      setTimeout(() => goToStep(3), 3000);
+    }
+
+    // 执行步骤3 - 模拟生成标题
+    function executeStep3() {
+      const style = document.getElementById('title-style').value;
+      const count = parseInt(document.getElementById('title-count').value);
+
+      addLog('正在调用AI模型生成标题...', 'info');
+
+      const styleNames = { hot: '热门爆款', refined: '精致高端', seo: 'SEO优化' };
+      addLog(`标题风格：${styleNames[style]}`, 'info');
+
+      // 模拟生成的标题
+      const templates = [
+        '2024夏季新款纯棉宽松百搭T恤男潮牌',
+        '韩版纯棉短袖T恤男宽松休闲潮流男装',
+        '夏季透气纯棉T恤男学生运动休闲上衣',
+        '新款韩版宽松纯棉T恤男简约百搭',
+        '潮流字母印花纯棉T恤男街头风'
+      ];
+
+      state.generatedTitles = templates.slice(0, count);
+      state.suggestedTitle = state.generatedTitles[0];
+
+      setTimeout(() => {
+        addLog(`生成完成，共 ${count} 个标题方案`, 'success');
+        state.generatedTitles.forEach((t, i) => addLog(`方案${i+1}: ${t}`, 'info'));
+        showToast('步骤3完成：标题生成成功', 'success');
+      }, 1500);
+
+      setTimeout(() => goToStep(4), 2000);
+    }
+
+    // 执行步骤4 - 模拟查找原始标题
+    function executeStep4() {
+      addLog(`正在查找商品ID: ${state.productId}...`, 'info');
+
+      // 模拟原始标题
+      state.originalTitle = '2024新款T恤男短袖纯棉宽松休闲学生运动装男大码上衣潮';
+
+      setTimeout(() => {
+        addLog(`找到商品：${state.originalTitle}`, 'success');
+        document.getElementById('original-title-text').textContent = state.originalTitle;
+        document.getElementById('original-score').textContent = '68万';
+        showToast('步骤4完成：原始标题已获取', 'success');
+      }, 1000);
+
+      setTimeout(() => {
+        document.getElementById('suggested-title-text').textContent = state.suggestedTitle;
+        document.getElementById('suggested-score').textContent = '95万 ↑40%';
+      }, 1500);
+
+      setTimeout(() => goToStep(5), 2000);
+    }
+
+    // 执行步骤5 - 对比分析
+    function executeStep5() {
+      addLog('正在分析标题差异...', 'info');
+
+      // 模拟对比结果
+      const removeWords = ['新款', '大码', '运动装'];
+      const addWords = ['2024', '纯棉', '潮流'];
+      const suggestions = [
+        '建议增加品牌/店铺名称前缀',
+        '可考虑添加季节性关键词',
+        '优化关键词顺序，突出核心卖点'
+      ];
+
+      const diffList = document.getElementById('diff-list');
+      diffList.innerHTML = '';
+
+      removeWords.forEach(w => {
+        const item = document.createElement('div');
+        item.className = 'diff-item remove';
+        item.textContent = `➖ 建议删除：${w}`;
+        diffList.appendChild(item);
+      });
+
+      addWords.forEach(w => {
+        const item = document.createElement('div');
+        item.className = 'diff-item add';
+        item.textContent = `➕ 建议加入：${w}`;
+        diffList.appendChild(item);
+      });
+
+      suggestions.forEach((s, i) => {
+        const item = document.createElement('div');
+        item.className = 'diff-item';
+        item.style.background = '#e3f2fd';
+        item.style.color = '#1565c0';
+        item.textContent = `${i+1}. ${s}`;
+        diffList.appendChild(item);
+      });
+
+      setTimeout(() => {
+        addLog('对比分析完成', 'success');
+        showToast('步骤5完成：对比分析完成', 'success');
+      }, 1000);
+
+      setTimeout(() => goToStep(6), 1500);
+    }
+
+    // 确认更换
+    function confirmChange() {
+      document.getElementById('confirm-modal').classList.remove('show');
+      addLog('用户确认更换标题', 'success');
+      setTimeout(() => goToStep(7), 500);
+    }
+
+    // 取消更换
+    function rejectChange() {
+      showToast('已取消标题更换', 'warning');
+      addLog('用户取消操作，任务结束', 'warning');
+    }
+
+    // 执行步骤7 - 模拟自动更换
+    function executeStep7() {
+      const steps = [
+        { msg: '正在进入天猫商家后台...', delay: 500 },
+        { msg: '定位商品列表...', delay: 1200 },
+        { msg: `搜索商品ID: ${state.productId}`, delay: 1800 },
+        { msg: '找到目标商品 ✓', delay: 2200 },
+        { msg: '悬停显示编辑按钮...', delay: 2800 },
+        { msg: '点击"一支笔"编辑图标 ✓', delay: 3400 },
+        { msg: '清空原标题...', delay: 4000 },
+        { msg: '粘贴新标题...', delay: 4600 },
+        { msg: `新标题: ${state.suggestedTitle}`, delay: 5000 },
+        { msg: '点击提交按钮...', delay: 5500 },
+        { msg: '等待服务器响应...', delay: 6000 },
+        { msg: '标题更新成功 ✓', delay: 6500 }
+      ];
+
+      const progressSteps = document.querySelectorAll('.workflow-step');
+
+      steps.forEach((step, index) => {
+        setTimeout(() => {
+          if (step.msg.includes('✓')) {
+            addLog(step.msg, 'success');
+            progressSteps[index].classList.add('done');
+            if (progressSteps[index + 1]) {
+              progressSteps[index + 1].classList.add('active');
+            }
+          } else {
+            addLog(step.msg, 'info');
+          }
+        }, step.delay);
+      });
+
+      setTimeout(() => {
+        showToast('🎉 标题更换成功！', 'success');
+        showPanel('complete');
+        document.getElementById('final-title').textContent = state.suggestedTitle;
+      }, 7000);
+    }
+
+    // 重置工作流
+    function resetWorkflow() {
+      state.currentStep = 1;
+      state.category = '';
+      state.productId = '';
+      state.searchWords = [];
+      state.originalTitle = '';
+      state.generatedTitles = [];
+      state.suggestedTitle = '';
+      state.comparisonResult = null;
+
+      document.getElementById('category').value = '';
+      document.getElementById('product-id').value = '';
+      document.getElementById('exec-log').innerHTML = '<div class="log-entry info">[等待] 准备开始执行...</div>';
+      document.querySelectorAll('.workflow-step').forEach(s => {
+        s.classList.remove('done', 'active');
+      });
+      document.querySelector('.workflow-step').classList.add('active');
+
+      updateNav();
+      showPanel(1);
+    }
+
+    // 步骤导航点击
+    document.querySelectorAll('.step-nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const step = parseInt(item.dataset.step);
+        // 只能跳转到已完成的步骤或当前步骤
+        if (step <= state.currentStep) {
+          goToStep(step);
+        } else {
+          showToast(`请先完成第${step-1}步`, 'warning');
+        }
+      });
+    });
+
+    // 初始化
+    updateNav();
+    showPanel(1);
+  </script>
+</body>
+</html>
