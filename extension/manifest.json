@@ -3,8 +3,35 @@
   "name": "电商AI助手",
   "version": "3.0.0",
   "description": "跨境运营智能上品中枢",
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "storage", "cookies", "tabs"],
+  "host_permissions": [
+    "https://*.1688.com/*",
+    "https://*.taobao.com/*",
+    "https://*.tmall.com/*",
+    "https://*.pinduoduo.com/*"
+  ],
   "background": {
     "service_worker": "src/background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.1688.com/offer/*",
+        "https://*.taobao.com/item/*",
+        "https://*.tmall.com/item/*"
+      ],
+      "js": ["src/content/content-script.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "48": "icons/icon48.png"
+    }
+  },
+  "icons": {
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   }
 }

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Button, Card } from './ui';
-import { DEFAULT_CUSTOM_CSS, type ThemeId, useTheme } from '../lib/theme';
+import { Button, Card, Badge } from './ui';
+import { DEFAULT_CUSTOM_CSS, type ThemeId, type ThemeCategory, THEME_OPTIONS, THEME_CATEGORIES, useTheme } from '../lib/theme';
 
 export function ThemeSettings() {
-  const { theme, setTheme, options, customCss, applyCustomCss, resetCustomCss } = useTheme();
+  const { theme, setTheme, customCss, applyCustomCss, resetCustomCss } = useTheme();
   const [draftCss, setDraftCss] = useState(customCss);
   const [msg, setMsg] = useState('');
+  const [activeCategory, setActiveCategory] = useState<ThemeCategory | 'all'>('all');
 
   useEffect(() => {
     setDraftCss(customCss);
@@ -16,16 +17,51 @@ export function ThemeSettings() {
     setMsg('已应用自定义 CSS，并切换为「自定义」主题。');
   }
 
+  const filteredThemes = activeCategory === 'all'
+    ? THEME_OPTIONS
+    : THEME_OPTIONS.filter(t => t.category === activeCategory);
+
+  const categoryCount = (cat: ThemeCategory) =>
+    THEME_OPTIONS.filter(t => t.category === cat).length;
+
   return (
     <div className="space-y-6">
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {options.map((opt) => (
+      {/* 分类切换 */}
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          onClick={() => setActiveCategory('all')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+            activeCategory === 'all'
+              ? 'bg-[var(--color-primary)] text-white'
+              : 'bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-primary)]'
+          }`}
+        >
+          全部 ({THEME_OPTIONS.filter(t => t.id !== 'custom').length})
+        </button>
+        {THEME_CATEGORIES.map(cat => (
+          <button
+            key={cat.id}
+            onClick={() => setActiveCategory(cat.id)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+              activeCategory === cat.id
+                ? 'bg-[var(--color-primary)] text-white'
+                : 'bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-primary)]'
+            }`}
+          >
+            {cat.label} ({categoryCount(cat.id)})
+          </button>
+        ))}
+      </div>
+
+      {/* 主题网格 */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {filteredThemes.map((opt) => (
           <label
             key={opt.id}
-            className={`cursor-pointer rounded-lg border px-4 py-3 transition ${
+            className={`cursor-pointer rounded-xl border-2 p-3 transition all ${
               theme === opt.id
-                ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-focus-ring)]'
-                : 'border-[var(--color-border)] hover:border-[var(--color-primary)]'
+                ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-focus-ring)] shadow-lg'
+                : 'border-[var(--color-border)] hover:border-[var(--color-primary)] hover:shadow-md'
             } bg-[var(--color-surface)]`}
           >
             <input
@@ -38,12 +74,62 @@ export function ThemeSettings() {
                 setMsg(opt.id === 'custom' ? '已选择自定义主题，可在下方编辑 CSS。' : '');
               }}
             />
-            <p className="text-sm font-medium">{opt.label}</p>
-            <p className="mt-1 text-xs text-muted">{opt.description}</p>
+            {/* 主题预览色块 */}
+            <div className="flex gap-1.5 mb-3">
+              <div
+                className="w-6 h-6 rounded-md border border-[var(--color-border)]"
+                style={{ backgroundColor: opt.preview.bg }}
+                title="背景色"
+              />
+              <div
+                className="w-6 h-6 rounded-md border border-[var(--color-border)]"
+                style={{ backgroundColor: opt.preview.surface }}
+                title="表面色"
+              />
+              <div
+                className="w-6 h-6 rounded-md border border-[var(--color-border)]"
+                style={{ backgroundColor: opt.preview.accent }}
+                title="主强调色"
+              />
+              <div
+                className="w-6 h-6 rounded-md border border-[var(--color-border)]"
+                style={{ backgroundColor: opt.preview.accent2 }}
+                title="次强调色"
+              />
+            </div>
+            <div className="flex items-center gap-2 mb-1">
+              <p className="text-sm font-medium">{opt.label}</p>
+              <Badge tone={opt.category === 'light' ? 'default' : opt.category === 'dark' ? 'ok' : opt.category === 'tech' ? 'warn' : 'default'} className="text-[10px] px-1.5">
+                {THEME_CATEGORIES.find(c => c.id === opt.category)?.label}
+              </Badge>
+            </div>
+            {opt.labelEn && (
+              <p className="text-xs text-muted mb-1">{opt.labelEn}</p>
+            )}
+            <p className="text-xs text-muted">{opt.description}</p>
+            {theme === opt.id && (
+              <div className="mt-2 flex items-center gap-1 text-xs text-[var(--color-primary)]">
+                <span>✓</span> <span>当前主题</span>
+              </div>
+            )}
           </label>
         ))}
       </div>
 
+      {/* 主题统计 */}
+      <div className="flex flex-wrap gap-4 text-xs text-muted">
+        <span>共 {THEME_OPTIONS.filter(t => t.id !== 'custom').length} 种预设主题</span>
+        <span>·</span>
+        <span>浅色系: {categoryCount('light')}</span>
+        <span>·</span>
+        <span>深色系: {categoryCount('dark')}</span>
+        <span>·</span>
+        <span>科技感: {categoryCount('tech')}</span>
+        <span>·</span>
+        <span>复古风: {categoryCount('retro')}</span>
+      </div>
+
+      {/* 自定义CSS编辑器 */}
       <Card>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>

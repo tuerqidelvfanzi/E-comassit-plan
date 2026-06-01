@@ -1,34 +1,60 @@
-import { useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from './components/AppLayout';
-import { SettingsPage } from './pages/SettingsPage';
-import { InboxPage } from './pages/inbox/InboxPage';
+import { DashboardPage } from './pages/DashboardPage';
 import { WorkbenchPage } from './pages/workbench/WorkbenchPage';
+import { CompetitorsPage } from './pages/competitors/CompetitorsPage';
+import { TitleOptimizationPage } from './pages/workbench/TitleOptimizationPage';
+import { InboxPage } from './pages/inbox/InboxPage';
+import { LinkCollectPage } from './pages/link-collect/LinkCollectPage';
+import { BatchCollectPage } from './pages/BatchCollectPage';
+import { TemplatesPage } from './pages/TemplatesPage';
+import { RulesPage } from './pages/RulesPage';
+import { InsightsPage } from './pages/InsightsPage';
+import { PublishPage } from './pages/PublishPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { ThemeSettings } from './components/ThemeSettings';
+import { IntegrationsPage } from './pages/IntegrationsPage';
+import { TeamPage } from './pages/TeamPage';
 
-type Page = 'inbox' | 'workbench' | 'settings' | 'themes';
-
+/**
+ * V3.0 完整路由配置
+ * 覆盖所有V3需求中的菜单项
+ */
 export function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('workbench');
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'inbox':
-        return <InboxPage />;
-      case 'workbench':
-        return <WorkbenchPage />;
-      case 'settings':
-        return <SettingsPage />;
-      case 'themes':
-        return <ThemeSettings />;
-      default:
-        return <WorkbenchPage />;
-    }
-  };
-
   return (
-    <AppLayout currentPage={currentPage} onNavigate={setCurrentPage}>
-      {renderPage()}
-    </AppLayout>
+    <Routes>
+      <Route element={<AppLayout />}>
+        {/* 首页/工作台 */}
+        <Route path="/" element={<Navigate to="/app" replace />} />
+        <Route path="/app" element={<DashboardPage />} />
+
+        {/* 选品中心 */}
+        <Route path="/app/competitors" element={<CompetitorsPage />} />
+
+        {/* 工作台 */}
+        <Route path="/app/title-optimization" element={<TitleOptimizationPage />} />
+        <Route path="/app/inbox" element={<InboxPage />} />
+        <Route path="/app/link-collect" element={<LinkCollectPage />} />
+        <Route path="/app/batch-collect" element={<BatchCollectPage />} />
+
+        {/* 配置中心 */}
+        <Route path="/app/templates" element={<TemplatesPage />} />
+        <Route path="/app/rules" element={<RulesPage />} />
+
+        {/* 发布中心 */}
+        <Route path="/app/insights" element={<InsightsPage />} />
+        <Route path="/app/publish" element={<PublishPage />} />
+
+        {/* 系统设置 */}
+        <Route path="/app/settings" element={<SettingsPage />} />
+        <Route path="/app/settings/themes" element={<ThemeSettings />} />
+        <Route path="/app/integrations" element={<IntegrationsPage />} />
+        <Route path="/app/team" element={<TeamPage />} />
+
+        {/* 兜底 */}
+        <Route path="*" element={<Navigate to="/app" replace />} />
+      </Route>
+    </Routes>
   );
 }
 
