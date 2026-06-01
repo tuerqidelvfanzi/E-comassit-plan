@@ -7,6 +7,7 @@ import { initTheme } from './lib/theme';
 import { repairLlmStorage } from './lib/llmProviders';
 import { installExtensionBridge } from './lib/api/extensionBridge';
 import { QueryProvider } from './providers/QueryProvider';
+import { AuthProvider } from './hooks/useAuth';
 import './index.css';
 
 initTheme();
@@ -16,9 +17,11 @@ installExtensionBridge();
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryProvider>
-      <BrowserRouter basename={getRouterBasename()}>
-        <App />
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter basename={getRouterBasename()}>
+          <App />
+        </BrowserRouter>
+      </AuthProvider>
     </QueryProvider>
   </StrictMode>,
 );

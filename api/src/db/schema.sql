@@ -110,3 +110,85 @@ CREATE TABLE IF NOT EXISTS insight_jobs (
   top_features_json TEXT NOT NULL DEFAULT '[]',
   updated_at TEXT NOT NULL
 );
+
+-- 用户认证扩展表（邮箱或手机号二选一）
+CREATE TABLE IF NOT EXISTS user_auth (
+  user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  auth_type TEXT NOT NULL CHECK(auth_type IN ('email', 'phone')),
+  email TEXT,
+  phone TEXT,
+  password_hash TEXT,
+  email_verified INTEGER NOT NULL DEFAULT 0,
+  phone_verified INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  UNIQUE(email),
+  UNIQUE(phone)
+);
+
+-- 短信验证码表
+CREATE TABLE IF NOT EXISTS sms_codes (
+  phone TEXT NOT NULL,
+  code TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  used INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_sms_codes_phone ON sms_codes(phone, expires_at);
+
+-- 团队表
+CREATE TABLE IF NOT EXISTS teams (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  owner_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  plan TEXT NOT NULL DEFAULT 'free' CHECK(plan IN ('free', 'pro', 'team', 'enterprise')),
+  token_quota INTEGER NOT NULL DEFAULT 100,
+  token_used INTEGER NOT NULL DEFAULT 0,
+  balance REAL NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_teams_owner ON teams(owner_id);
+
+-- 团队成员表
+CREATE TABLE IF NOT EXISTS team_members (
+  team_id TEXT NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL DEFAULT 'member' CHECK(role IN ('owner', 'admin', 'member', 'viewer')),
+  invited_by TEXT,
+  joined_at TEXT NOT NULL,
+  PRIMARY KEY (team_id, user_id)
+);
+
+-- Token消耗记录表
+CREATE TABLE IF NOT EXISTS usage_records (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  team_id TEXT REFERENCES teams(id) ON DELETE SET NULL,
+  action TEXT NOT NULL,
+  model TEXT NOT NULL,
+  input_tokens INTEGER NOT NULL DEFAULT 0,
+  output_tokens INTEGER NOT NULL DEFAULT 0,
+  cost REAL NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_usage_team ON usage_records(team_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_usage_user ON usage_records(user_id, created_at);
+
+-- 交易记录表
+CREATE TABLE IF NOT EXISTS transactions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  team_id TEXT REFERENCES teams(id) ON DELETE SET NULL,
+  type TEXT NOT NULL CHECK(type IN ('recharge', 'subscription', 'consumption')),
+  amount REAL NOT NULL,
+  balance_before REAL NOT NULL,
+  balance_after REAL NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'completed', 'failed')),
+  order_no TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_transactions_team ON transactions(team_id, created_at);

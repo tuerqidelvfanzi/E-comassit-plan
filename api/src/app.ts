@@ -31,6 +31,10 @@ import {
 import { createImageJob, getImageJob, listImageJobs } from './services/imageJobs.js';
 import { encodeSku, encodeDummyHookSku } from './domain/listing.js';
 import { registerV2Routes } from './v2/routes.js';
+import {
+  createEmailUser, createPhoneUser, loginWithEmail, loginWithPhone,
+  createSmsCode, verifySmsCode, getUserTeams, getTeamMembers, recordUsage, getUserBalance,
+} from './services/auth.js';
 
 const app = new Hono().basePath(API_PREFIX);
 
@@ -64,6 +68,97 @@ app.post('/auth/login', async (c) => {
 });
 
 app.get('/auth/me', jwtAuth, (c) => ok(c, c.get('user')));
+
+// —— 新用户管理系统 (邮箱或手机二选一) ——
+// 邮箱注册
+app.post('/auth/register/email', async (c) => {
+  const body = z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
+  }).safeParse(await c.req.json());
+  if (!body.success) return fail(c, 'INVALID_BODY');
+  const result = createEmailUser(body.data.email, body.data.password);
+  if (!result) return fail(c, 'EMAIL_EXISTS', 400);
+  const accessToken = await signAccessToken(result.user);
+  const refreshToken = await signRefreshToken(result.user);
+  const teams = getUserTeams(result.user.id);
+  return ok(c, { accessToken, refreshToken, user: result.user, team: teams[0] }, 201);
+});
+
+// 邮箱登录
+app.post('/auth/login/email', async (c) => {
+  const body = z.object({
+    email: z.string().email(),
+    password: z.string(),
+  }).safeParse(await c.req.json());
+  if (!body.success) return fail(c, 'INVALID_BODY');
+  const user = loginWithEmail(body.data.email, body.data.password);
+  if (!user) return fail(c, 'INVALID_CREDENTIALS', 401);
+  const accessToken = await signAccessToken(user);
+  const refreshToken = await signRefreshToken(user);
+  const teams = getUserTeams(user.id);
+  return ok(c, { accessToken, refreshToken, user, team: teams[0] });
+});
+
+// 发送短信验证码
+app.post('/auth/sms/send', async (c) => {
+  const body = z.object({ phone: z.string().regex(/^1[3-9]\d{9}$/) }).safeParse(await c.req.json());
+  if (!body.success) return fail(c, 'INVALID_PHONE');
+  const result = createSmsCode(body.data.phone);
+  // 生产环境应接入阿里云短信API，此处返回验证码用于测试
+  return ok(c, { success: result.success, code: result.code });
+});
+
+// 验证短信验证码并登录/注册
+app.post('/auth/sms/verify', async (c) => {
+  const body = z.object({
+    phone: z.string().regex(/^1[3-9]\d{9}$/),
+    code: z.string().length(6),
+  }).safeParse(await c.req.json());
+  if (!body.success) return fail(c, 'INVALID_BODY');
+  if (!verifySmsCode(body.data.phone, body.data.code)) {
+    return fail(c, 'INVALID_CODE', 401);
+  }
+  // 自动创建或登录用户
+  const result = createPhoneUser(body.data.phone);
+  if (!result) return fail(c, 'PHONE_USER_ERROR', 500);
+  const accessToken = await signAccessToken(result.user);
+  const refreshToken = await signRefreshToken(result.user);
+  const teams = getUserTeams(result.user.id);
+  return ok(c, { accessToken, refreshToken, user: result.user, team: teams[0] });
+});
+
+// 获取用户团队
+app.get('/auth/teams', jwtAuth, (c) => {
+  const teams = getUserTeams(c.get('user').id);
+  return ok(c, teams);
+});
+
+// 获取团队成员
+app.get('/teams/:id/members', jwtAuth, (c) => {
+  const members = getTeamMembers(c.req.param('id'));
+  return ok(c, members);
+});
+
+// 余额查询
+app.get('/auth/balance', jwtAuth, (c) => {
+  const balance = getUserBalance(c.get('user').id);
+  return ok(c, balance);
+});
+
+// 记录使用量
+app.post('/usage/record', jwtAuth, async (c) => {
+  const body = z.object({
+    teamId: z.string().optional(),
+    action: z.string(),
+    model: z.string(),
+    inputTokens: z.number(),
+    outputTokens: z.number(),
+  }).safeParse(await c.req.json());
+  if (!body.success) return fail(c, 'INVALID_BODY');
+  recordUsage(c.get('user').id, body.data.teamId || null, body.data.action, body.data.model, body.data.inputTokens, body.data.outputTokens);
+  return ok(c, { recorded: true });
+});
 
 // —— Extension ——
 app.get('/extension/token', jwtAuth, (c) => {

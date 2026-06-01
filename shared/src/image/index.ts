@@ -26,6 +26,7 @@ export interface ImageIssue {
 
 /** 各国图片要求 */
 export const IMAGE_REQUIREMENTS: Record<string, {
+  name: string;
   minCount: number;
   maxCount: number;
   aspectRatio: string;
@@ -33,6 +34,7 @@ export const IMAGE_REQUIREMENTS: Record<string, {
   mainImageWhiteBg: boolean;
 }> = {
   'vi-VN': {
+    name: '越南',
     minCount: 9,
     maxCount: 15,
     aspectRatio: '1:1',
@@ -40,6 +42,7 @@ export const IMAGE_REQUIREMENTS: Record<string, {
     mainImageWhiteBg: true
   },
   'th-TH': {
+    name: '泰国',
     minCount: 5,
     maxCount: 20,
     aspectRatio: '1:1',
@@ -47,6 +50,7 @@ export const IMAGE_REQUIREMENTS: Record<string, {
     mainImageWhiteBg: false
   },
   'fil-PH': {
+    name: '菲律宾',
     minCount: 9,
     maxCount: 20,
     aspectRatio: '1:1',
@@ -54,6 +58,7 @@ export const IMAGE_REQUIREMENTS: Record<string, {
     mainImageWhiteBg: false
   },
   'id-ID': {
+    name: '印尼',
     minCount: 6,
     maxCount: 20,
     aspectRatio: '1:1',

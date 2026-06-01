@@ -15,14 +15,22 @@ import { SettingsPage } from './pages/SettingsPage';
 import { ThemeSettings } from './components/ThemeSettings';
 import { IntegrationsPage } from './pages/IntegrationsPage';
 import { TeamPage } from './pages/TeamPage';
+import { LoginPage } from './pages/auth/LoginPage';
+import { RegisterPage } from './pages/auth/RegisterPage';
+import { useAuth } from './hooks/useAuth';
 
 /**
  * V3.0 完整路由配置
  * 覆盖所有V3需求中的菜单项
  */
 export function App() {
+  const { isAuthenticated } = useAuth();
   return (
     <Routes>
+      {/* 公开路由 */}
+      <Route path="/login" element={isAuthenticated ? <Navigate to="/app" replace /> : <LoginPage />} />
+      <Route path="/register" element={isAuthenticated ? <Navigate to="/app" replace /> : <RegisterPage />} />
+
       <Route element={<AppLayout />}>
         {/* 首页/工作台 */}
         <Route path="/" element={<Navigate to="/app" replace />} />
