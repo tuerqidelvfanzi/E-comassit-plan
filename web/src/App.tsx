@@ -1,53 +1,35 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { useState } from 'react';
 import { AppLayout } from './components/AppLayout';
-import { LoginPage } from './pages/LoginPage';
 import { SettingsPage } from './pages/SettingsPage';
-import {
-  DashboardV2Page,
-  CompetitorsPage,
-  InboxV2Page,
-  LinkCollectPage,
-  BatchCollectV2Page,
-  WorkbenchV2Page,
-  TemplatesV2Page,
-  TemplatesManageV2Page,
-  RulesV2Page,
-  InsightsV2Page,
-  TitleOptimizationPage,
-  PublishV2Page,
-  IntegrationsPage,
-  TeamPage,
-} from './v2/pages';
-import { useAuth } from './lib/auth';
+import { InboxPage } from './pages/inbox/InboxPage';
+import { WorkbenchPage } from './pages/workbench/WorkbenchPage';
+import { ThemeSettings } from './components/ThemeSettings';
 
-export default function App() {
-  const { isLoggedIn } = useAuth();
+type Page = 'inbox' | 'workbench' | 'settings' | 'themes';
+
+export function App() {
+  const [currentPage, setCurrentPage] = useState<Page>('workbench');
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'inbox':
+        return <InboxPage />;
+      case 'workbench':
+        return <WorkbenchPage />;
+      case 'settings':
+        return <SettingsPage />;
+      case 'themes':
+        return <ThemeSettings />;
+      default:
+        return <WorkbenchPage />;
+    }
+  };
 
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to={isLoggedIn ? '/app' : '/login'} replace />} />
-      <Route path="/login" element={isLoggedIn ? <Navigate to="/app" replace /> : <LoginPage />} />
-      <Route
-        path="/app"
-        element={isLoggedIn ? <AppLayout /> : <Navigate to="/login" replace />}
-      >
-        <Route index element={<DashboardV2Page />} />
-        <Route path="competitors" element={<CompetitorsPage />} />
-        <Route path="inbox" element={<InboxV2Page />} />
-        <Route path="link-collect" element={<LinkCollectPage />} />
-        <Route path="batch-collect" element={<BatchCollectV2Page />} />
-        <Route path="workbench/:id" element={<WorkbenchV2Page />} />
-        <Route path="templates" element={<TemplatesV2Page />} />
-        <Route path="templates/manage" element={<TemplatesManageV2Page />} />
-        <Route path="rules" element={<RulesV2Page />} />
-        <Route path="insights" element={<InsightsV2Page />} />
-        <Route path="title-optimization" element={<TitleOptimizationPage />} />
-        <Route path="publish" element={<PublishV2Page />} />
-        <Route path="integrations" element={<IntegrationsPage />} />
-        <Route path="team" element={<TeamPage />} />
-        <Route path="settings" element={<SettingsPage />} />
-      </Route>
-      <Route path="*" element={<Navigate to={isLoggedIn ? '/app' : '/login'} replace />} />
-    </Routes>
+    <AppLayout currentPage={currentPage} onNavigate={setCurrentPage}>
+      {renderPage()}
+    </AppLayout>
   );
 }
+
+export default App;
