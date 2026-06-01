@@ -4,38 +4,47 @@
  */
 import { useState } from 'react';
 import { Card, Button } from '../ui';
-import { generateSkuMatrix, COLOR_CODES, SIZE_CODES, SIZE_BY_GENDER, type SkuConfig } from '../../../../shared/src/sku';
+import { generateSkuMatrix, COLOR_CODES, SIZE_CODES, SIZE_BY_GENDER, type SkuMatrix, type GeneratedSku } from '../../../../shared/src/sku';
 
 interface SkuGeneratorProps {
   prefix?: string;
-  onGenerated?: (skus: any[]) => void;
+  onGenerated?: (skus: GeneratedSku[]) => void;
 }
 
 export function SkuGenerator({ prefix = 'BF', onGenerated }: SkuGeneratorProps) {
   const [prefixVal, setPrefix] = useState(prefix);
   const [sequence, setSequence] = useState(1);
-  const [side, setSide] = useState('PR');
+  const [side, setSide] = useState<'P' | 'R' | 'PR'>('PR');
   const [colors, setColors] = useState(['白色', '黑色', '蓝色']);
   const [sizes, setSizes] = useState(['S', 'M', 'L', 'XL']);
-  const [gender, setGender] = useState('童装');
+  const [gender, setGender] = useState<string>('童装');
   const [isSingleColor, setIsSingleColor] = useState(false);
   const [hasPrint, setHasPrint] = useState(false);
-  const [generatedMatrix, setGeneratedMatrix] = useState(null);
+  const [generatedMatrix, setGeneratedMatrix] = useState<SkuMatrix | null>(null);
 
-  const handleGenderChange = (newGender) => {
+  const handleGenderChange = (newGender: string) => {
     setGender(newGender);
-    setSizes(SIZE_BY_GENDER[newGender]);
+    const newSizes = SIZE_BY_GENDER[newGender] || ['S', 'M', 'L', 'XL'];
+    setSizes(newSizes);
   };
 
   const handleGenerate = () => {
-    const config = { prefix: prefixVal.toUpperCase(), sequence, side, colors, sizes, isSingleColor, hasPrint };
+    const config = {
+      prefix: prefixVal.toUpperCase(),
+      sequence,
+      side,
+      colors,
+      sizes,
+      isSingleColor,
+      hasPrint
+    };
     const matrix = generateSkuMatrix(config);
     setGeneratedMatrix(matrix);
     onGenerated?.(matrix.skus);
   };
 
   const colorOptions = Object.keys(COLOR_CODES).slice(0, 20);
-  const colorHexMap = {
+  const colorHexMap: Record<string, string> = {
     '白': '#ffffff', '白色': '#ffffff', '黑': '#000000', '黑色': '#000000',
     '红': '#ff0000', '红色': '#dc2626', '蓝': '#0000ff', '蓝色': '#2563eb',
     '绿': '#00ff00', '绿色': '#16a34a', '黄': '#ffff00', '黄色': '#eab308',
@@ -64,7 +73,7 @@ export function SkuGenerator({ prefix = 'BF', onGenerated }: SkuGeneratorProps) 
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">款式</label>
-          <select className="w-full px-3 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]" value={side} onChange={(e) => setSide(e.target.value)}>
+          <select className="w-full px-3 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]" value={side} onChange={(e) => setSide(e.target.value as 'P' | 'R' | 'PR')}>
             <option value="P">正面</option>
             <option value="R">反面</option>
             <option value="PR">正反面</option>

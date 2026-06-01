@@ -107,7 +107,7 @@ export const PLATFORM_TERMS: Record<string, Record<string, string>> = {
 };
 
 // 常用表达
-export const COMMON_PHRASES: Record<string, Record<string, string>> = {
+export const COMMON_PHRASES: Record<string, string[]> = {
   'vi-VN': [
     'Mua ngay!',
     'Hàng mới về!',

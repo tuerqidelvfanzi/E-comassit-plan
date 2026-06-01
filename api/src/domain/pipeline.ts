@@ -1,7 +1,7 @@
 /**
  * 与 shared/pipeline/engine.ts 保持同步（API 编译入口）
  */
-export type TargetLocale = 'vi-VN' | 'th-TH';
+export type TargetLocale = 'vi-VN' | 'th-TH' | 'fil-PH' | 'id-ID';
 
 export type PipelineInput = {
   title: string;
