@@ -256,6 +256,181 @@
   --syntax-error: #dc2626;
 }
 
+/* —— 极简白 · Minimal White —— */
+:root[data-theme='minimal-white'] {
+  --color-bg: #ffffff;
+  --color-bg-gradient-from: #ffffff;
+  --color-bg-gradient-to: #f8fafc;
+  --color-surface: #ffffff;
+  --color-muted: #f8fafc;
+  --color-table-head: #f8fafc;
+  --color-table-row-hover: rgba(37, 99, 235, 0.04);
+  --color-code-bg: #f8fafc;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-label: #475569;
+  --color-border: #e2e8f0;
+  --color-primary: #2563eb;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(37, 99, 235, 0.1);
+  --color-success: #059669;
+  --color-success-soft: #d1fae5;
+  --color-success-fg: #065f46;
+  --color-warn: #d97706;
+  --color-warn-soft: #fef3c7;
+  --color-warn-fg: #92400e;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #f1f5f9;
+  --color-badge-default-fg: #334155;
+  --color-focus-ring: rgba(37, 99, 235, 0.2);
+  --color-topbar: #ffffff;
+  --color-topbar-fg: #0f172a;
+  --color-sidebar-fg: #475569;
+  --color-nav-accent: #2563eb;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --glow-primary: none;
+}
+
+/* —— 德古拉紫 · Dracula —— */
+:root[data-theme='dracula'] {
+  --color-bg: #282a36;
+  --color-bg-gradient-from: #282a36;
+  --color-bg-gradient-to: #21222c;
+  --color-surface: #44475a;
+  --color-muted: #383a4a;
+  --color-table-head: #383a4a;
+  --color-table-row-hover: rgba(255, 121, 198, 0.08);
+  --color-code-bg: #21222c;
+  --color-text: #f8f8f2;
+  --color-text-muted: #6272a4;
+  --color-text-label: #e6e6e6;
+  --color-border: #6272a4;
+  --color-primary: #ff79c6;
+  --color-primary-fg: #282a36;
+  --color-primary-soft: rgba(255, 121, 198, 0.2);
+  --color-success: #50fa7b;
+  --color-success-soft: rgba(80, 250, 123, 0.2);
+  --color-success-fg: #50fa7b;
+  --color-warn: #f1fa8c;
+  --color-warn-soft: rgba(241, 250, 140, 0.2);
+  --color-warn-fg: #f1fa8c;
+  --color-danger: #ff5555;
+  --color-badge-default-bg: #383a4a;
+  --color-badge-default-fg: #f8f8f2;
+  --color-focus-ring: rgba(255, 121, 198, 0.4);
+  --color-topbar: #21222c;
+  --color-topbar-fg: #f8f8f2;
+  --color-sidebar-fg: #6272a4;
+  --color-nav-accent: #ff79c6;
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --glow-primary: 0 0 12px rgba(255, 121, 198, 0.3);
+}
+
+/* —— 东京夜景 · Tokyo Night —— */
+:root[data-theme='tokyo-night'] {
+  --color-bg: #1a1b26;
+  --color-bg-gradient-from: #1a1b26;
+  --color-bg-gradient-to: #16171f;
+  --color-surface: #24283b;
+  --color-muted: #1f2335;
+  --color-table-head: #1f2335;
+  --color-table-row-hover: rgba(122, 162, 247, 0.08);
+  --color-code-bg: #16171f;
+  --color-text: #c0caf5;
+  --color-text-muted: #565f89;
+  --color-text-label: #9aa5ce;
+  --color-border: #3b4261;
+  --color-primary: #7aa2f7;
+  --color-primary-fg: #1a1b26;
+  --color-primary-soft: rgba(122, 162, 247, 0.2);
+  --color-success: #9ece6a;
+  --color-success-soft: rgba(158, 206, 106, 0.2);
+  --color-success-fg: #9ece6a;
+  --color-warn: #e0af68;
+  --color-warn-soft: rgba(224, 175, 104, 0.2);
+  --color-warn-fg: #e0af68;
+  --color-danger: #f7768e;
+  --color-badge-default-bg: #1f2335;
+  --color-badge-default-fg: #c0caf5;
+  --color-focus-ring: rgba(122, 162, 247, 0.4);
+  --color-topbar: #16171f;
+  --color-topbar-fg: #c0caf5;
+  --color-sidebar-fg: #565f89;
+  --color-nav-accent: #7aa2f7;
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --glow-primary: 0 0 12px rgba(122, 162, 247, 0.3);
+}
+
+/* —— 北欧极简 · Nord —— */
+:root[data-theme='nord'] {
+  --color-bg: #2e3440;
+  --color-bg-gradient-from: #2e3440;
+  --color-bg-gradient-to: #282c34;
+  --color-surface: #3b4252;
+  --color-muted: #434c5e;
+  --color-table-head: #434c5e;
+  --color-table-row-hover: rgba(136, 192, 208, 0.08);
+  --color-code-bg: #282c34;
+  --color-text: #eceff4;
+  --color-text-muted: #8892a4;
+  --color-text-label: #d8dee9;
+  --color-border: #4c566a;
+  --color-primary: #88c0d0;
+  --color-primary-fg: #2e3440;
+  --color-primary-soft: rgba(136, 192, 208, 0.2);
+  --color-success: #a3be8c;
+  --color-success-soft: rgba(163, 190, 140, 0.2);
+  --color-success-fg: #a3be8c;
+  --color-warn: #ebcb8b;
+  --color-warn-soft: rgba(235, 203, 139, 0.2);
+  --color-warn-fg: #ebcb8b;
+  --color-danger: #bf616a;
+  --color-badge-default-bg: #434c5e;
+  --color-badge-default-fg: #eceff4;
+  --color-focus-ring: rgba(136, 192, 208, 0.4);
+  --color-topbar: #282c34;
+  --color-topbar-fg: #eceff4;
+  --color-sidebar-fg: #8892a4;
+  --color-nav-accent: #88c0d0;
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --glow-primary: none;
+}
+
+/* —— 蒸汽波 · Vaporwave —— */
+:root[data-theme='vaporwave'] {
+  --color-bg: #1a0a2e;
+  --color-bg-gradient-from: #1a0a2e;
+  --color-bg-gradient-to: #150828;
+  --color-surface: #2d1b4e;
+  --color-muted: #241542;
+  --color-table-head: #241542;
+  --color-table-row-hover: rgba(255, 113, 206, 0.08);
+  --color-code-bg: #150828;
+  --color-text: #e0e0ff;
+  --color-text-muted: #8080a0;
+  --color-text-label: #b8b8d8;
+  --color-border: #ff71ce;
+  --color-primary: #ff71ce;
+  --color-primary-fg: #1a0a2e;
+  --color-primary-soft: rgba(255, 113, 206, 0.25);
+  --color-success: #01cdfe;
+  --color-success-soft: rgba(1, 205, 254, 0.2);
+  --color-success-fg: #01cdfe;
+  --color-warn: #b967ff;
+  --color-warn-soft: rgba(185, 103, 255, 0.2);
+  --color-warn-fg: #b967ff;
+  --color-danger: #ff0040;
+  --color-badge-default-bg: #241542;
+  --color-badge-default-fg: #e0e0ff;
+  --color-focus-ring: rgba(255, 113, 206, 0.4);
+  --color-topbar: #150828;
+  --color-topbar-fg: #ff71ce;
+  --color-sidebar-fg: #8080a0;
+  --color-nav-accent: #ff71ce;
+  --shadow-card: 0 4px 20px rgba(255, 113, 206, 0.3);
+  --glow-primary: 0 0 16px rgba(255, 113, 206, 0.4);
+}
+
 /* —— 落日橙黑 · Sunset —— */
 :root[data-theme='sunset'] {
   --color-bg: #121212;
