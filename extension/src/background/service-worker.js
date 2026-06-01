@@ -1,135 +1,160 @@
 /**
- * 电商助手 Chrome Extension - Background Service Worker
- * V3.0 功能: 采集、填表、通信
+ * 电商助手 Chrome Extension - Background Service Worker v3.1
+ * 功能: 采集、填表、通信、API对接
  */
 
+var CONFIG = {
+  appUrl: 'http://localhost:5173',
+  apiUrl: 'http://127.0.0.1:8080'
+};
+
+// 加载配置
+chrome.storage.local.get(['config'], function(result) {
+  if (result.config) {
+    CONFIG = { ...CONFIG, ...result.config };
+  }
+});
+
 // 消息处理
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   console.log('[Background] 收到消息:', message.type);
-  
+
   switch (message.type) {
     case 'CAPTURE_PAGE':
       handleCapturePage(sendResponse);
-      return true; // 异步响应
-    
+      return true;
+
+    case 'CAPTURE_RESULT':
+      // 来自content的采集结果
+      handleCaptureResult(message.data, message.platform, sendResponse);
+      return true;
+
+    case 'UPLOAD_TO_INBOX':
+      handleUploadToInbox(message.data, sendResponse);
+      return true;
+
     case 'FILL_FORM':
       handleFillForm(message.data, sendResponse);
       return true;
-    
+
     case 'GET_PRODUCT':
-      sendResponse({ success: true, data: getMockProduct() });
-      break;
-    
-    case 'UPLOAD_PRODUCT':
-      handleUploadProduct(message.data, sendResponse);
+      handleGetProduct(sendResponse);
+      return true;
+
+    case 'GET_CONFIG':
+      sendResponse(CONFIG);
+      return true;
+
+    case 'SAVE_CONFIG':
+      handleSaveConfig(message.config, sendResponse);
       return true;
   }
 });
 
-// 采集页面处理
 async function handleCapturePage(sendResponse) {
   try {
-    // 从content script获取页面数据
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    
-    if (!tab?.id) {
+    var tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tabs[0]?.id) {
       sendResponse({ success: false, error: '无法获取当前标签页' });
       return;
     }
-
-    // 尝试从content script获取数据
     try {
-      const result = await chrome.tabs.sendMessage(tab.id, { type: 'GET_PAGE_DATA' });
-      sendResponse({ success: true, data: result });
+      var result = await chrome.tabs.sendMessage(tabs[0].id, { type: 'CAPTURE_PAGE' });
+      sendResponse(result);
     } catch (err) {
-      // Content script未加载，返回模拟数据
-      sendResponse({ success: true, data: getMockProduct() });
+      sendResponse({ success: false, error: '请在商品详情页使用插件' });
     }
   } catch (err) {
     sendResponse({ success: false, error: err.message });
   }
 }
 
-// 填表处理
+async function handleCaptureResult(data, platform, sendResponse) {
+  console.log('[Background] 采集结果:', platform, data.title);
+  // 可以在这里添加自动上传等逻辑
+  sendResponse({ success: true });
+}
+
+async function handleUploadToInbox(data, sendResponse) {
+  try {
+    var storage = await chrome.storage.local.get(['ecomassist_ext_token']);
+    var token = storage['ecomassist_ext_token'] || '';
+
+    var res = await fetch(CONFIG.apiUrl + '/api/v1/collect-jobs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Extension-Token': token
+      },
+      body: JSON.stringify({ payload: data })
+    });
+
+    if (res.ok) {
+      var json = await res.json();
+      sendResponse({ success: true, data: json.data });
+    } else {
+      sendResponse({ success: false, error: '上传失败: ' + res.status });
+    }
+  } catch (err) {
+    // 离线模式，存储到本地
+    var products = await chrome.storage.local.get(['products']);
+    var list = products.products || [];
+    list.unshift({
+      id: 'prd-' + Date.now(),
+      ...data,
+      status: 'raw',
+      capturedAt: new Date().toISOString()
+    });
+    await chrome.storage.local.set({ products: list });
+    sendResponse({ success: true, offline: true });
+  }
+}
+
 async function handleFillForm(data, sendResponse) {
   try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    
-    if (tab?.id) {
-      await chrome.tabs.sendMessage(tab.id, {
+    var tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tabs[0]?.id) {
+      await chrome.tabs.sendMessage(tabs[0].id, {
         type: 'FILL_FORM_DATA',
         data: data
       });
     }
-    
     sendResponse({ success: true });
   } catch (err) {
     sendResponse({ success: false, error: err.message });
   }
 }
 
-// 上传商品处理
-async function handleUploadProduct(data, sendResponse) {
+async function handleGetProduct(sendResponse) {
   try {
-    // 存储到Chrome Storage
-    const products = await chrome.storage.local.get(['products']);
-    const productList = products.products || [];
-    
-    const newProduct = {
-      id: 'prd-' + Date.now(),
-      ...data,
-      status: 'raw',
-      capturedAt: new Date().toISOString(),
-    };
-    
-    productList.unshift(newProduct);
-    await chrome.storage.local.set({ products: productList });
-    
-    sendResponse({ success: true, productId: newProduct.id });
+    var tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tabs[0]?.id) {
+      var result = await chrome.tabs.sendMessage(tabs[0].id, { type: 'GET_PAGE_DATA' });
+      sendResponse({ success: true, data: result });
+    } else {
+      sendResponse({ success: false, error: '无活动标签页' });
+    }
   } catch (err) {
     sendResponse({ success: false, error: err.message });
   }
 }
 
-// 模拟商品数据
-function getMockProduct() {
-  return {
-    title: '2024夏季新款可爱卡通小熊图案印花纯棉短袖T恤儿童百搭休闲上衣',
-    price: 29.9,
-    source: '1688',
-    sourceUrl: 'https://detail.1688.com/offer/123456.html',
-    thumb: 'https://placehold.co/200x200/pink/white?text=T-shirt',
-    images: [
-      'https://placehold.co/400x400/pink/white?text=主图',
-      'https://placehold.co/400x400/blue/white?text=图2',
-      'https://placehold.co/400x400/green/white?text=图3',
-    ],
-    skus: [
-      { color: '白色', size: 'S', price: 29.9, stock: 50 },
-      { color: '白色', size: 'M', price: 29.9, stock: 60 },
-      { color: '蓝色', size: 'S', price: 29.9, stock: 45 },
-    ],
-    skuCount: 12,
-    category: 'T恤',
-    attributes: {
-      '材质': '纯棉',
-      '适用年龄': '3-12岁',
-    },
-  };
+function handleSaveConfig(config, sendResponse) {
+  CONFIG = { ...CONFIG, ...config };
+  chrome.storage.local.set({ config: CONFIG });
+  sendResponse({ success: true });
 }
 
 // 监听安装事件
-chrome.runtime.onInstalled.addListener((details) => {
+chrome.runtime.onInstalled.addListener(function(details) {
   console.log('[Background] 插件已安装/更新:', details.reason);
-  
-  // 设置默认配置
   chrome.storage.local.set({
     config: {
       appUrl: 'http://localhost:5173',
-      apiUrl: 'http://localhost:3004',
-      targetLocale: 'vi-VN',
+      apiUrl: 'http://127.0.0.1:8080',
+      targetLocale: 'vi-VN'
     }
   });
 });
 
-console.log('[Background] Service Worker 已启动');
+console.log('[Background] Service Worker v3.1 已启动');

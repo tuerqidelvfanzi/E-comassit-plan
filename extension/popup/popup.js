@@ -1,166 +1,229 @@
 /**
- * 电商助手 Chrome Extension - Popup Script
- * V3.0 功能: 采集 / 发布填表
+ * 电商助手 Chrome Extension - Popup Script v3.1
+ * 功能: 采集 / 发布填表 / API对接
  */
 (function() {
   'use strict';
 
-  const CONFIG = {
-    appUrl: 'http://localhost:5173',
-    apiUrl: 'http://localhost:3004',
-    extTokenKey: 'psa_ext_token',
+  var CONFIG = {
+    appUrl: localStorage.getItem('ecomassist_app_url') || 'http://localhost:5173',
+    apiUrl: localStorage.getItem('ecomassist_api_url') || 'http://127.0.0.1:8080',
+    extTokenKey: 'ecomassist_ext_token'
   };
 
-  let state = {
+  var state = {
     connected: false,
     lastCapture: null,
-    currentTab: 'connect',
+    currentTab: 'connect'
   };
-
-  function q(sel) { return document.querySelector(sel); }
-  function qa(sel) { return document.querySelectorAll(sel); }
 
   function log(msg, type) {
     console.log('[Popup] ' + msg);
-    var el = q('#api-test-msg') || document.createElement('div');
-    el.textContent = msg;
-    el.className = 'msg ' + (type || 'info');
-    el.id = 'api-test-msg';
-    el.style.cssText = 'margin-top:8px;font-size:11px;padding:8px;border-radius:8px;background:rgba(59,130,246,.2);color:#60a5fa';
-    if (!el.parentNode) {
-      var panel = q('#panel-connect');
+    var el = document.getElementById('api-test-msg');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'api-test-msg';
+      var panel = document.getElementById('panel-connect');
       if (panel) panel.appendChild(el);
     }
+    el.textContent = msg;
+    el.className = 'msg ' + (type || 'info');
   }
 
-  function getStoredToken() {
-    return localStorage.getItem(CONFIG.extTokenKey) || '';
-  }
-
-  function saveToken(token) {
-    localStorage.setItem(CONFIG.extTokenKey, token);
-  }
+  function getToken() { return localStorage.getItem(CONFIG.extTokenKey) || ''; }
+  function saveToken(t) { localStorage.setItem(CONFIG.extTokenKey, t); }
 
   function initTabs() {
-    qa('.tab').forEach(function(tab) {
+    document.querySelectorAll('.tab').forEach(function(tab) {
       tab.addEventListener('click', function() {
         var target = tab.dataset.tab;
-        qa('.tab').forEach(function(t) { t.classList.remove('active'); });
-        qa('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+        document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.tab-panel').forEach(function(p) { p.hidden = true; p.classList.remove('active'); });
         tab.classList.add('active');
-        var panel = q('#panel-' + target);
-        if (panel) panel.classList.add('active');
+        var panel = document.getElementById('panel-' + target);
+        if (panel) { panel.hidden = false; panel.classList.add('active'); }
         state.currentTab = target;
       });
     });
   }
 
-  function initConnectPanel() {
-    var tokenInput = q('#ext-token');
-    if (tokenInput) {
-      tokenInput.value = getStoredToken();
-      tokenInput.addEventListener('change', function(e) {
-        saveToken(e.target.value);
-        updateConnectionStatus();
-      });
-    }
-
-    var testBtn = q('#btn-test-api');
-    if (testBtn) {
-      testBtn.addEventListener('click', function() {
-        log('测试API连接... (Mock模式可用)', 'info');
-        state.connected = true;
-        updateConnectionStatus();
-        setTimeout(function() { log('API连接成功!', 'success'); }, 500);
-      });
-    }
-
-    var syncBtn = q('#btn-sync-cookies');
-    if (syncBtn) {
-      syncBtn.addEventListener('click', function() {
-        log('同步Cookie...', 'info');
-        setTimeout(function() { log('Cookie同步完成', 'success'); }, 500);
-      });
+  function updateStatus() {
+    var el = document.getElementById('conn-status');
+    if (el) {
+      el.textContent = state.connected ? '已连接' : '未连接';
+      el.className = 'status-pill' + (state.connected ? ' connected' : '');
     }
   }
 
-  function updateConnectionStatus() {
-    var statusEl = q('#conn-status');
-    if (statusEl) {
-      statusEl.textContent = state.connected ? '已连接' : '未连接';
-      statusEl.className = 'status-pill' + (state.connected ? ' connected' : '');
+  function initConnectPanel() {
+    var tokenInput = document.getElementById('ext-token');
+    if (tokenInput) {
+      tokenInput.value = getToken();
+      tokenInput.addEventListener('change', function(e) {
+        saveToken(e.target.value);
+        updateStatus();
+      });
+    }
+
+    var testBtn = document.getElementById('btn-test-api');
+    if (testBtn) {
+      testBtn.addEventListener('click', async function() {
+        log('测试API连接...');
+        try {
+          var res = await fetch(CONFIG.apiUrl + '/api/v1/health');
+          if (res.ok) {
+            state.connected = true;
+            updateStatus();
+            log('API连接成功!', 'success');
+          } else {
+            log('API返回错误: ' + res.status);
+          }
+        } catch(e) {
+          log('API连接失败: ' + e.message, 'error');
+        }
+      });
+    }
+
+    var syncBtn = document.getElementById('btn-sync-cookies');
+    if (syncBtn) {
+      syncBtn.addEventListener('click', async function() {
+        log('同步Cookie...');
+        try {
+          var tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+          if (tabs[0]) {
+            chrome.cookies.getAll({ domain: new URL(tabs[0].url).hostname }, function(cookies) {
+              log('获取到 ' + cookies.length + ' 个Cookie');
+            });
+          }
+        } catch(e) {
+          log('Cookie同步失败');
+        }
+      });
     }
   }
 
   function initCollectPanel() {
-    var captureBtn = q('#btn-capture');
+    var captureBtn = document.getElementById('btn-capture');
     if (captureBtn) {
-      captureBtn.addEventListener('click', function() {
+      captureBtn.addEventListener('click', async function() {
         captureBtn.disabled = true;
         captureBtn.textContent = '采集中...';
-        setTimeout(function() {
-          state.lastCapture = {
-            title: '2024夏季新款可爱卡通小熊图案印花纯棉短袖T恤儿童百搭休闲上衣',
-            price: 29.9,
-            source: '1688',
-            skuCount: 12
-          };
-          var titleEl = q('#preview-title');
-          var metaEl = q('#preview-meta');
-          var preview = q('#preview');
-          if (titleEl) titleEl.textContent = state.lastCapture.title;
-          if (metaEl) metaEl.textContent = '价格: ¥' + state.lastCapture.price + ' | 来源: ' + state.lastCapture.source + ' | SKU: ' + state.lastCapture.skuCount + '个';
-          if (preview) preview.classList.remove('hidden');
-          captureBtn.disabled = false;
-          captureBtn.textContent = '采集当前页';
-          log('采集成功!', 'success');
-        }, 1500);
+        try {
+          var tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+          var result = await chrome.tabs.sendMessage(tabs[0].id, { type: 'CAPTURE_PAGE' });
+          if (result && result.success) {
+            state.lastCapture = result.data;
+            showPreview(result.data);
+            log('采集成功! 平台: ' + result.platform, 'success');
+          } else {
+            log('采集失败: ' + (result?.error || '未知错误'), 'error');
+          }
+        } catch(e) {
+          log('采集失败: 请在商品详情页使用', 'error');
+        }
+        captureBtn.disabled = false;
+        captureBtn.textContent = '采集当前页';
       });
     }
 
-    var linkBtn = q('#btn-link');
+    var linkBtn = document.getElementById('btn-link');
     if (linkBtn) {
       linkBtn.addEventListener('click', function() {
         var url = prompt('粘贴商品链接 (1688/淘宝/天猫):');
-        if (url) { log('链接采集功能开发中...', 'info'); }
+        if (url) { log('链接采集开发中...', 'info'); }
       });
     }
 
-    var uploadBtn = q('#btn-upload');
+    var uploadBtn = document.getElementById('btn-upload');
     if (uploadBtn) {
-      uploadBtn.addEventListener('click', function() {
-        if (state.lastCapture) {
-          log('已上传到采集箱!', 'success');
-          setTimeout(function() {
-            var preview = q('#preview');
-            if (preview) preview.classList.add('hidden');
-          }, 2000);
-        } else {
+      uploadBtn.addEventListener('click', async function() {
+        if (!state.lastCapture) {
           log('请先采集商品', 'error');
+          return;
+        }
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = '上传中...';
+        try {
+          var token = getToken();
+          var res = await fetch(CONFIG.apiUrl + '/api/v1/collect-jobs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Extension-Token': token },
+            body: JSON.stringify({ payload: state.lastCapture })
+          });
+          if (res.ok) {
+            log('上传成功!', 'success');
+            document.getElementById('preview')?.classList.add('hidden');
+          } else {
+            log('上传失败: ' + res.status, 'error');
+          }
+        } catch(e) {
+          log('上传失败: ' + e.message, 'error');
+        }
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = '上传到采集箱';
+      });
+    }
+  }
+
+  function showPreview(data) {
+    var preview = document.getElementById('preview');
+    var titleEl = document.getElementById('preview-title');
+    var metaEl = document.getElementById('preview-meta');
+    if (preview) preview.classList.remove('hidden');
+    if (titleEl) titleEl.textContent = (data.title || '').substring(0, 50);
+    if (metaEl) metaEl.textContent = '价格: ¥' + (data.price || 0) + ' | 图片: ' + (data.images?.length || 0) + '张 | SKU: ' + (data.skuCount || 0) + '个';
+  }
+
+  function initPublishPanel() {
+    var loadBtn = document.getElementById('btn-load-fill');
+    if (loadBtn) {
+      loadBtn.addEventListener('click', async function() {
+        var token = getToken();
+        var platform = document.getElementById('platform')?.value || 'shopee';
+        try {
+          var res = await fetch(CONFIG.apiUrl + '/api/v1/extension/publish-fill?platform=' + platform, {
+            headers: { 'X-Extension-Token': token }
+          });
+          if (res.ok) {
+            var json = await res.json();
+            showFillPreview(json.data || {});
+            log('填表数据加载成功!', 'success');
+          } else {
+            log('加载失败: ' + res.status, 'error');
+          }
+        } catch(e) {
+          log('加载失败: ' + e.message, 'error');
+        }
+      });
+    }
+
+    var publishBtn = document.getElementById('btn-publish');
+    if (publishBtn) {
+      publishBtn.addEventListener('click', async function() {
+        try {
+          var tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+          if (tabs[0]) {
+            chrome.tabs.sendMessage(tabs[0].id, { type: 'FILL_FORM' });
+            log('已发送填表指令', 'success');
+          }
+        } catch(e) {
+          log('发送失败', 'error');
         }
       });
     }
   }
 
-  function initPublishPanel() {
-    var loadBtn = q('#btn-load-fill');
-    if (loadBtn) {
-      loadBtn.addEventListener('click', function() {
-        var dl = q('#fill-dl');
-        var card = q('#fill-preview');
-        if (dl) {
-          dl.innerHTML = '<dt>平台</dt><dd>Shopee越南</dd><dt>标题</dt><dd>Ao thun cotton gau truc</dd><dt>价格</dt><dd>79000 VND</dd><dt>库存</dt><dd>50</dd>';
-        }
-        if (card) card.classList.remove('hidden');
-        log('填表数据加载成功!', 'success');
-      });
-    }
-
-    var publishBtn = q('#btn-publish');
-    if (publishBtn) {
-      publishBtn.addEventListener('click', function() {
-        log('发布功能开发中，请在网页端操作', 'info');
-      });
+  function showFillPreview(data) {
+    var card = document.getElementById('fill-preview');
+    var dl = document.getElementById('fill-dl');
+    if (card) card.classList.remove('hidden');
+    if (dl) {
+      var html = '';
+      for (var key in data) {
+        var val = typeof data[key] === 'object' ? JSON.stringify(data[key]) : data[key];
+        html += '<dt>' + key + '</dt><dd>' + val + '</dd>';
+      }
+      dl.innerHTML = html || '<dt>无数据</dt><dd>-</dd>';
     }
   }
 
@@ -170,18 +233,31 @@
     initCollectPanel();
     initPublishPanel();
 
-    var inboxLink = q('#link-inbox');
-    var publishLink = q('#link-publish');
-    if (inboxLink) inboxLink.setAttribute('href', CONFIG.appUrl + '/#/app/inbox');
-    if (publishLink) publishLink.setAttribute('href', CONFIG.appUrl + '/#/app/publish');
+    var inboxLink = document.getElementById('link-inbox');
+    var publishLink = document.getElementById('link-publish');
+    if (inboxLink) inboxLink.href = CONFIG.appUrl + '/#/app/inbox';
+    if (publishLink) publishLink.href = CONFIG.appUrl + '/#/app/publish';
 
-    state.connected = true;
-    updateConnectionStatus();
+    // 自动检测连接状态
+    setTimeout(async function() {
+      try {
+        var res = await fetch(CONFIG.apiUrl + '/api/v1/health');
+        state.connected = res.ok;
+      } catch(e) {
+        state.connected = false;
+      }
+      updateStatus();
+    }, 500);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  document.addEventListener('DOMContentLoaded', init);
+
+  // 监听来自content的消息
+  chrome.runtime.onMessage.addListener(function(msg) {
+    if (msg.type === 'CAPTURE_RESULT') {
+      state.lastCapture = msg.data;
+      showPreview(msg.data);
+      log('采集完成!', 'success');
+    }
+  });
 })();
