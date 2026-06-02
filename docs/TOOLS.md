@@ -1,21 +1,21 @@
 # 开发管道工具规范
 
-## 概述
-
-本文档定义 V3.0 开发管道中每个步骤使用的工具/技能。
+> **设计原则**: 防错式 - 工具调用是"自动强制"，不是"建议参考"
+> **配套文档**: [PIPELINE.md](./PIPELINE.md) 自动化防错管道
 
 ---
 
 ## 工具映射表
 
-| 管道步骤 | 主要工具 | 辅助工具 | 产出物 |
-|----------|----------|----------|--------|
-| **需求** | Claude Code + 文档模板 | 用户访谈 | 需求文档 |
-| **调研** | Claude Code + GitHub API | 竞品分析 | 调研报告 |
-| **SPEC** | Claude Code | 接口文档工具 | SPEC.md |
-| **实现** | Claude Code | Cursor规则 | 源代码 |
-| **自测** | tsc + vitest + playwright | ESLint | 测试报告 |
-| **验收** | Claude Code (独立会话) | 第三方审查 | 验收报告 |
+| 管道步骤 | 主要工具 | 辅助工具 | 产出物 | 强制 |
+|----------|----------|----------|--------|------|
+| **需求** | Claude Code + 文档模板 | 用户访谈 | 需求文档 | ✅ |
+| **调研** | Claude Code + GitHub API | 竞品分析 | 调研报告 | ✅ |
+| **SPEC** | Claude Code | 接口文档工具 | SPEC.md | ✅ |
+| **实现** | Claude Code | Cursor规则 | 源代码 | ✅ |
+| **预检** | `scripts/ci-test.sh` (5项检查) | Husky pre-commit | 检查报告 | ✅ |
+| **自测** | tsc + vitest + playwright | ESLint | 测试报告 | ✅ |
+| **验收** | Claude Code (独立会话) | 第三方审查 | 验收报告 | ✅ |
 
 ---
 
@@ -183,17 +183,30 @@ npx prettier --write src/
 }
 ```
 
-### 自测清单
+### 自测清单（强制执行）
 
 ```bash
-# 完整自测流程
-1. npx tsc --noEmit           # 类型检查
-2. npm run build              # 构建测试
-3. npm test                   # 单元测试
-4. npm run test:e2e           # E2E测试
-5. git add -A && git commit  # 提交代码
-6. git push                   # 推送到远程
+# 完整自测流程（pre-commit 钩子自动跑 1-5 项，6 必须手动）
+1. npx tsc --noEmit                              # ✅ 自动
+2. node scripts/check-spec-coverage.js          # ✅ 自动
+3. node scripts/check-design-preservation.js    # ✅ 自动
+4. node scripts/check-component-adapters.js     # ✅ 自动
+5. npm test -- --run                             # ✅ 自动
+6. npm run build                                 # ⚠️ 建议（防回归）
+7. npm run test:e2e                              # ⚠️ 建议（UI 改动时必跑）
+8. git add -A && git commit                      # pre-commit 会拦截
+9. git push                                      # 推送（自测通过后）
 ```
+
+### 自动化脚本清单
+
+| 脚本 | 检查目标 | 拦截条件 |
+|------|---------|---------|
+| `scripts/ci-test.sh` | CI 全套测试 | 任一失败则 exit 1 |
+| `scripts/check-spec-coverage.js` | SPEC vs 实现 | 4 主题/8 维度/10 颜色字段缺失 |
+| `scripts/check-design-preservation.js` | 设计保留 | 关键文件被删/清空、删>3×增 |
+| `scripts/check-component-adapters.js` | 视觉适配 | 4 风格/3 密度/5 变量缺失 |
+| `scripts/third-party-review.sh` | 独立审查 | 生成审查任务（必须独立 Agent 执行）|
 
 ### 产出物
 
@@ -240,16 +253,25 @@ test-results/
 
 ## 工具调用规则
 
-### 何时调用 Superpower
+### 何时调用 Superpower（自动触发，非"建议"）
 
-| 场景 | Superpower 任务 |
-|------|-----------------|
-| 需求不明确 | 需求分析 + 文档生成 |
-| 技术选型困难 | 竞品分析 + 技术对比 |
-| 代码质量差 | 代码审查 + 重构建议 |
-| 遇到 bug | 根因分析 + 修复方案 |
-| 测试覆盖率低 | 测试用例生成 |
-| 需要第三方审查 | 独立 Agent 审查 |
+| 场景 | Superpower 任务 | 强制 |
+|------|-----------------|------|
+| 需求不明确 | 需求分析 + 文档生成 | ✅ |
+| 技术选型困难 | 竞品分析 + 技术对比 | ✅ |
+| 代码质量差 | 代码审查 + 重构建议 | ✅ |
+| 遇到 bug | 根因分析 + 修复方案 | ✅ |
+| 测试覆盖率低 | 测试用例生成 | ✅ |
+| 验收前 | 独立 Agent 审查（`third-party-review.sh`）| ✅ **必须独立会话** |
+
+### 反模式（避免这些"软"语言）
+
+| ❌ 不允许 | ✅ 必须这样写 |
+|----------|--------------|
+| "请记得做 X" | "未做 X 则 pre-commit 拦截" |
+| "建议审查" | "必须 `third-party-review.sh`" |
+| "应该测试" | "pre-commit 自动跑 `npm test`" |
+| "可以考虑" | "强制项：必须" |
 
 ### 调用格式
 
@@ -285,12 +307,13 @@ test-results/
 }
 ```
 
-### Cursor 规则
+### Claude 规则
 
 ```
-.claude/rules/design-preservation.md  # 设计保留原则
-.claude/rules/code-style.md           # 代码风格
-.claude/skills/SKILL.md              # 图片理解工具
+.claude/
+├── design-preservation.md    # 设计保留原则（防 36 主题被删）
+├── code-style.md             # 代码风格
+└── skills/SKILL.md           # 图片理解工具
 ```
 
 ---
