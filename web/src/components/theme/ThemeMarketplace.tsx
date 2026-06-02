@@ -2,20 +2,24 @@
  * ThemeMarketplace - 主题市场页面
  * 展示内置 + 用户主题，支持导入导出
  */
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useThemeMarket } from '../../hooks/useThemeMarket';
 import { ThemePreview } from './ThemePreview';
 import { importTheme, exportTheme } from '../../lib/theme-storage';
 import { Button, Card } from '../ui';
 
 export function ThemeMarketplace() {
-  const { allPresets, userPresets, activeId, setActive, addUserTheme, removeUserTheme } = useThemeMarket();
+  const { allPresets, userPresets, activeId, setActive, addUserTheme, removeUserTheme, cloneFromPreset } = useThemeMarket();
   const [tab, setTab] = useState<'builtIn' | 'user'>('builtIn');
   const [search, setSearch] = useState('');
   const [msg, setMsg] = useState('');
+  const [importError, setImportError] = useState('');
 
-  const list = (tab === 'builtIn' ? allPresets : userPresets)
-    .filter(t => t.name.toLowerCase().includes(search.toLowerCase()));
+  // Bug-7 fix: useMemo 避免每次 render 重算
+  const list = React.useMemo(() => {
+    return (tab === 'builtIn' ? allPresets : userPresets)
+      .filter(t => t.name.toLowerCase().includes(search.toLowerCase()));
+  }, [allPresets, userPresets, tab, search]);
 
   function handleExport(themeId: string) {
     const theme = allPresets.find(t => t.id === themeId);
@@ -25,7 +29,8 @@ export function ThemeMarketplace() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = theme.name + '.theme.json';
+    // Bug-5 fix: sanitize 文件名
+    a.download = theme.name.replace(/[\\/:*?"<>|]/g, '_') + '.theme.json';
     a.click();
     URL.revokeObjectURL(url);
     setMsg('已导出: ' + theme.name);
@@ -34,17 +39,47 @@ export function ThemeMarketplace() {
   function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Bug-4 fix: 限制文件大小 1MB
+    if (file.size > 1024 * 1024) {
+      setImportError('文件超过 1MB 限制');
+      e.target.value = '';
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => {
       try {
         const theme = importTheme(String(reader.result));
-        addUserTheme(theme);
-        setMsg('已导入: ' + theme.name);
+        // Bug-2 fix: ID 冲突检测
+        const exists = allPresets.some(t => t.id === theme.id);
+        const finalTheme = exists
+          ? { ...theme, id: 'user-' + Date.now().toString(36), name: theme.name + ' (导入)' }
+          : theme;
+        addUserTheme(finalTheme);
+        setImportError('');
+        setMsg('已导入: ' + finalTheme.name);
       } catch (err) {
-        setMsg('导入失败: ' + (err as Error).message);
+        setImportError('导入失败: ' + (err as Error).message);
       }
     };
     reader.readAsText(file);
+    e.target.value = '';
+  }
+
+  function handleDelete(themeId: string, themeName: string) {
+    // Bug-3 fix: 删除二次确认
+    if (!window.confirm('确认删除主题 "' + themeName + '"？此操作不可撤销。')) return;
+    removeUserTheme(themeId);
+    setMsg('已删除: ' + themeName);
+  }
+
+  function handleClone(themeId: string) {
+    const name = window.prompt('为派生主题命名：', '我的主题');
+    if (!name) return;
+    const cloned = cloneFromPreset(themeId, name);
+    if (cloned) {
+      addUserTheme(cloned);
+      setMsg('已创建派生主题: ' + name);
+    }
   }
 
   return (
@@ -88,8 +123,13 @@ export function ThemeMarketplace() {
               <Button size="sm" variant="outline" onClick={() => handleExport(theme.id)}>
                 导出
               </Button>
+              {tab === 'builtIn' && (
+                <Button size="sm" variant="outline" onClick={() => handleClone(theme.id)}>
+                  派生
+                </Button>
+              )}
               {tab === 'user' && (
-                <Button size="sm" variant="outline" onClick={() => removeUserTheme(theme.id)}>
+                <Button size="sm" variant="outline" onClick={() => handleDelete(theme.id, theme.name)}>
                   删除
                 </Button>
               )}
@@ -99,6 +139,7 @@ export function ThemeMarketplace() {
       </div>
 
       {msg && <p className="text-sm text-[var(--color-primary)]">{msg}</p>}
+      {importError && <p className="text-sm text-[var(--color-danger)]">{importError}</p>}
     </div>
   );
 }
