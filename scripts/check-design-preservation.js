@@ -127,6 +127,47 @@ if (fs.existsSync(themeImpl)) {
   }
 }
 
+// 5. 36 主题残留关键词扫描（防止 36 主题被精简的事故重演）
+const OLD_THEME_KEYWORDS = [
+  'minimal-white', 'editorial-serif', 'soft-pastel', 'corporate-clean',
+  'academic-paper', 'swiss-grid', 'xiaohongshu-white', 'sharp-mono',
+  'magazine-bold', 'engineering-whiteprint', 'news-broadcast', 'solarized-light',
+  'catppuccin-latte', 'arctic-cool', 'sunset-warm', 'memphis-pop', 'bauhaus',
+  'midcentury', 'rainbow-gradient', 'dracula', 'tokyo-night', 'nord',
+  'catppuccin-mocha', 'gruvbox-dark', 'rose-pine', 'terminal-green',
+  'glassmorphism', 'aurora', 'pitch-deck-vc', 'cyberpunk-neon', 'blueprint',
+  'y2k-chrome', 'neo-brutalism', 'vaporwave', 'retro-tv', 'japanese-minimal',
+  'preset-themes', 'PRESET_THEMES', '12-themes', 'TWELVE_THEMES',
+];
+
+let residueCount = 0;
+const webSrc = path.join(ROOT, 'web/src');
+if (fs.existsSync(webSrc)) {
+  const walk = (dir) => {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (!['node_modules', 'dist', 'e2e'].includes(entry.name)) walk(full);
+      } else if (/\.(ts|tsx|js|jsx)$/.test(entry.name)) {
+        const text = fs.readFileSync(full, 'utf-8');
+        for (const kw of OLD_THEME_KEYWORDS) {
+          if (text.includes(kw)) {
+            console.warn('⚠️  ' + path.relative(ROOT, full) + ' 包含 36 主题残留: ' + kw);
+            residueCount++;
+          }
+        }
+      }
+    }
+  };
+  walk(webSrc);
+}
+if (residueCount > 0) {
+  fail('发现 ' + residueCount + ' 处 36 主题残留关键词');
+} else {
+  pass('无 36 主题残留');
+}
+
 // 5. 报告
 console.log('');
 if (failed) {

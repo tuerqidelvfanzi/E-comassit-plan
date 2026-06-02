@@ -4,7 +4,7 @@
  */
 import { useState, useCallback, useEffect } from 'react';
 import { THEME_PRESETS } from '../lib/theme-v2';
-import { loadUserThemes, saveUserThemes, setActiveThemeId, getActiveThemeId } from '../lib/theme-storage';
+import { loadUserThemes, saveUserThemes, setActiveThemeId, getActiveThemeId, importTheme as importThemeFn } from '../lib/theme-storage';
 import type { ThemePackage } from '../types/theme-package';
 
 export function useThemeMarket() {
@@ -80,8 +80,20 @@ export function useThemeMarket() {
     activeTheme,
     activeId,
     setActive,
+    setActiveTheme: setActive, // SPEC 命名兼容
     addUserTheme,
     removeUserTheme,
+    deleteUserTheme: removeUserTheme, // SPEC 命名兼容
+    exportCurrent: () => {
+      const theme = allPresets.find(t => t.id === activeId);
+      if (!theme) return '';
+      return JSON.stringify(theme, null, 2);
+    },
+    import: async (file: File) => {
+      const text = await file.text();
+      const theme = importThemeFn(text);
+      addUserTheme(theme);
+    },
     cloneFromPreset,
   };
 }
