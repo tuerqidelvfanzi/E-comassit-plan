@@ -13,6 +13,8 @@ import { InsightsPage } from './pages/InsightsPage';
 import { PublishPage } from './pages/PublishPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { ThemeSettingsV2 } from './lib/ThemeSettingsV2';
+import { ThemeMarketplace } from './components/theme/ThemeMarketplace';
+import { TitleOptimizerV2 } from './pages/TitleOptimizerV2';
 import { IntegrationsPage } from './pages/IntegrationsPage';
 import { TeamPage } from './pages/TeamPage';
 import { LoginPage } from './pages/auth/LoginPage';
@@ -56,6 +58,8 @@ export function App() {
         {/* 系统设置 */}
         <Route path="/app/settings" element={<SettingsPage />} />
         <Route path="/app/settings/themes" element={<ThemeSettingsV2 />} />
+        <Route path="/app/settings/themes/market" element={<ThemeMarketplace />} />
+        <Route path="/app/title-optimizer-v2" element={<TitleOptimizerV2 />} />
         <Route path="/app/integrations" element={<IntegrationsPage />} />
         <Route path="/app/team" element={<TeamPage />} />
 
