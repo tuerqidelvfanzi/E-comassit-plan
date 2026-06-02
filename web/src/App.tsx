@@ -12,7 +12,6 @@ import { RulesPage } from './pages/RulesPage';
 import { InsightsPage } from './pages/InsightsPage';
 import { PublishPage } from './pages/PublishPage';
 import { SettingsPage } from './pages/SettingsPage';
-import { ThemeSettings } from './components/ThemeSettings';
 import { ThemeSettingsV2 } from './lib/ThemeSettingsV2';
 import { IntegrationsPage } from './pages/IntegrationsPage';
 import { TeamPage } from './pages/TeamPage';
