@@ -20,6 +20,9 @@ web/test-results/
 # LazyGit 本地运行时状态（包含 notebook ID 与时间戳，不入 GitHub）
 scripts/lazygit-state.json
 
+# Windows 本地调试脚本（与本项目无关，是作者本地的微软商店弹窗修复工具）
+scripts/store-fix/
+
 # 演示讲解 / 调研索引 / 本地核对表（与代码无直接耦合，不入 GitHub）
 docs/DEMO_PRESENTATION_FLOWS.md
 docs/LOCAL_DEMO_FLOW.html
