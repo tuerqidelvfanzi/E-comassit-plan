@@ -9,14 +9,13 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-CLI = r"C:\Users\HUAWEI\AppData\Roaming\Python\Python312\Scripts\notebooklm.exe"
+CLI = os.environ.get("NOTEBOOKLM_CLI", "notebooklm")
 STATE = Path(__file__).parent / "lazygit-state.json"
 OUT_DIR = Path(__file__).parent.parent / "docs" / "nblm-research"
 
 def run(cmd):
     env = os.environ.copy()
-    env["HTTP_PROXY"] = "http://127.0.0.1:7890"
-    env["HTTPS_PROXY"] = "http://127.0.0.1:7890"
+    # 代理从环境变量继承（HTTP_PROXY/HTTPS_PROXY），不在源码硬编码
     import subprocess
     r = subprocess.run(f'"{CLI}" {cmd}', shell=True, capture_output=True, env=env)
     return (r.stdout + r.stderr).decode("utf-8", errors="replace")

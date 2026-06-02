@@ -17,6 +17,9 @@ web/test-results/
 # oh-my-mermaid
 .omm/
 
+# LazyGit 本地运行时状态（包含 notebook ID 与时间戳，不入 GitHub）
+scripts/lazygit-state.json
+
 # 演示讲解 / 调研索引 / 本地核对表（与代码无直接耦合，不入 GitHub）
 docs/DEMO_PRESENTATION_FLOWS.md
 docs/LOCAL_DEMO_FLOW.html

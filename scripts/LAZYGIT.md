@@ -26,8 +26,8 @@
 ## 命令
 
 ```bash
-# 进入项目目录
-cd d:/02-学习/06-yitang/app
+# 进入项目目录（请将 <repo_root> 替换为你的本地仓库路径）
+cd <repo_root>
 
 # 检查同步状态
 python scripts/lazygit.py
@@ -42,17 +42,17 @@ python scripts/lazygit.py pull
 或者用批处理：
 ```cmd
 scripts\lazygit.bat
-scripts\lazygit.bat init d8bda89a
+scripts\lazygit.bat init <笔记本ID前8位>
 ```
 
 ## 状态文件
 
-`scripts/lazygit-state.json` 记录已同步的笔记本：
+`scripts/lazygit-state.json` 记录已同步的笔记本（**已在 .gitignore 忽略**）：
 
 ```json
 {
   "notebooks": {
-    "d8bda89a": {
+    "<笔记本ID>": {
       "title": "跨境电商AI助手",
       "count": 24,
       "date": "2026-06-01T16:30:00"
