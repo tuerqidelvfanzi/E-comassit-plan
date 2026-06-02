@@ -46,7 +46,7 @@ export const v3NavGroups: NavGroup[] = [
     items: [
       { to: '/app/templates', label: '类目模板', icon: '📋' },
       { to: '/app/rules', label: '规则库', icon: '📐' },
-      { to: '/app/settings/themes', label: '36主题', icon: '🎨' },
+      { to: '/app/settings/themes', label: '主题风格', icon: '🎨' },
     ],
   },
   {
