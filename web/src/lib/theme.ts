@@ -3,8 +3,28 @@ import { useSyncExternalStore } from 'react';
 export type ThemeCategory = 'light' | 'dark' | 'tech' | 'retro';
 
 export type PresetThemeId =
-  | 'browser' | 'solarized' | 'cyberpunk' | 'jade' | 'sunset' | 'parchment'
-  | 'minimal-white' | 'dracula' | 'tokyo-night' | 'nord' | 'vaporwave';
+  // 系统主题
+  | 'browser'
+  // 经典主题
+  | 'solarized' | 'cyberpunk' | 'jade' | 'sunset' | 'parchment' | 'minimal-white'
+  // 程序员主题
+  | 'dracula' | 'tokyo-night' | 'nord'
+  // 复古/蒸汽波
+  | 'vaporwave'
+  // ===== 恢复的配色主题 =====
+  // 浅色系
+  | 'editorial-serif' | 'soft-pastel' | 'corporate-clean' | 'academic-paper'
+  | 'swiss-grid' | 'xiaohongshu-white' | 'sharp-mono' | 'magazine-bold'
+  | 'engineering-whiteprint' | 'news-broadcast' | 'sunlight'
+  | 'catppuccin-latte' | 'arctic-cool' | 'sunset-warm'
+  | 'memphis-pop' | 'bauhaus' | 'midcentury' | 'rainbow-gradient'
+  // 深色系
+  | 'catppuccin-mocha' | 'gruvbox-dark' | 'rose-pine' | 'terminal-green'
+  | 'glassmorphism' | 'aurora' | 'pitch-deck-vc'
+  // 科技感
+  | 'cyberpunk-neon' | 'blueprint' | 'y2k-chrome' | 'neo-brutalism'
+  // 复古风
+  | 'retro-tv' | 'japanese-minimal';
 
 export type ThemeId = PresetThemeId | 'custom';
 
@@ -23,23 +43,70 @@ export const THEME_CATEGORIES: { id: ThemeCategory; label: string }[] = [
 
 /** 主题选项 - 与 themes.css 中的 data-theme 值对应 */
 export const THEME_OPTIONS: ThemeOption[] = [
+  // 系统主题
   { id: 'browser', label: '跟随系统', category: 'light' },
+
+  // 经典主题
   { id: 'minimal-white', label: '极简白', category: 'light' },
+  { id: 'solarized', label: '阳光墨玉', category: 'dark' },
+  { id: 'cyberpunk', label: '赛博朋克', category: 'tech' },
+  { id: 'jade', label: '翡翠暗绿', category: 'dark' },
+  { id: 'sunset', label: '落日橙黑', category: 'dark' },
+  { id: 'parchment', label: '羊皮纸', category: 'retro' },
+  { id: 'sunlight', label: '日光暖白', category: 'light' },
+
+  // 程序员主题
   { id: 'dracula', label: '德古拉紫', category: 'dark' },
   { id: 'tokyo-night', label: '东京夜景', category: 'dark' },
   { id: 'nord', label: '北欧极简', category: 'dark' },
-  { id: 'jade', label: '翡翠暗绿', category: 'dark' },
-  { id: 'sunset', label: '落日橙黑', category: 'dark' },
+  { id: 'catppuccin-latte', label: 'Catppuccin Latte', category: 'light' },
+  { id: 'catppuccin-mocha', label: 'Catppuccin Mocha', category: 'dark' },
+  { id: 'gruvbox-dark', label: 'Gruvbox Dark', category: 'dark' },
+  { id: 'rose-pine', label: '玫瑰松石', category: 'dark' },
+  { id: 'terminal-green', label: '绿屏终端', category: 'dark' },
+
+  // 复古/蒸汽波
   { id: 'vaporwave', label: '蒸汽波', category: 'retro' },
-  { id: 'solarized', label: '阳光墨玉', category: 'dark' },
-  { id: 'cyberpunk', label: '赛博朋克', category: 'tech' },
-  { id: 'parchment', label: '羊皮纸', category: 'retro' },
+  { id: 'retro-tv', label: 'CRT扫描线', category: 'retro' },
+  { id: 'japanese-minimal', label: '和风极简', category: 'retro' },
+
+  // ===== 恢复的配色主题 =====
+  // 浅色系
+  { id: 'editorial-serif', label: '杂志衬线', category: 'light' },
+  { id: 'soft-pastel', label: '马卡龙', category: 'light' },
+  { id: 'corporate-clean', label: '企业商务', category: 'light' },
+  { id: 'academic-paper', label: '学术白皮书', category: 'light' },
+  { id: 'swiss-grid', label: '瑞士网格', category: 'light' },
+  { id: 'xiaohongshu-white', label: '小红书白底', category: 'light' },
+  { id: 'sharp-mono', label: '黑白高对比', category: 'light' },
+  { id: 'magazine-bold', label: '大字杂志', category: 'light' },
+  { id: 'engineering-whiteprint', label: '工程白图', category: 'light' },
+  { id: 'news-broadcast', label: '新闻播报', category: 'light' },
+  { id: 'arctic-cool', label: '冷色调', category: 'light' },
+  { id: 'sunset-warm', label: '暖色调', category: 'light' },
+  { id: 'memphis-pop', label: '孟菲斯波普', category: 'light' },
+  { id: 'bauhaus', label: '包豪斯几何', category: 'light' },
+  { id: 'midcentury', label: '世纪中期', category: 'light' },
+  { id: 'rainbow-gradient', label: '彩虹渐变', category: 'light' },
+
+  // 深色系
+  { id: 'glassmorphism', label: '毛玻璃', category: 'dark' },
+  { id: 'aurora', label: '极光渐变', category: 'dark' },
+  { id: 'pitch-deck-vc', label: 'VC融资风', category: 'dark' },
+
+  // 科技感
+  { id: 'cyberpunk-neon', label: '赛博霓虹', category: 'tech' },
+  { id: 'blueprint', label: '蓝图工程', category: 'tech' },
+  { id: 'y2k-chrome', label: 'Y2K镜面', category: 'tech' },
+  { id: 'neo-brutalism', label: '新粗野主义', category: 'tech' },
+
+  // 自定义
   { id: 'custom', label: '自定义 CSS', category: 'light' },
 ];
 
 const VALID_THEMES = new Set<string>(THEME_OPTIONS.map((o) => o.id));
 const DEPRECATED_THEMES: Record<string, ThemeId> = {
-  sunlight: 'parchment',
+  // 未来可能废弃的主题映射
 };
 const DEFAULT_THEME: ThemeId = 'jade';
 
