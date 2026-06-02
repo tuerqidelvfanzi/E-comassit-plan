@@ -191,6 +191,8 @@ npx prettier --write src/
 2. npm run build              # 构建测试
 3. npm test                   # 单元测试
 4. npm run test:e2e           # E2E测试
+5. git add -A && git commit  # 提交代码
+6. git push                   # 推送到远程
 ```
 
 ### 产出物
@@ -200,6 +202,14 @@ test-results/
 ├── unit-test-report.html
 └── e2e-test-report.html
 ```
+
+### Git 推送规则
+
+| 条件 | 操作 |
+|------|------|
+| 测试全部通过 | 自动推送 |
+| 测试部分通过 | 修复后推送 |
+| 测试失败 | 禁止推送 |
 
 ---
 
@@ -300,4 +310,9 @@ npm run test:e2e         # E2E测试
 # 代码质量
 npx prettier --write .   # 格式化
 npm run lint             # 检查
+
+# Git（自测通过后执行）
+git add -A              # 暂存所有更改
+git commit -m "描述"     # 提交
+git push                 # 推送到远程
 ```
