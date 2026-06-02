@@ -227,11 +227,86 @@
     }
   }
 
+  // 主题面板
+  var currentTheme = 'trello-premium';
+
+  function initThemePanel() {
+    // 加载当前主题
+    chrome.storage.local.get('psa_theme_data', function(result) {
+      if (result.psa_theme_data && result.psa_theme_data.presetId) {
+        currentTheme = result.psa_theme_data.presetId;
+        updateThemeUI();
+      }
+    });
+
+    // 主题卡片点击
+    document.querySelectorAll('.theme-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        var themeId = card.dataset.theme;
+        if (themeId) {
+          selectTheme(themeId);
+        }
+      });
+    });
+  }
+
+  function selectTheme(themeId) {
+    currentTheme = themeId;
+    updateThemeUI();
+
+    // 保存到 storage
+    var themeData = {
+      presetId: themeId,
+      timestamp: Date.now()
+    };
+    chrome.storage.local.set({ psa_theme_data: themeData }, function() {
+      // 通知 Web 端
+      chrome.runtime.sendMessage({
+        type: 'THEME_UPDATED',
+        presetId: themeId,
+        colorOverrides: null
+      });
+
+      // 通知所有 content scripts
+      chrome.tabs.query({}, function(tabs) {
+        tabs.forEach(function(tab) {
+          chrome.tabs.sendMessage(tab.id, {
+            type: 'THEME_SYNC',
+            themeData: themeData
+          }).catch(function() {});
+        });
+      });
+
+      var msgEl = document.getElementById('theme-msg');
+      if (msgEl) {
+        var names = {
+          'trello-premium': 'Trello 高级风',
+          'linear-dark': 'Linear 极客风',
+          'monday-vibrant': 'Monday 活力风',
+          'enterprise-classic': '企业商务风'
+        };
+        msgEl.textContent = '已切换到 ' + (names[themeId] || themeId);
+        msgEl.className = 'msg success';
+      }
+    });
+  }
+
+  function updateThemeUI() {
+    document.querySelectorAll('.theme-card').forEach(function(card) {
+      if (card.dataset.theme === currentTheme) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
+  }
+
   function init() {
     initTabs();
     initConnectPanel();
     initCollectPanel();
     initPublishPanel();
+    initThemePanel();
 
     var inboxLink = document.getElementById('link-inbox');
     var publishLink = document.getElementById('link-publish');

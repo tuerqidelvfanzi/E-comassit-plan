@@ -22,6 +22,7 @@
       <button type="button" class="tab active" data-tab="connect">连接</button>
       <button type="button" class="tab" data-tab="collect">采集</button>
       <button type="button" class="tab" data-tab="publish">发布</button>
+      <button type="button" class="tab" data-tab="theme">主题</button>
     </nav>
 
     <!-- 连接 -->
@@ -77,6 +78,46 @@
       <button type="button" id="btn-publish" class="btn primary">填入当前卖家页（DOM + 预览）</button>
       <button type="button" id="btn-mock-only" class="btn secondary">仅打开 Mock 预览面板</button>
       <p class="hint">步骤：发布中心「生成填表」→ 打开卖家后台「新建商品」→ 点上方按钮 → 左侧预览核对 → 平台内发布。</p>
+    </section>
+
+    <!-- 主题 -->
+    <section class="tab-panel" id="panel-theme" hidden>
+      <p class="lead">选择主题风格，同步到 Web 端。</p>
+      <div class="theme-grid" id="theme-grid">
+        <button type="button" class="theme-card" data-theme="trello-premium">
+          <div class="theme-preview">
+            <span class="theme-dot" style="background:#0079BF"></span>
+            <span class="theme-dot" style="background:#F7F7F7"></span>
+            <span class="theme-dot" style="background:#FFFFFF"></span>
+          </div>
+          <span class="theme-name">Trello 高级风</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="linear-dark">
+          <div class="theme-preview">
+            <span class="theme-dot" style="background:#5E6AD2"></span>
+            <span class="theme-dot" style="background:#0D0D0D"></span>
+            <span class="theme-dot" style="background:#1A1A1A"></span>
+          </div>
+          <span class="theme-name">Linear 极客风</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="monday-vibrant">
+          <div class="theme-preview">
+            <span class="theme-dot" style="background:#FF3D57"></span>
+            <span class="theme-dot" style="background:#FAFAFA"></span>
+            <span class="theme-dot" style="background:#FFFFFF"></span>
+          </div>
+          <span class="theme-name">Monday 活力风</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="enterprise-classic">
+          <div class="theme-preview">
+            <span class="theme-dot" style="background:#1E40AF"></span>
+            <span class="theme-dot" style="background:#F1F5F9"></span>
+            <span class="theme-dot" style="background:#FFFFFF"></span>
+          </div>
+          <span class="theme-name">企业商务风</span>
+        </button>
+      </div>
+      <p class="msg" id="theme-msg"></p>
     </section>
 
     <footer>

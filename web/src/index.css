@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './styles/themes.css';
+@import './styles/theme-presets.css';
 
 @theme {
   --font-sans: 'Segoe UI', system-ui, sans-serif;

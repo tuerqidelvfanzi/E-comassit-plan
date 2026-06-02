@@ -33,7 +33,7 @@
         "https://*.yangkeduo.com/*",
         "https://*.pinduoduo.com/*"
       ],
-      "js": ["src/content/content-script.js"],
+      "js": ["src/content/content-script.js", "src/content/theme-injector.js"],
       "run_at": "document_end",
       "all_frames": false
     },
@@ -42,7 +42,7 @@
         "https://*.shopee.*/seller/*",
         "https://*.tiktok.com/shop/*"
       ],
-      "js": ["src/content/publish-script.js"],
+      "js": ["src/content/publish-script.js", "src/content/theme-injector.js"],
       "run_at": "document_end",
       "all_frames": false
     }
