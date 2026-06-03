@@ -9,8 +9,8 @@ import { SettingsSectionBoundary } from './SettingsSectionBoundary';
 function NavGroupSection({ group }: { group: NavGroup }) {
   return (
     <div className="mb-4">
-      <div className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
-        <span>{group.icon}</span>
+      <div className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-[var(--color-text-muted)] tracking-wider">
+        <span className="text-base">{group.icon}</span>
         <span>{group.title}</span>
       </div>
       <div className="space-y-0.5">
@@ -20,7 +20,7 @@ function NavGroupSection({ group }: { group: NavGroup }) {
             to={item.to}
             end={item.end}
             className={({ isActive }) =>
-              `flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${
+              `flex items-center gap-2 rounded-lg px-3 py-2 text-xs transition ${
                 isActive
                   ? 'bg-[var(--color-primary-soft)] font-medium text-[var(--color-nav-accent,var(--color-primary))]'
                   : 'text-[var(--color-text-label)] hover:bg-[var(--color-muted)]'
