@@ -28,3 +28,18 @@ docs/DEMO_PRESENTATION_FLOWS.md
 docs/LOCAL_DEMO_FLOW.html
 docs/original-research/
 docs/local/
+
+# ===== V3.0+ 新增忽略项 =====
+
+# Python 编译缓存（构建产物）
+__pycache__/
+*.py[cod]
+*.pyo
+
+# 本地分析/调研产物（不入 GitHub，与代码无直接耦合）
+docs/analysis/
+docs/architecture-diagrams/
+projects/
+
+# Claude Code 本地插件缓存
+.claude/plugins/
