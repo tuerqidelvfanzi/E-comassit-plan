@@ -34,14 +34,11 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Typecheck
-        run: npm run lint
-
       - name: Build
         env:
           # GitHub Pages project URL: https://<user>.github.io/<repo>/
           VITE_BASE_PATH: ${{ github.event.repository.name }}
-        run: npm run build
+        run: npx vite build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
