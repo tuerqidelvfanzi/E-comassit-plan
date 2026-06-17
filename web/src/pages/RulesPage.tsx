@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageHeader, Card, Badge, Button, Input } from '../components/ui';
+import { PlatformRulesMatrix } from '../components/rules/PlatformRulesMatrix';
 import { api } from '../lib/api';
 import { queryKeys, useRules } from '../hooks/useAppQueries';
 import type { RuleItem } from '../lib/api/types';
@@ -230,6 +231,11 @@ export function RulesPage() {
           <p>4. <strong>翻译规则</strong> → 最后执行翻译，避免翻译无效内容</p>
         </div>
       </Card>
+
+      {/* 平台规则矩阵（V3.0 合并自 v2/components/PlatformRulesMatrix） */}
+      <div className="mt-6">
+        <PlatformRulesMatrix />
+      </div>
     </>
   );
 }

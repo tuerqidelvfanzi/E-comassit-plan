@@ -43,3 +43,15 @@ projects/
 
 # Claude Code 本地插件缓存
 .claude/plugins/
+
+# ===== 阶段 3 补全（chore/v3-baseline-sync）=====
+
+# 本地参考包（一次性导入产物，不入 GitHub）
+frontend-stack-reference-pack/
+frontend-stack-reference-pack.zip
+
+# 临时工作区（Plan / Spec 起草区）
+.workspace/
+
+# 通配 Python 编译缓存（兼容嵌套目录）
+**/__pycache__/

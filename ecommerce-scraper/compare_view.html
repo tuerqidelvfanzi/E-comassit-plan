@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>ecommerce-scraper · 双轨对比</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #181b22;
+    --panel-2: #1f232c;
+    --border: #2a2f3a;
+    --text: #e6e8eb;
+    --dim: #8b93a1;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --accent: #60a5fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    line-height: 1.6;
+  }
+  .header {
+    max-width: 1400px; margin: 0 auto 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .header h1 { margin: 0; font-size: 18px; font-weight: 600; }
+  .header .meta { color: var(--dim); font-size: 13px; }
+  .summary {
+    max-width: 1400px; margin: 0 auto 20px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  }
+  .stat {
+    padding: 14px 18px;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .stat .label { color: var(--dim); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .stat.green .value { color: var(--green); }
+  .stat.yellow .value { color: var(--yellow); }
+  .stat.red .value { color: var(--red); }
+  .stat.blue .value { color: var(--accent); }
+  .container {
+    max-width: 1400px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  .panel {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .panel-header {
+    padding: 12px 18px;
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .panel-header h2 { margin: 0; font-size: 14px; font-weight: 600; }
+  .badge {
+    padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+    background: var(--border); color: var(--dim);
+  }
+  .badge.local { background: #1e3a5f; color: var(--accent); }
+  .badge.apify { background: #4a2c4a; color: #d8a0d8; }
+  .badge.ok    { background: #0f3a2c; color: var(--green); }
+  .badge.warn  { background: #3a2f0f; color: var(--yellow); }
+  .badge.err   { background: #3a0f0f; color: var(--red); }
+  .row {
+    display: grid; grid-template-columns: 110px 1fr;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .row:last-child { border-bottom: none; }
+  .row .k { color: var(--dim); font-size: 12px; }
+  .row .v { color: var(--text); word-break: break-word; }
+  .row.diff-exact    { background: rgba(52, 211, 153, 0.04); }
+  .row.diff-minor    { background: rgba(251, 191, 36, 0.08); }
+  .row.diff-major    { background: rgba(248, 113, 113, 0.10); }
+  .row.diff-incomparable { background: rgba(139, 147, 161, 0.10); }
+  .row .v-tag {
+    display: inline-block; margin-left: 6px;
+    padding: 1px 6px; border-radius: 3px;
+    font-size: 10px; font-weight: 600;
+  }
+  .v-tag.minor { background: rgba(251, 191, 36, 0.2); color: var(--yellow); }
+  .v-tag.major { background: rgba(248, 113, 113, 0.2); color: var(--red); }
+  .v-tag.incomparable { background: var(--border); color: var(--dim); }
+  .v-tag.exact { background: rgba(52, 211, 153, 0.2); color: var(--green); }
+  .error-row { color: var(--red); padding: 14px 18px; font-family: monospace; font-size: 12px; }
+  .specs { font-size: 12px; color: var(--dim); white-space: pre-wrap; }
+  .footer {
+    max-width: 1400px; margin: 20px auto 0;
+    padding: 12px 18px;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--dim); font-size: 12px; text-align: center;
+  }
+  .recommended {
+    max-width: 1400px; margin: 20px auto 0;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #1a2440, #1f1830);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .recommended h2 { margin: 0 0 10px; font-size: 14px; color: var(--accent); }
+  .recommended-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  }
+  .recommended-grid div { font-size: 13px; }
+  .recommended-grid strong { color: var(--dim); display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .conflicts {
+    max-width: 1400px; margin: 20px auto 0;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .conflicts table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .conflicts th, .conflicts td {
+    text-align: left; padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .conflicts th { background: var(--panel-2); color: var(--dim); font-weight: 500; font-size: 12px; text-transform: uppercase; }
+  .conflicts tr:last-child td { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🛒 Amazon · 双轨制抓取对比</h1>
+    <div class="meta">URL: <a href="https://www.amazon.com/dp/B08N5WRWNW" style="color:var(--accent);">https://www.amazon.com/dp/B08N5WRWNW</a></div>
+  </div>
+  <div class="meta">2026-06-12 01:49:15</div>
+</div>
+
+<div class="summary">
+  <div class="stat green">
+    <div class="label">一致度</div>
+    <div class="value">98.0%</div>
+  </div>
+  <div class="stat green">
+    <div class="label">漂移等级</div>
+    <div class="value">none</div>
+  </div>
+  <div class="stat blue">
+    <div class="label">冲突字段</div>
+    <div class="value">3</div>
+  </div>
+  <div class="stat green">
+    <div class="label">抓取状态</div>
+    <div class="value">✅ 成功</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="panel">
+    <div class="panel-header">
+      <h2>📍 本地引擎 (LocalFetcher)</h2>
+      <span class="badge ok">ok</span>
+    </div>
+    <div class="row "><div class="k">标题</div><div class="v">Echo Dot (4th Gen, 2020 release) | Smart speaker with Alexa</div></div>
+<div class="row diff-minor"><div class="k">价格<span class="v-tag minor">minor</span></div><div class="v">USD 49.99</div></div>
+<div class="row "><div class="k">库存</div><div class="v">in_stock</div></div>
+<div class="row "><div class="k">卖家</div><div class="v">Amazon Renewed</div></div>
+<div class="row "><div class="k">评分</div><div class="v">⭐ 4.7</div></div>
+<div class="row diff-minor"><div class="k">评论数<span class="v-tag minor">minor</span></div><div class="v">12345</div></div>
+<div class="row "><div class="k">描述</div><div class="v">Meet Echo Dot - Our most popular smart speaker with fabric design. Ideal for bedside table or kitchen counter.</div></div>
+<div class="row "><div class="k">图片数</div><div class="v">1</div></div>
+<div class="row "><div class="k">方法</div><div class="v">undetected-playwright:stealth</div></div>
+<div class="row "><div class="k">置信度</div><div class="v">85%</div></div>
+<div class="row "><div class="k">规格</div><div class="v">Brand: Amazon
+Model: Echo Dot 4th Gen
+Color: Charcoal</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <h2>☁️  Apify 云端</h2>
+      <span class="badge ok">ok</span>
+    </div>
+    <div class="row "><div class="k">标题</div><div class="v">Echo Dot (4th Gen, 2020 release) | Smart speaker with Alexa (Renewed)</div></div>
+<div class="row diff-minor"><div class="k">价格<span class="v-tag minor">minor</span></div><div class="v">USD 49.98</div></div>
+<div class="row "><div class="k">库存</div><div class="v">in_stock</div></div>
+<div class="row "><div class="k">卖家</div><div class="v">Amazon</div></div>
+<div class="row "><div class="k">评分</div><div class="v">⭐ 4.7</div></div>
+<div class="row diff-minor"><div class="k">评论数<span class="v-tag minor">minor</span></div><div class="v">12350</div></div>
+<div class="row "><div class="k">描述</div><div class="v">Meet Echo Dot - Our most popular smart speaker with fabric design.</div></div>
+<div class="row "><div class="k">图片数</div><div class="v">1</div></div>
+<div class="row "><div class="k">方法</div><div class="v">apify:apify/amazon-product-scraper</div></div>
+<div class="row "><div class="k">置信度</div><div class="v">95%</div></div>
+<div class="row "><div class="k">规格</div><div class="v">Brand: Amazon
+Model: Echo Dot 4th Gen
+Color: Twilight Blue</div></div>
+  </div>
+</div>
+
+<div class="recommended">
+  <h2>🏆 推荐结果（综合）</h2>
+  <div class="recommended-grid">
+    <div><strong>标题</strong>Echo Dot (4th Gen, 2020 release) | Smart speaker with Alexa (Renewed)</div>
+    <div><strong>价格</strong>USD 49.98</div>
+    <div><strong>库存</strong>in_stock</div>
+    <div><strong>卖家</strong>Amazon</div>
+    <div><strong>评分</strong>⭐ 4.7 (12350)</div>
+    <div><strong>方法</strong>merged:local(undetected-playwright:stealth)+apify(apify:apify/amazon-product-scraper)</div>
+  </div>
+</div>
+
+
+<div class="conflicts">
+  <table>
+    <thead>
+      <tr>
+        <th>字段</th><th>本地</th><th>Apify</th><th>严重度</th><th>相似度</th><th>处理</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>price</code></td><td>49.99</td><td>49.98</td><td><span class="v-tag minor">minor</span></td><td>1.00</td><td>use_apify</td></tr><tr><td><code>review_count</code></td><td>12345</td><td>12350</td><td><span class="v-tag minor">minor</span></td><td>1.00</td><td>use_apify</td></tr><tr><td><code>description_len</code></td><td>110</td><td>66</td><td><span class="v-tag major">major</span></td><td>0.60</td><td>needs_review</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="footer">
+  ecommerce-scraper v0.1.0 · 本地 1200ms · 渲染耗时 50ms
+</div>
+
+</body>
+</html>

@@ -317,6 +317,8 @@ export function generateThemeCSS(preset: ThemePreset, colorOverrides?: Partial<C
 const PRESET_KEY = 'psa_theme_preset';
 const COLORS_KEY = 'psa_theme_colors';
 const STYLE_ID = 'psa-theme-v2-style';
+const CSS_THEME_KEY = 'psa_css_theme';
+const THEME_MODE_KEY = 'psa_theme_mode';
 
 export function getStoredPresetId(): string {
   const stored = localStorage.getItem(PRESET_KEY);
@@ -339,6 +341,10 @@ export function getStoredColorOverrides(): Partial<ColorScheme> | null {
 export function applyPreset(presetId: string, colorOverrides?: Partial<ColorScheme>) {
   const preset = THEME_PRESETS.find(p => p.id === presetId);
   if (!preset) return;
+
+  // switch to preset mode: clear CSS data-theme
+  localStorage.setItem(THEME_MODE_KEY, 'preset');
+  document.documentElement.removeAttribute('data-theme');
 
   localStorage.setItem(PRESET_KEY, presetId);
   
@@ -377,11 +383,88 @@ export function resetColorOverrides() {
 }
 
 export function initThemeV2() {
-  const presetId = getStoredPresetId();
-  const colorOverrides = getStoredColorOverrides();
-  applyPreset(presetId, colorOverrides ?? undefined);
+  const mode = getStoredThemeMode();
+  if (mode === "css") {
+    applyCssTheme(getStoredCssTheme());
+  } else {
+    const presetId = getStoredPresetId();
+    const colorOverrides = getStoredColorOverrides();
+    applyPreset(presetId, colorOverrides ?? undefined);
+  }
 }
 
+// ---- CSS theme registry (43 themes) ----
+export interface CssThemeEntry {
+  id: string;
+  name: string;
+  description: string;
+  category: "light" | "dark" | "special";
+}
+
+export const CSS_THEMES: CssThemeEntry[] = [
+  { id: "jade", name: "翡翠绿", description: "温润如玉的绿色调", category: "light" },
+  { id: "sunlight", name: "暖阳黄", description: "柔和温暖的黄色调", category: "light" },
+  { id: "minimal-white", name: "极简纯白", description: "干净利落的纯白界面", category: "light" },
+  { id: "parchment", name: "羊皮纸", description: "复古泛黄的纸质阅读感", category: "light" },
+  { id: "editorial-serif", name: "杂志衬线", description: "优雅的衬线字体排版", category: "light" },
+  { id: "soft-pastel", name: "柔彩粉", description: "轻盈柔和的粉彩色系", category: "light" },
+  { id: "corporate-clean", name: "企业洁净", description: "专业干净的商务白", category: "light" },
+  { id: "academic-paper", name: "学术论文", description: "严谨规范的学术风格", category: "light" },
+  { id: "swiss-grid", name: "瑞士网格", description: "精准克制的网格排版", category: "light" },
+  { id: "xiaohongshu-white", name: "小红书白", description: "小红书风格清新留白", category: "light" },
+  { id: "catppuccin-latte", name: "Catppuccin 拿铁", description: "温暖柔和的奶茶色调", category: "light" },
+  { id: "arctic-cool", name: "极地冰蓝", description: "清冷透亮的冰川色系", category: "light" },
+  { id: "engineering-whiteprint", name: "工程蓝图", description: "技术文档般的蓝图风格", category: "light" },
+  { id: "news-broadcast", name: "新闻播报", description: "权威正式的新闻排版", category: "light" },
+  { id: "solarized", name: "阳光墨玉", description: "护眼 Solarized 经典配色", category: "dark" },
+  { id: "dracula", name: "德古拉", description: "经典 Dracula 暗色主题", category: "dark" },
+  { id: "tokyo-night", name: "东京之夜", description: "霓虹都市的深蓝夜晚", category: "dark" },
+  { id: "nord", name: "Nord 极光", description: "冷峻优雅的北极光色", category: "dark" },
+  { id: "catppuccin-mocha", name: "Catppuccin 摩卡", description: "醇厚温暖的咖啡暗色", category: "dark" },
+  { id: "gruvbox-dark", name: "Gruvbox 复古", description: "怀旧暖色暗色主题", category: "dark" },
+  { id: "rose-pine", name: "玫瑰松木", description: "浪漫优雅的粉紫暗色", category: "dark" },
+  { id: "terminal-green", name: "终端绿", description: "经典黑客终端风格", category: "dark" },
+  { id: "sharp-mono", name: "锐利等宽", description: "极简克制的等宽字体暗色", category: "dark" },
+  { id: "vaporwave", name: "蒸汽波", description: "80 年代复古霓虹美学", category: "special" },
+  { id: "cyberpunk", name: "赛博朋克", description: "霓虹灯闪烁的未来都市", category: "special" },
+  { id: "sunset", name: "日落余晖", description: "温暖绚丽的渐变落日", category: "special" },
+  { id: "sunset-warm", name: "落日暖橙", description: "温暖浪漫的橙色黄昏", category: "special" },
+  { id: "magazine-bold", name: "杂志粗体", description: "大胆醒目的杂志排版", category: "special" },
+  { id: "memphis-pop", name: "孟菲斯波普", description: "活泼跳跃的孟菲斯风格", category: "special" },
+  { id: "bauhaus", name: "包豪斯", description: "经典几何构成主义", category: "special" },
+  { id: "midcentury", name: "中世纪现代", description: "1950 年代复古现代风", category: "special" },
+  { id: "rainbow-gradient", name: "彩虹渐变", description: "绚丽多彩的渐变配色", category: "special" },
+  { id: "glassmorphism", name: "玻璃拟态", description: "半透明毛玻璃质感", category: "special" },
+  { id: "aurora", name: "极光幻彩", description: "神秘变幻的极光色彩", category: "special" },
+  { id: "pitch-deck-vc", name: "VC 融资风", description: "投资人路演 PPT 风格", category: "special" },
+  { id: "cyberpunk-neon", name: "赛博霓虹", description: "更强烈的霓虹光效", category: "special" },
+  { id: "blueprint", name: "蓝图", description: "工程蓝图的线框风格", category: "special" },
+  { id: "y2k-chrome", name: "Y2K 金属", description: "千禧年金属质感风格", category: "special" },
+  { id: "neo-brutalism", name: "新粗野主义", description: "大胆厚重的粗野设计", category: "special" },
+  { id: "retro-tv", name: "CRT 扫描线", description: "复古电视 CRT 怀旧感", category: "special" },
+  { id: "japanese-minimal", name: "和风极简", description: "日式留白禅意美学", category: "special" },
+  { id: "browser", name: "跟随系统", description: "跟随浏览器明暗设置", category: "light" },
+  { id: "custom", name: "自定义", description: "用户自定义 CSS 覆盖", category: "special" },
+];
+
+export function getStoredThemeMode(): string {
+  return localStorage.getItem(THEME_MODE_KEY) ?? "preset";
+}
+
+export function getStoredCssTheme(): string {
+  return localStorage.getItem(CSS_THEME_KEY) ?? "browser";
+}
+
+export function applyCssTheme(themeId: string) {
+  localStorage.setItem(THEME_MODE_KEY, "css");
+  localStorage.setItem(CSS_THEME_KEY, themeId);
+
+  document.getElementById(STYLE_ID)?.remove();
+  document.documentElement.setAttribute("data-theme", themeId);
+  document.documentElement.removeAttribute("data-preset");
+
+  window.dispatchEvent(new Event("theme-change"));
+}
 // ============ React Hook ============
 
 function subscribe(cb: () => void) {
@@ -394,15 +477,23 @@ function subscribe(cb: () => void) {
 }
 
 export function useThemeV2() {
+  const mode = useSyncExternalStore(subscribe, getStoredThemeMode, () => 'preset');
   const presetId = useSyncExternalStore(subscribe, getStoredPresetId, () => 'trello-premium');
+  const cssThemeId = useSyncExternalStore(subscribe, getStoredCssTheme, () => 'browser');
   const colorOverrides = useSyncExternalStore(subscribe, getStoredColorOverrides, () => null);
   const preset = THEME_PRESETS.find(p => p.id === presetId) ?? THEME_PRESETS[0];
+  const cssTheme = CSS_THEMES.find(t => t.id === cssThemeId) ?? CSS_THEMES[0];
 
   return {
+    mode,
     preset,
     presets: THEME_PRESETS,
+    cssThemes: CSS_THEMES,
+    cssTheme,
+    cssThemeId,
     colorOverrides,
     setPreset: (id: string) => applyPreset(id),
+    setCssTheme: (id: string) => applyCssTheme(id),
     updateColors: updateColorOverrides,
     resetColors: resetColorOverrides,
   };

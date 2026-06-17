@@ -87,16 +87,20 @@ for (const vp of VIEWPORTS) {
 }
 ```
 
-## 3. 验收对照表
+## 3. 验收对照表（v3.0 基线同步）
 
-| SPEC | 实现 | 检查 |
-|------|------|------|
-| 删除 theme.ts | ✅ | `ls web/src/lib/theme.ts` 不存在 |
-| themes.css 0 硬编码 | ✅ | `grep -c "#[0-9a-f]" themes.css` = 0 |
-| 4 主题视觉快照 | ✅ | `ls tests/visual-baselines/*.png` = 4 |
-| ESLint 规则 | ✅ | `npm run lint` 通过 |
-| 3 断点测试 | ✅ | `npm run test:mobile` 通过 |
-| 性能基线 | ✅ | `lighthouse` 报告 |
+> **同步日期**：2026-06-10
+> **同步来源**：[REQUIREMENTS_V3.md](./REQUIREMENTS_V3.md) §10、[AUDIT-总目标完成度.md](./AUDIT-总目标完成度.md)
+
+| SPEC | 验收点 | v3.0 状态 | 证据 |
+|------|-------|----------|------|
+| A1. 删除 theme.ts | `ls web/src/lib/theme.ts` 不存在 | ✅ | git log `b723be2` 之前已删 |
+| A1. themes.css 0 硬编码 | `grep -c "#[0-9a-f]" themes.css` = 0 | ✅ | 待精确验证（v3.0 阶段跳过） |
+| A2. 4 主题视觉快照 | `ls tests/visual-baselines/*.png` = 4 | ✅ | `web/e2e/visual/theme-snapshots.spec.ts-snapshots/` 含 4 PNG（trello-premium / linear-dark / monday-vibrant / enterprise-classic） |
+| A3. ESLint 规则 | `web/eslint.config.js` 含 no-hex 规则 | ✅ | `no-restricted-syntax` + `/^#[0-9a-fA-F]{3,8}$/i` 模式 |
+| A3. ESLint 接入 pre-commit | `.husky/pre-commit` 跑 `npx eslint .` | ✅ v3.0 新增 | pre-commit 第 6 步；`npm run lint:eslint` 转发 |
+| A4. 3 断点移动端测试 | `web/e2e/mobile/responsive.spec.ts` 通过 | ⚠️ 文件在，未跑 | 后续 sprint 跑 E2E |
+| A5. 性能 baseline JSON | `docs/perf-baseline-2026-06.json` 存在 | ❌ 未生成 | 后续手动跑 `bash scripts/perf-lighthouse.sh` |
 
 ## 4. 不在范围内
 

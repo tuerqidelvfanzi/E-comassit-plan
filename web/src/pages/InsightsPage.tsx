@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageHeader, Card, Button, Badge } from '../components/ui';
+import { ApiModeBanner } from '../components/ApiModeBanner';
 import { api } from '../lib/api';
 import { queryKeys, useInsight } from '../hooks/useAppQueries';
 import type { CompetitorProduct, ConversionData, ProfitMargin, GmvCtrFilter } from '../lib/api/types';
@@ -227,7 +228,7 @@ export function InsightsPage() {
     <>
       <PageHeader
         title="选品洞察"
-        desc="竞品分析 · 转化追踪 · 毛利评估"
+        desc="竞品分析 · 转化追踪 · 毛利评估（数据来源：Mock 静态数据，待 v2.1 接入真实 API）"
         action={
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setFilter(DEFAULT_FILTER)}>
@@ -239,6 +240,8 @@ export function InsightsPage() {
           </div>
         }
       />
+
+      <ApiModeBanner />
 
       {/* 核心指标卡片 */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

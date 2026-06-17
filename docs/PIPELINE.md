@@ -1,6 +1,17 @@
 # V3.0 自动化防错开发管道
 
 > **设计原则**: 管道应该是"防错设计"，不是"指导手册"
+> **基线日期**: 2026-06-10（与 [REQUIREMENTS_V3.md](./REQUIREMENTS_V3.md) 同步）
+
+---
+
+## ⚠️ 重要说明（v3.0 基线）
+
+> **本节示例代码（§2.3 §2.5）为教学简化版，实际脚本以 `scripts/` 目录文件内容为准。**
+>
+> **示例代码与实际脚本差异点**：
+> - `check-spec-coverage.js`：文档示例仅检查 4 个主题 ID；实际脚本检查 `docs/theme-system/SPEC.md`、8 维度类型导出、ColorScheme 字段等。
+> - `check-component-adapters.js`：文档示例用 `data-visual=X.Y` 正则；实际脚本检查 4×3×4=48 适配点矩阵。
 
 ---
 
@@ -8,7 +19,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    自动化防错管道 v2                              │
+│                    自动化防错管道 v3.0                            │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │   ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐            │
@@ -32,205 +43,71 @@
 
 ## 2. 内置防错机制
 
-### 2.1 Pre-commit Hook（提交前拦截）
+### 2.1 Pre-commit Hook（v3.0 实际 6 项检查）
 
 **位置**: `.husky/pre-commit`
 
-```bash
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+**v3.0 实际执行 6 项**（v3.0 基线已确认）：
 
-# 强制执行 5 个检查
-echo "🔍 Pre-commit 检查..."
+| # | 命令 | 用途 | 强制 |
+|---|------|------|------|
+| 1 | `npm run lint` (= `cd web && npx tsc --noEmit`) | TypeScript 类型检查 | ✅ |
+| 2 | `npm test` (= `cd web && npm test -- --run`) | 单元测试 | ✅ |
+| 3 | `node scripts/check-spec-coverage.js` | SPEC 对照检查 | ✅ |
+| 4 | `node scripts/check-design-preservation.js` | 设计保留检查 | ✅ |
+| 5 | `node scripts/check-component-adapters.js` | 组件适配检查 | ✅ |
+| 6 | `npm run lint:eslint` (= `cd web && npx eslint .`) | ESLint 规则（含 no-hex-color） | ✅ v3.0 新增 |
 
-# 1. 类型检查
-echo "1/5 TypeScript 类型检查"
-npx tsc --noEmit || exit 1
+**v3.0 变更点**：
+- v2 → v3.0 新增第 6 步 ESLint（SPEC-A §2.3 验收项曾标记为"未接入 pre-commit"）；
+- 通过根 `package.json` wrapper 解决 `npm test` 在 root cwd 失败问题（v3.0 之前根目录无 `package.json`）。
 
-# 2. 单元测试
-echo "2/5 单元测试"
-npm test -- --run || exit 1
-
-# 3. SPEC 对照检查
-echo "3/5 SPEC 对照检查"
-node scripts/check-spec-coverage.js || exit 1
-
-# 4. 设计保留检查
-echo "4/5 设计保留检查"
-node scripts/check-design-preservation.js || exit 1
-
-# 5. 组件适配检查
-echo "5/5 组件适配检查"
-node scripts/check-component-adapters.js || exit 1
-
-echo "✅ 所有检查通过"
-```
-
-### 2.2 强制测试脚本
+### 2.2 CI 脚本（独立流水线）
 
 **位置**: `scripts/ci-test.sh`
 
-```bash
-#!/bin/bash
-# CI 测试脚本 - 任何修改都强制跑
+v3.0 CI 脚本与 pre-commit 是**两套独立流水线**：
+- pre-commit 跑 6 项快速检查（< 30 秒）
+- CI 跑完整流程（tsc + build + vitest + playwright + coverage）
 
-set -e
+**v3.0 决策**：pre-commit 与 CI 分离，不在 pre-commit 中调 `ci-test.sh`（避免 commit 卡顿）。
 
-echo "🧪 开始自动化测试..."
-
-# 1. 类型检查
-npx tsc --noEmit
-
-# 2. 构建测试
-npm run build
-
-# 3. 单元测试
-npm test -- --run
-
-# 4. E2E 测试
-npm run test:e2e
-
-# 5. 覆盖率检查
-if [ "$COVERAGE" = "true" ]; then
-  npm test -- --coverage
-fi
-
-echo "✅ 所有测试通过"
-```
-
-### 2.3 SPEC 对照表自动生成
+### 2.3 SPEC 对照检查
 
 **位置**: `scripts/check-spec-coverage.js`
 
+> ⚠️ **本节为教学简化版示例，实际脚本实现更复杂**（请以文件实际内容为准）。
+
 ```javascript
 /**
- * SPEC 对照检查
- * 比较 SPEC.md 中的功能定义与实际实现
+ * SPEC 对照检查（教学示例）
+ * 实际脚本检查 docs/theme-system/SPEC.md、8 维度类型导出、ColorScheme 字段等
  */
-const fs = require('fs');
-const path = require('path');
-
 function checkSpecCoverage() {
-  const specPath = path.join(__dirname, '../docs/theme-system/SPEC.md');
-  const themePath = path.join(__dirname, '../web/src/lib/theme-v2.ts');
-  
-  if (!fs.existsSync(specPath)) {
-    console.error('❌ SPEC.md 不存在');
-    return false;
-  }
-  
-  if (!fs.existsSync(themePath)) {
-    console.error('❌ theme-v2.ts 不存在');
-    return false;
-  }
-  
-  const spec = fs.readFileSync(specPath, 'utf-8');
-  const impl = fs.readFileSync(themePath, 'utf-8');
-  
-  // 提取 SPEC 中定义的主题包 ID
-  const themeIds = ['trello-premium', 'linear-dark', 'monday-vibrant', 'enterprise-classic'];
-  
-  let missing = [];
-  for (const id of themeIds) {
-    if (!impl.includes(id)) {
-      missing.push(id);
-    }
-  }
-  
-  if (missing.length > 0) {
-    console.error('❌ SPEC 定义的主题未实现:', missing);
-    return false;
-  }
-  
-  console.log('✅ 所有 SPEC 定义的主题已实现');
+  // 实际逻辑：遍历 SPEC.md 中的功能定义，验证代码侧是否实现
   return true;
 }
-
-checkSpecCoverage();
 ```
 
 ### 2.4 第三方审查脚本
 
 **位置**: `scripts/third-party-review.sh`
 
-```bash
-#!/bin/bash
-# 第三方审查 - 调用独立 Agent
-
-echo "🔍 启动第三方审查..."
-
-# 收集变更信息
-CHANGED_FILES=$(git diff --name-only HEAD~1)
-SPEC_PATH="docs/SPEC.md"
-REVIEW_FILE="docs/reviews/review-$(date +%Y%m%d).md"
-
-# 生成审查任务
-cat > /tmp/review-task.md << EOF
-请作为独立审查 Agent，审查以下代码变更：
-
-\`\`\`
-$CHANGED_FILES
-\`\`\`
-
-请对照 $SPEC_PATH 逐项检查：
-1. 功能是否完整实现
-2. 是否有删减
-3. 是否有性能问题
-4. 是否有安全隐患
-
-输出审查报告到: $REVIEW_FILE
-EOF
-
-# 调用独立 Agent (新窗口)
-echo "请在另一个窗口执行："
-echo "  @claude-code /tmp/review-task.md"
-```
+> ⚠️ **v3.0 环境受限豁免**（ADR-008）：
+>
+> 当前环境无法在独立窗口启动 Claude Code Agent 进程。
+> **v3.0 状态**：脚本生成任务文件供人工执行；**不阻塞** pre-commit。
+> **v3.1 计划**：若环境支持，启动自动化。
 
 ### 2.5 组件适配检查
 
 **位置**: `scripts/check-component-adapters.js`
 
-```javascript
-/**
- * 组件适配检查
- * 验证每个视觉风格都有对应的 CSS 适配
- */
-const fs = require('fs');
-const path = require('path');
-
-function checkComponentAdapters() {
-  const cssPath = path.join(__dirname, '../web/src/styles/theme-presets.css');
-  const css = fs.readFileSync(cssPath, 'utf-8');
-  
-  const visualStyles = ['trello', 'linear', 'monday', 'enterprise'];
-  const components = ['.card', '.btn-primary', '.input', '.badge'];
-  
-  let missing = [];
-  
-  for (const style of visualStyles) {
-    for (const comp of components) {
-      const pattern = new RegExp(`data-visual=.${style}.${comp.replace('.', '\.')}`);
-      if (!pattern.test(css)) {
-        missing.push(`${style} - ${comp}`);
-      }
-    }
-  }
-  
-  if (missing.length > 0) {
-    console.error('❌ 缺失组件适配:', missing);
-    return false;
-  }
-  
-  console.log('✅ 所有组件适配完整');
-  return true;
-}
-
-checkComponentAdapters();
-```
+> ⚠️ **本节为教学简化版示例，实际脚本检查 4 视觉风格 × 3 组件类型 × 4 状态 = 48 适配点**。
 
 ---
 
-## 3. 阶段详解（带强制约束）
+## 3. 阶段详解（v3.0 强制约束）
 
 ### Phase 1: 需求
 
@@ -241,6 +118,8 @@ checkComponentAdapters();
 **强制项**:
 - ❌ 禁止跳过需求直接编码
 - ❌ 禁止无验收标准
+
+**v3.0 落地**：需求 → `docs/REQUIREMENTS_V3.md` §5 FR-* 列表，每条带状态标签。
 
 ### Phase 2: 调研
 
@@ -261,6 +140,11 @@ checkComponentAdapters();
 - [ ] 每个功能必须有验收标准
 - [ ] 每个功能必须可测试
 
+**v3.0 落地**：
+- `docs/SPEC-A-V30-收尾优化.md`（V3.0 收尾）
+- `docs/SPEC-B-V31-主题系统增强.md`（V3.1 主题市场）
+- `docs/SPEC-C-V40-AI标题优化器V2.md`（V4.0 标题优化器）
+
 ### Phase 4: 实现
 
 **自动化产出**:
@@ -268,11 +152,11 @@ checkComponentAdapters();
 - [ ] 设计保留检查通过
 
 **强制项**:
-- ❌ 禁止使用硬编码颜色（必须 CSS 变量）
-- ❌ 禁止删减设计规格中的功能
-- ❌ 禁止提交未通过测试的代码
+- ❌ 禁止使用硬编码颜色（必须 CSS 变量）— ESLint `no-restricted-syntax` 检查
+- ❌ 禁止删减设计规格中的功能 — `check-design-preservation.js` 校验
+- ❌ 禁止提交未通过测试的代码 — pre-commit 拦截
 
-### Phase 5: 预检（Pre-commit）
+### Phase 5: 预检（Pre-commit）— v3.0 6 步
 
 **自动化产出**:
 - [ ] 类型检查通过
@@ -280,6 +164,7 @@ checkComponentAdapters();
 - [ ] SPEC 对照通过
 - [ ] 设计保留检查通过
 - [ ] 组件适配检查通过
+- [ ] ESLint 通过（v3.0 新增）
 
 **强制项**:
 - ❌ 任何检查失败都禁止提交
@@ -298,26 +183,43 @@ checkComponentAdapters();
 ### Phase 7: 验收
 
 **自动化产出**:
-- [ ] SPEC 对照表（自动生成）
-- [ ] 第三方审查报告
+- [ ] SPEC 对照表（自动生成）— `FEATURE_STATUS_V3.md`
+- [ ] 第三方审查报告（v3.0 豁免）
 
 **强制项**:
-- [ ] 必须有独立 Agent 审查
 - [ ] 必须有 SPEC 对照清单
+- ⚠️ 独立 Agent 审查 — v3.0 豁免，v3.1 实施
 
 ---
 
-## 4. 工具映射（带强制执行）
+## 4. 工具映射（v3.0 与实际脚本对齐）
 
-| 阶段 | 工具 | 命令 | 强制 |
+| 阶段 | 工具 | 命令 | 强制 | v3.0 状态 |
+|------|------|------|------|----------|
+| 预检 | TypeScript | `npm run lint` (= `cd web && npx tsc --noEmit`) | ✅ | ✅ |
+| 预检 | ESLint | `npm run lint:eslint` | ✅ | ✅ v3.0 新增 |
+| 预检 | SPEC 检查 | `node scripts/check-spec-coverage.js` | ✅ | ✅ |
+| 预检 | 设计保留 | `node scripts/check-design-preservation.js` | ✅ | ✅ |
+| 预检 | 组件适配 | `node scripts/check-component-adapters.js` | ✅ | ✅ |
+| 测试 | Vitest | `npm test` | ✅ | ✅ |
+| 测试 | Playwright | `cd web && npm run test:e2e` | ❌（CI 阶段） | ✅ 脚本在 |
+| 验收 | 独立 Agent | 另一个窗口 | ⚠️ v3.0 豁免 | ⚠️ |
+| 提交 | Git Hook | 自动 | ✅ | ✅ 6 步 |
+| 性能 | Lighthouse | `bash scripts/perf-lighthouse.sh` | ❌ | ✅ 脚本在，待 `docs/perf-baseline/` 产出 |
+
+### 非管道工具（与代码构建无关）
+
+| 工具 | 命令 | 角色 | 强制 |
 |------|------|------|------|
-| 预检 | TypeScript | `npx tsc --noEmit` | ✅ |
-| 预检 | SPEC 检查 | `node scripts/check-spec-coverage.js` | ✅ |
-| 预检 | 设计保留 | `node scripts/check-design-preservation.js` | ✅ |
-| 测试 | Vitest | `npm test` | ✅ |
-| 测试 | Playwright | `npm run test:e2e` | ✅ |
-| 验收 | 独立 Agent | 另一个窗口 | ✅ |
-| 提交 | Git Hook | 自动 | ✅ |
+| 架构图生成 | `python3 scripts/build_arch_v100.py` | 文档产物生成器 | ❌ |
+| 深度研究图 | `python3 scripts/build_deep_v100.py` 等 4 个 | 文档产物生成器 | ❌ |
+| 重建 | `python3 scripts/rebuild_p1.py` | 文档产物生成器 | ❌ |
+| 扩展图标生成 | `python3 scripts/gen-extension-icons.py` | 资源生成 | ❌ |
+| SPA fallback | `node scripts/copy-spa-fallback.mjs` | web build 附属 | ✅（被 `web/package.json` build 引用） |
+| 扩展打包 | `node scripts/zip-extension.mjs` | web build 附属 | ✅（被 `web/package.json` prebuild 引用） |
+| LazyGit | `python3 scripts/lazygit.py` | 本地辅助 | ❌ |
+
+> **v3.0 决策**：将 `build_*.py` 6 个 Python 脚本归类为"文档产物生成器"，**非代码管道工具**，不纳入 pre-commit。
 
 ---
 
@@ -338,12 +240,13 @@ checkComponentAdapters();
 
 | 检查项 | 脚本 | 通过 |
 |--------|------|------|
-| TypeScript 编译 | tsc --noEmit | ✅/❌ |
-| 单元测试 | vitest | ✅/❌ |
-| E2E 测试 | playwright | ✅/❌ |
+| TypeScript 编译 | npm run lint | ✅/❌ |
+| 单元测试 | npm test | ✅/❌ |
+| E2E 测试 | cd web && npm run test:e2e | ✅/❌ |
 | SPEC 覆盖 | check-spec-coverage.js | ✅/❌ |
 | 设计保留 | check-design-preservation.js | ✅/❌ |
 | 组件适配 | check-component-adapters.js | ✅/❌ |
+| ESLint 规则 | npm run lint:eslint | ✅/❌（v3.0 新增）|
 ```
 
 ---
@@ -353,12 +256,9 @@ checkComponentAdapters();
 ### 6.1 初始化（一次性）
 
 ```bash
-# 安装 husky
 npm install husky --save-dev
 npx husky install
-
-# 添加 pre-commit hook
-npx husky add .husky/pre-commit "bash scripts/ci-test.sh"
+# v3.0 根目录新增 package.json wrapper（pre-commit 转发用）
 ```
 
 ### 6.2 日常开发
@@ -367,20 +267,21 @@ npx husky add .husky/pre-commit "bash scripts/ci-test.sh"
 # 1. 编码（无需记命令）
 code src/...
 
-# 2. 提交时自动跑
+# 2. 提交时自动跑 6 项检查
 git add -A
 git commit -m "..."
-# → 自动跑测试，失败则阻止提交
+# → 自动跑 6 项检查，失败则阻止提交
 
 # 3. 推送
 git push
 ```
 
-### 6.3 第三方审查
+### 6.3 第三方审查（v3.0 豁免）
 
 ```bash
-# 在另一个 Claude Code 窗口执行
-@claude-code /tmp/review-task.md
+# v3.0 状态：环境受限，无法自动启动独立 Agent
+# 替代方案：人工在另一个窗口执行
+# @claude-code /tmp/review-task.md
 ```
 
 ---
@@ -401,5 +302,20 @@ git push
 
 ### 管道设计的反模式
 - ❌ "请记得做X" → ✅ "未做X则禁止提交"
-- ❌ "建议审查" → ✅ "必须独立Agent审查"
+- ❌ "建议审查" → ✅ "必须独立Agent审查"（v3.0 豁免）
 - ❌ "应该测试" → ✅ "pre-commit 自动跑测试"
+
+---
+
+## 8. v3.0 与 v2 差异清单
+
+| # | 差异 | v2 | v3.0 |
+|---|------|-----|------|
+| 1 | pre-commit 步骤数 | 5 | 6（新增 ESLint）|
+| 2 | 根 `package.json` | 不存在 | wrapper 存在 |
+| 3 | `web/package.json` lint | `tsc --noEmit` | 保留 + 新增 `lint:eslint` |
+| 4 | PIPELINE.md §2.3 §2.5 示例 | 实际为准 | 加 ⚠️ 提示"教学简化" |
+| 5 | 第三方独立 Agent | 必选 | 环境受限豁免（ADR-008） |
+| 6 | 文档基线 | REQUIREMENTS_V2 | REQUIREMENTS_V3（代码反向）|
+| 7 | FR 状态标注 | 无 | ✅/⚠️/❌/⏳ 四级 |
+| 8 | 路由权威源 | 文档 | `web/src/App.tsx` |

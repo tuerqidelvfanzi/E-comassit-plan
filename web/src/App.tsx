@@ -4,7 +4,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { WorkbenchPage } from './pages/workbench/WorkbenchPage';
 import { CompetitorsPage } from './pages/competitors/CompetitorsPage';
 import { TitleOptimizationPage } from './pages/workbench/TitleOptimizationPage';
-import { InboxPage } from './pages/inbox/InboxPage';
+import { InboxPage } from './pages/InboxPage';
 import { LinkCollectPage } from './pages/link-collect/LinkCollectPage';
 import { BatchCollectPage } from './pages/BatchCollectPage';
 import { TemplatesPage } from './pages/TemplatesPage';
@@ -17,9 +17,10 @@ import { ThemeMarketplace } from './components/theme/ThemeMarketplace';
 import { TitleOptimizerV2 } from './pages/TitleOptimizerV2';
 import { IntegrationsPage } from './pages/IntegrationsPage';
 import { TeamPage } from './pages/TeamPage';
-import { LoginPage } from './pages/auth/LoginPage';
+import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
 import { useAuth } from './hooks/useAuth';
+import { isDemoMode, DEMO_ROUTES } from './lib/demoConfig';
 
 /**
  * V3.0 完整路由配置
@@ -42,6 +43,7 @@ export function App() {
         <Route path="/app/competitors" element={<CompetitorsPage />} />
 
         {/* 工作台 */}
+        <Route path="/app/workbench/:id" element={<WorkbenchPage />} />
         <Route path="/app/title-optimization" element={<TitleOptimizationPage />} />
         <Route path="/app/inbox" element={<InboxPage />} />
         <Route path="/app/link-collect" element={<LinkCollectPage />} />

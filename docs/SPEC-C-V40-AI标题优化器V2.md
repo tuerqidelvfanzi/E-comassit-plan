@@ -261,20 +261,61 @@ export async function fetchCompetitorTitles(
 +----------------------------------+
 ```
 
-## 8. 验收对照表
+## 8. 验收对照表（v3.0 基线同步）
 
-| SPEC | 实现 | 检查 |
-|------|------|------|
-| 5 平台规则 | ✅ | 单元测试覆盖 |
-| 5 语言 | ✅ | franc + DeepL |
-| SEO 评分 | ✅ | 4 维度算法 |
-| 5 候选 | ✅ | 多策略生成 |
-| 竞品抓取 | ✅ | Playwright |
-| 批量上传 | ✅ | CSV < 100 行 |
-| 单元测试 | ✅ | 覆盖率 > 80% |
-| E2E 测试 | ✅ | 5 步流程 |
+> **同步日期**：2026-06-10
+> **同步来源**：[REQUIREMENTS_V3.md](./REQUIREMENTS_V3.md) §10.1、`web/src/lib/title-optimizer/*`、`web/src/pages/TitleOptimizerV2.tsx`
+
+| SPEC | 验收点 | v3.0 状态 | 证据 |
+|------|-------|----------|------|
+| 6 平台规则 | `platform-rules.ts` 含 amazon/ebay/shopee/tiktok/lazada 等 | ✅ | `PLATFORM_RULES` 字典 + `platform-rules.test.ts` |
+| 语言检测 | `language-detector.ts` | ✅ | `language-detector.test.ts` 通过 |
+| SEO 评分（4 维度） | `seo-scorer.ts` density/length/diversity/position | ✅ | `seo-scorer.test.ts` |
+| 5 候选 | `candidate-generator.ts` 多策略 | ✅ | `candidate-generator.test.ts` |
+| 竞品抓取 | `competitor-fetcher.ts` Playwright | ✅ 库实装 | `competitor-fetcher.test.ts`（无 API 端点） |
+| 批量上传 | `batch-optimizer.ts` | ✅ 库实装 | `batch-optimizer.test.ts`（无 API 端点） |
+| 单元测试 | 6 个 lib + 6 个 .test.ts | ✅ 29 单测 | vitest 全部通过 |
+| E2E 测试 | 5 步流程 | ⚠️ 无 | v3.0 跳过 E2E |
+| UI 集成 | `pages/TitleOptimizerV2.tsx` 7.3 KB | ✅ | 路由 `/app/title-optimizer-v2` 可访问 |
+| **API 端点** | POST/GET /api/v1/title/* | ⏳ v3.1 延期 | 见 §10 |
 
 ## 9. 风险
 
 - 翻译 API 限流 → 队列 + 缓存
 - 评分主观性 → A/B 测试反馈
+
+---
+
+## 10. 延期项（v3.1 实施）
+
+> **决策**：ADR-007 — 标题优化器 API 端点 v3.0 文档标记延期至 v3.1。
+> **日期**：2026-06-10
+
+### 10.1 待实施 API 端点
+
+- [ ] `POST /api/v1/title/optimize` — 单商品标题优化
+- [ ] `POST /api/v1/title/batch` — 批量标题优化
+- [ ] `GET /api/v1/title/competitors` — 竞品标题抓取
+
+### 10.2 延期原因
+
+v3.0 阶段 `pages/TitleOptimizerV2.tsx` 全部由本地 `lib/title-optimizer/*` 6 个 lib 驱动评分与候选生成：
+- `platform-rules.ts` — 平台规则字典（前端直接 import）
+- `seo-scorer.ts` — 评分函数（前端 import）
+- `candidate-generator.ts` — 候选生成（前端 import）
+- `language-detector.ts` — 语言检测（前端 import）
+- `competitor-fetcher.ts` — 竞品抓取（前端 import；当前为 mock）
+- `batch-optimizer.ts` — 批量优化（前端 import）
+
+**当前无后端调用依赖**。v3.1 再行实施（需后端 `api/` 目录新建 Hono 路由）。
+
+### 10.3 验收门槛（v3.1）
+
+- 3 个端点全部 Hono 路由实现
+- 前端 `pages/TitleOptimizerV2.tsx` 切换为 fetch 调用
+- 单元测试 + 集成测试覆盖
+- 与 worker 队列对接
+
+---
+
+*文档结束 — V4.0 AI 标题优化器 SPEC（v3.0 同步版）*

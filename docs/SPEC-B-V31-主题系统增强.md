@@ -157,17 +157,21 @@ body {
 }
 ```
 
-## 6. 验收对照表
+## 6. 验收对照表（v3.0 基线同步）
 
-| SPEC | 实现 | 检查 |
-|------|------|------|
-| ThemePackage 类型 | ✅ | type-check 通过 |
-| import/export | ✅ | 单元测试通过 |
-| 4 内置主题 | ✅ | 主题市场展示 4 卡片 |
-| 用户主题持久化 | ✅ | 刷新后保留 |
-| 动画 300ms | ✅ | DevTools 性能 |
-| 降级无动画 | ✅ | prefers-reduced-motion |
-| 预览图组件 | ✅ | 4 个主题卡片 |
+> **同步日期**：2026-06-10
+> **同步来源**：[REQUIREMENTS_V3.md](./REQUIREMENTS_V3.md) §10.1 + `web/src/components/theme/`
+
+| SPEC | 验收点 | v3.0 状态 | 证据 |
+|------|-------|----------|------|
+| ThemePackage 类型 | `web/src/types/theme-package.ts` 定义 | ✅ | type-check 通过 |
+| import/export | `web/src/lib/theme-storage.ts` 1.5 KB | ✅ | `theme-storage.test.ts` 通过 |
+| 4 内置主题 | 主题市场展示 4 卡片 | ✅ | `useThemeMarket.ts` + `ThemeMarketplace.tsx` |
+| 用户主题持久化 | 刷新后保留 | ✅ | `localStorage` + `loadUserThemes()` |
+| 动画 300ms | DevTools 性能 | ✅ | `ThemeTransition.tsx` + `useThemeAnimation.ts` |
+| 降级无动画 | prefers-reduced-motion | ✅ | `theme-transition.css` 媒体查询 |
+| 预览图组件 | 4 主题卡片 | ✅ | `ThemePreview.tsx` |
+| **路由可访问** | `/app/settings/themes/market` | ✅ v3.0 已修 | `web/src/App.tsx` Route 60 行 |
 
 ## 7. 不在范围内
 

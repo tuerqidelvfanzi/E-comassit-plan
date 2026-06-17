@@ -1,0 +1,42 @@
+[
+  {
+    "source_type": "manual",
+    "source_name": "example.com",
+    "title": "Title: Example Domain",
+    "content": "URL Source: https://example.com/\n\nPublished Time: Tue, 16 Jun 2026 20:39:21 GMT\n\nWarning: This is a cached snapshot of the original page, consider retry with caching opt-out.\n\nMarkdown Content:\nThis domain is for use in documentation examples without needing permission. Avoid use in operations.\n\n[Learn more](https://iana.org/domains/example)",
+    "url": "https://example.com",
+    "id": "c984d06aafbe",
+    "fetched_at": "2026-06-17T11:25:18.231997",
+    "media_type": "text",
+    "media_url": null,
+    "score": 0,
+    "priority": "normal",
+    "category": "",
+    "tags": [],
+    "processed": false,
+    "digest_date": null,
+    "title_cn": null,
+    "content_cn": null,
+    "extra": {}
+  },
+  {
+    "source_type": "manual",
+    "source_name": "www.iana.org",
+    "title": "Title: Example Domains",
+    "content": "URL Source: https://www.iana.org/domains/example\n\nPublished Time: Fri, 08 May 2026 02:17:00 GMT\n\nWarning: This page maybe not yet fully loaded, consider explicitly specify a timeout.\n\nMarkdown Content:\nAs described in [RFC 2606](https://www.iana.org/go/rfc2606) and [RFC 6761](https://www.iana.org/go/rfc6761), a number of domains such as example.com and example.org are maintained for documentation purposes. These domains may be used as illustrative examples in documents without prior coordination with us. They are not available for registration or transfer.\n\nWe provide a web service on the example domain hosts to provide basic information on the purpose of the domain. These web services are provided as best effort, but are not designed to support production applications. While incidental traffic for incorrectly configured applications is expected, please do not design applications that require the example domains to have operating HTTP service.\n\n## Further Reading\n\n*   [IANA-managed Reserved Domains](https://www.iana.org/domains/reserved)\n\nLast revised 2017-05-13.",
+    "url": "https://www.iana.org/domains/example",
+    "id": "5c36633c263a",
+    "fetched_at": "2026-06-17T11:26:19.051152",
+    "media_type": "text",
+    "media_url": null,
+    "score": 0,
+    "priority": "normal",
+    "category": "",
+    "tags": [],
+    "processed": false,
+    "digest_date": null,
+    "title_cn": null,
+    "content_cn": null,
+    "extra": {}
+  }
+]
