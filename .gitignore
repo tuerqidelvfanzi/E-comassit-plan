@@ -1,0 +1,57 @@
+node_modules/
+dist/
+dist-admin/
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+web/node_modules/
+web/dist/
+api/node_modules/
+api/dist/
+api/data/
+web/test-results/
+.cursor-plugin/
+
+# oh-my-mermaid
+.omm/
+
+# LazyGit 本地运行时状态（包含 notebook ID 与时间戳，不入 GitHub）
+scripts/lazygit-state.json
+
+# Windows 本地调试脚本（与本项目无关，是作者本地的微软商店弹窗修复工具）
+scripts/store-fix/
+
+# 演示讲解 / 调研索引 / 本地核对表（与代码无直接耦合，不入 GitHub）
+docs/DEMO_PRESENTATION_FLOWS.md
+docs/LOCAL_DEMO_FLOW.html
+docs/original-research/
+docs/local/
+
+# ===== V3.0+ 新增忽略项 =====
+
+# Python 编译缓存（构建产物）
+__pycache__/
+*.py[cod]
+*.pyo
+
+# 本地分析/调研产物（不入 GitHub，与代码无直接耦合）
+docs/analysis/
+docs/architecture-diagrams/
+projects/
+
+# Claude Code 本地插件缓存
+.claude/plugins/
+
+# ===== 阶段 3 补全（chore/v3-baseline-sync）=====
+
+# 本地参考包（一次性导入产物，不入 GitHub）
+frontend-stack-reference-pack/
+frontend-stack-reference-pack.zip
+
+# 临时工作区（Plan / Spec 起草区）
+.workspace/
+
+# 通配 Python 编译缓存（兼容嵌套目录）
+**/__pycache__/

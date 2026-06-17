@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ecommerce-assistant.local/schemas/normalized-product.json",
+  "title": "NormalizedProduct",
+  "description": "插件、Collect Worker、B 站 API 统一的采集商品原始结构（Phase 1）",
+  "type": "object",
+  "required": ["source", "sourceUrl", "title", "price", "images", "skus", "attributes", "capturedAt"],
+  "additionalProperties": false,
+  "properties": {
+    "source": {
+      "type": "string",
+      "description": "来源平台展示名，如 1688、淘宝、天猫"
+    },
+    "sourceUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "采集时页面 URL"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "price": {
+      "type": "object",
+      "required": ["amount", "currency"],
+      "additionalProperties": false,
+      "properties": {
+        "amount": { "type": "number", "minimum": 0 },
+        "currency": { "type": "string", "minLength": 3, "maxLength": 3 }
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": { "type": "string", "format": "uri" }
+    },
+    "skus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "price": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "attributes": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "平台特有字段，如 offerId、itemId、shopId"
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "extractMethod": {
+      "type": "string",
+      "enum": ["json_embed", "json_ld", "dom"]
+    },
+    "extractLayer": {
+      "type": "string",
+      "enum": ["L1", "L2", "L4"]
+    }
+  }
+}

@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 临时文件
+*.tmp
+*.bak
+*~
+._*
+
+# 生成的中间产物
+_tmp_*.mmd
+out/
+dist/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# 日志
+*.log

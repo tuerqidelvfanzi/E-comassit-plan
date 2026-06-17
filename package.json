@@ -1,0 +1,11 @@
+{
+  "name": "yitang-app-root",
+  "private": true,
+  "version": "3.0.0",
+  "description": "Yitang App 根 package.json wrapper（仅用于 pre-commit 转发，禁止在此目录运行 npm install）",
+  "scripts": {
+    "test": "cd web && npm test -- --run",
+    "lint": "cd web && npm run lint",
+    "lint:eslint": "cd web && npx eslint ."
+  }
+}

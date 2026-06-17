@@ -1,0 +1,30 @@
+# gitleaks 自定义规则 - 电商助手项目
+# 文档：https://github.com/gitleaks/gitleaks
+
+title = "E-comassit-plan secret scan rules"
+
+[extend]
+# 使用 gitleaks 内置规则集
+useDefault = true
+
+# 允许误报（已确认安全的 React Query 标识符）
+[[allowlists]]
+description = "React Query queryKey identifiers in web/src/v2/hooks"
+targetRules = ["generic-api-key"]
+paths = [
+  '''web/src/v2/hooks/useV2Queries\.ts$''',
+]
+
+# 允许本仓库内的占位邮箱/手机号
+[[allowlists]]
+description = "Demo placeholders (示例/演示用)"
+regexes = [
+  '''admin01@demo\.local''',
+  '''ops-a@demo\.local''',
+  '''picker-b@demo\.local''',
+  '''zhangsan@example\.com''',
+  '''lisi@example\.com''',
+  '''wangwu@example\.com''',
+  '''your@email\.com''',
+  '''13800138000''',
+]

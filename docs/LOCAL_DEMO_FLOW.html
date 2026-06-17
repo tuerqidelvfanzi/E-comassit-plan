@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>电商助手 · 本地全栈演示流程讲解</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --text: #1a2332;
+      --muted: #5c6b7a;
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --success: #059669;
+      --success-soft: #d1fae5;
+      --warn: #d97706;
+      --warn-soft: #fef3c7;
+      --border: #e2e8f0;
+      --part1: #1e40af;
+      --part2: #0f766e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 18px;
+      line-height: 1.65;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    header.hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 40px 36px;
+      margin-bottom: 32px;
+    }
+
+    header.hero h1 { font-size: 2.2rem; font-weight: 700; }
+    header.hero p { margin-top: 12px; font-size: 1.15rem; opacity: 0.92; max-width: 46em; }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .tag {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 0.95rem;
+    }
+
+    nav.toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 36px;
+    }
+
+    nav.toc h2 { font-size: 1.25rem; margin-bottom: 14px; }
+    nav.toc h3 { font-size: 1.05rem; margin: 16px 0 8px; color: var(--muted); }
+    nav.toc ol { padding-left: 1.4em; }
+    nav.toc li { margin: 6px 0; font-size: 1.02rem; }
+    nav.toc a { color: var(--primary); text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+
+    .part-banner {
+      border-radius: 14px;
+      padding: 28px 32px;
+      margin: 40px 0 28px;
+      color: #fff;
+    }
+
+    .part-banner.part1 { background: linear-gradient(90deg, #1e40af, #3b82f6); }
+    .part-banner.part2 { background: linear-gradient(90deg, #0f766e, #14b8a6); }
+
+    .part-banner h2 { font-size: 1.85rem; margin-bottom: 8px; }
+    .part-banner p { font-size: 1.05rem; opacity: 0.95; }
+
+    section.block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px 28px;
+      margin-bottom: 28px;
+    }
+
+    section.block h2 {
+      font-size: 1.65rem;
+      color: var(--primary);
+      border-bottom: 3px solid var(--primary-soft);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+    }
+
+    section.block.part2-block h2 { color: var(--part2); border-bottom-color: #ccfbf1; }
+
+    section.block h3 {
+      font-size: 1.25rem;
+      margin: 28px 0 14px;
+      color: var(--text);
+    }
+
+    p, li { font-size: 1.05rem; }
+    p { margin-bottom: 12px; }
+    ul, ol { padding-left: 1.5em; margin-bottom: 16px; }
+    li { margin: 6px 0; }
+
+    .note {
+      background: var(--warn-soft);
+      border-left: 4px solid var(--warn);
+      padding: 16px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 1rem;
+    }
+
+    .note.ok { background: var(--success-soft); border-left-color: var(--success); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 1rem;
+    }
+
+    th, td { border: 1px solid var(--border); padding: 12px 14px; text-align: left; vertical-align: top; }
+    th { background: #f8fafc; font-weight: 600; }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.92em;
+    }
+
+    /* Mermaid 容器：大图可横向滚动，字号由 JS 主题控制 */
+    .mermaid-wrap {
+      background: #fafbfc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 16px;
+      margin: 20px 0;
+      overflow-x: auto;
+    }
+
+    .mermaid-wrap .mermaid {
+      display: flex;
+      justify-content: center;
+      min-width: min(100%, 520px);
+    }
+
+    .mermaid-wrap.wide .mermaid { min-width: 720px; }
+
+    .mermaid-wrap figcaption {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 12px;
+    }
+
+    .menu-table td:first-child { font-weight: 600; white-space: nowrap; }
+    .menu-table .path { color: var(--muted); font-size: 0.92rem; }
+
+    .op-table .step-no {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+      white-space: nowrap;
+    }
+
+    .checklist { list-style: none; padding: 0; }
+    .checklist li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist .idx {
+      flex: 0 0 36px;
+      height: 36px;
+      background: var(--success);
+      color: #fff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .legend-item { padding: 14px; border-radius: 8px; font-size: 0.98rem; }
+    .legend-item.real { background: var(--success-soft); }
+    .legend-item.mock { background: var(--warn-soft); }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 40px;
+    }
+
+    @media print {
+      body { font-size: 14px; background: #fff; }
+      .mermaid-wrap { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <header class="hero">
+      <h1>电商助手 · 本地全栈演示流程</h1>
+      <p>
+        <strong>第一部分</strong>：菜单说明 + 小白操作（给没用过的人）。<br>
+        <strong>第二部分</strong>：技术架构与 API 细节（给开发/讲解备查）。<br>
+        <strong>演示版 v2（2026-05-30）</strong>：采集箱筛选、工作台 SKU/标题/图片、模板 SKU 配置持久化。<br>
+        GitHub Pages 仅前端演示；本地 <strong>api + web</strong> 才走 SQLite 真库。
+      </p>
+      <div class="tag-row">
+        <span class="tag">Web :3004</span>
+        <span class="tag">API :8080</span>
+        <span class="tag">admin01 / abcd234</span>
+        <span class="tag">api/data/app.db</span>
+        <span class="tag">演示 v2</span>
+      </div>
+    </header>
+
+    <nav class="toc">
+      <h2>目录</h2>
+      <h3>第一部分 · 使用说明</h3>
+      <ol>
+        <li><a href="#menu">菜单说明与相互关系</a></li>
+        <li><a href="#guide">小白逐步操作手册</a></li>
+        <li><a href="#m1">流程总览图（Mermaid）</a></li>
+        <li><a href="#v2">演示版 v2 新功能速览</a></li>
+      </ol>
+      <h3>第二部分 · 技术说明</h3>
+      <ol start="4">
+        <li><a href="#s0">环境与架构</a></li>
+        <li><a href="#s1">标准作业五步</a></li>
+        <li><a href="#s2">启动与登录</a></li>
+        <li><a href="#s3">插件与 API 联调</a></li>
+        <li><a href="#s4">单页采集与上传路径</a></li>
+        <li><a href="#s5">批量采集 Worker</a></li>
+        <li><a href="#s6">采集箱与处理工作台</a></li>
+        <li><a href="#s7">模板 / 规则 / 洞察</a></li>
+        <li><a href="#s8">发布中心与填草稿</a></li>
+        <li><a href="#s9">卖家后台人工发布</a></li>
+        <li><a href="#s10">数据库与数据流</a></li>
+        <li><a href="#s11">现场演示清单</a></li>
+        <li><a href="#s12">真功能 vs Mock</a></li>
+      </ol>
+    </nav>
+
+    <!-- ========== 第一部分 ========== -->
+    <div class="part-banner part1" id="part1">
+      <h2>第一部分 · 使用说明</h2>
+      <p>面向零基础操作者：每个菜单干什么、按什么顺序点、成功时长什么样。</p>
+    </div>
+
+    <section class="block" id="menu">
+      <h2>1. 菜单说明与相互关系</h2>
+      <p>登录后左侧共 <strong>8 个菜单</strong>。处理工作台不是菜单，从采集箱点「编辑」进入。</p>
+
+      <h3>每个菜单做什么？</h3>
+      <table class="menu-table">
+        <tr><th>菜单</th><th>路径</th><th>功能</th><th>什么时候来</th></tr>
+        <tr><td>工作台</td><td class="path">/app</td><td>首页统计、五步引导、下载插件</td><td>刚登录；看还有多少待处理</td></tr>
+        <tr><td>采集箱</td><td class="path">/app/inbox</td><td>商品列表；<strong>来源/关键词/日期</strong>筛选；可上传图片</td><td>插件上传后；要处理/删除</td></tr>
+        <tr><td>批量采集</td><td class="path">/app/batch-collect</td><td>填榜单 URL 一次抓多条</td><td>不想一页页用插件时</td></tr>
+        <tr><td>类目模板</td><td class="path">/app/templates</td><td>Prompt + <strong>SKU 前缀/颜色/尺码/Hook</strong>（悬停看编码建议）</td><td>跑管线前改模板</td></tr>
+        <tr><td>规则库</td><td class="path">/app/rules</td><td>定价、标题字数、违禁词</td><td>改越南价公式等</td></tr>
+        <tr><td>选品洞察</td><td class="path">/app/insights</td><td>热词、竞品特征参考</td><td>可选，不写回商品</td></tr>
+        <tr><td>发布中心</td><td class="path">/app/publish</td><td>发布任务、生成填表</td><td>商品「可发布」之后</td></tr>
+        <tr><td>设置</td><td class="path">/app/settings</td><td>下载插件、复制令牌、主题、LLM</td><td>第一次必来</td></tr>
+      </table>
+
+      <h3>菜单主链路（Mermaid）</h3>
+      <figure class="mermaid-wrap wide">
+        <pre class="mermaid">
+flowchart LR
+  A["① 设置<br/>装插件·复制令牌"]
+  B["② 采集箱<br/>商品入库"]
+  C["③ 处理工作台<br/>运行管线"]
+  D["④ 发布中心<br/>生成填表"]
+  E["⑤ 插件+卖家后台<br/>人工发布"]
+
+  A --> B --> C --> D --> E
+
+  T["类目模板"] -.-> C
+  R["规则库"] -.-> C
+  I["选品洞察"] -.-> C
+  BC["批量采集"] --> B
+        </pre>
+        <figcaption>实线 = 主流程；虚线 = 辅助菜单；批量采集与插件都是「进采集箱」的两条路</figcaption>
+      </figure>
+
+      <h3>大步骤 ↔ 菜单对照</h3>
+      <table>
+        <tr><th>步骤</th><th>主要菜单</th><th>还要配合</th></tr>
+        <tr><td>0 准备</td><td>（无）终端 api + web</td><td>/login</td></tr>
+        <tr><td>1 装插件</td><td><strong>设置</strong></td><td>Chrome 插件 Popup</td></tr>
+        <tr><td>2 采集</td><td>插件 → <strong>采集箱</strong></td><td>或 <strong>批量采集</strong></td></tr>
+        <tr><td>3 处理</td><td><strong>采集箱</strong> → 处理工作台</td><td>模板/规则/洞察（可选）</td></tr>
+        <tr><td>4 填草稿</td><td><strong>发布中心</strong></td><td>插件 + 卖家网站</td></tr>
+        <tr><td>5 上架</td><td>（无 B 站菜单）</td><td>Shopee / TikTok / 淘宝卖家后台</td></tr>
+      </table>
+    </section>
+
+    <section class="block" id="guide">
+      <h2>2. 小白逐步操作手册</h2>
+      <p>按顺序做即可。口诀：<strong>设置装插件 → 采集箱收货 → 编辑做处理 → 发布中心出货 → 卖家后台点发布</strong></p>
+
+      <table class="op-table">
+        <tr>
+          <th style="width:64px">步</th>
+          <th style="width:22%">做什么</th>
+          <th>怎么点</th>
+          <th>成功标志</th>
+        </tr>
+        <tr>
+          <td class="step-no">0</td>
+          <td>跑起来</td>
+          <td>① <code>cd api</code> → <code>npm run dev</code><br>② <code>cd web</code> → <code>npm run dev</code><br>③ 打开 <code>localhost:3004/login</code></td>
+          <td>左侧出现 8 个菜单</td>
+        </tr>
+        <tr>
+          <td class="step-no">1</td>
+          <td>登录</td>
+          <td><code>admin01</code> / <code>abcd234</code> → 登录</td>
+          <td>进入工作台首页</td>
+        </tr>
+        <tr>
+          <td class="step-no">2</td>
+          <td>连插件</td>
+          <td><strong>设置</strong> → 下载插件 → Chrome 加载 extension/<br>复制令牌 → Popup 填后台/API/令牌</td>
+          <td>Popup 三项填齐</td>
+        </tr>
+        <tr>
+          <td class="step-no">3</td>
+          <td>采 1 个品</td>
+          <td>1688/淘宝详情页 → 插件「采集当前页」→「上传」→ <strong>采集箱</strong></td>
+          <td>提示 API 写入；列表多一行「插件」</td>
+        </tr>
+        <tr>
+          <td class="step-no">3′</td>
+          <td>采很多条</td>
+          <td>插件同步 Cookie → <strong>批量采集</strong> → 开始 → <strong>采集箱</strong></td>
+          <td>任务 done；多条新货</td>
+        </tr>
+        <tr>
+          <td class="step-no">4</td>
+          <td>处理</td>
+          <td><strong>采集箱</strong> → 编辑 →「运行管线」</td>
+          <td>高曝光/高转化；状态「可发布」</td>
+        </tr>
+        <tr>
+          <td class="step-no">5</td>
+          <td>准备发布</td>
+          <td><strong>发布中心</strong> → 新建 →「生成填表」</td>
+          <td>校验「通过」</td>
+        </tr>
+        <tr>
+          <td class="step-no">6</td>
+          <td>填草稿</td>
+          <td>卖家后台新建页 → 插件「填入」→ 发布中心「标记已填入」</td>
+          <td>Toast 已填入；completed</td>
+        </tr>
+        <tr>
+          <td class="step-no">7</td>
+          <td>上架</td>
+          <td>卖家后台核对 → 点平台「发布」</td>
+          <td>平台显示已上架</td>
+        </tr>
+      </table>
+
+      <h3>我想做 X，去哪个菜单？</h3>
+      <table>
+        <tr><th>我想…</th><th>菜单</th><th>按钮</th></tr>
+        <tr><td>配置插件</td><td>设置</td><td>下载插件、复制令牌</td></tr>
+        <tr><td>看采了哪些货</td><td>采集箱</td><td>—</td></tr>
+        <tr><td>改标题/SKU/短描述</td><td>采集箱 → 编辑</td><td>编辑内容 → 保存；运行管线</td></tr>
+        <tr><td>图片去水印/翻译</td><td>处理工作台</td><td>消除笔、中→越翻译</td></tr>
+        <tr><td>一次采 10 条</td><td>批量采集</td><td>开始批量采集</td></tr>
+        <tr><td>发到 Shopee/TikTok</td><td>发布中心</td><td>生成填表 → 插件填入</td></tr>
+      </table>
+    </section>
+
+    <section class="block" id="v2">
+      <h2>3. 演示版 v2 新功能速览</h2>
+      <div class="note ok">
+        本轮重点：<strong>Web UI 接线</strong>（采集箱筛选、工作台编辑、模板 SKU 配置）。插件填表与真实 LLM/图片 Worker 仍属下一轮。
+      </div>
+      <table>
+        <tr><th>页面</th><th>新能力</th><th>操作提示</th></tr>
+        <tr>
+          <td>采集箱</td>
+          <td>来源筛选、关键词、日期范围（API <code>GET /products?source=&keyword=&dateFrom=</code>）</td>
+          <td>工具栏选条件 → 列表即时刷新；可「清空筛选」</td>
+        </tr>
+        <tr>
+          <td>处理工作台</td>
+          <td>标题字数/汉字统计；短描述≤20；SKU 表编辑；双栏对比；消除笔/翻译按钮</td>
+          <td>点「编辑内容」→ 改完「保存」→ 再「运行管线」</td>
+        </tr>
+        <tr>
+          <td>类目模板</td>
+          <td>PREFIX、颜色、尺码、印花后缀、Hook；悬停「编码建议 ⓘ」按类目+市场提示</td>
+          <td>展开 SKU 配置 → 保存后写入 <code>sku_config_json</code></td>
+        </tr>
+      </table>
+      <h3>SKU 编码灵活性（产品方向）</h3>
+      <p>不同国家/品类/店铺规则不同：演示阶段用<strong>模板级 skuConfig + 悬停 Tips</strong>；正式版建议「规则引擎 + 可配置脚本」，五段/六段由店铺策略决定，勿写死在单一 encode 函数。</p>
+      <h3>第二个演示版建议路线</h3>
+      <ol>
+        <li><strong>演示 A（当前 v2）</strong>：B 站全流程 + 插件采集 + 填表 payload（真库）</li>
+        <li><strong>演示 B（下一轮）</strong>：Shopee/TikTok DOM 填表实开 + 9 图管线 Worker</li>
+        <li><strong>演示 C</strong>：ADS Power / Redis 链抓取 + 计费挂钩</li>
+      </ol>
+    </section>
+
+    <section class="block" id="m1">
+      <h2>4. 流程总览图（小白版 Mermaid）</h2>
+
+      <h3>完整操作泳道</h3>
+      <figure class="mermaid-wrap wide">
+        <pre class="mermaid">
+flowchart TB
+  subgraph prep["准备"]
+    P0["启动 api + web"]
+    P1["登录 B 站"]
+    P2["设置：下载插件·复制令牌"]
+    P3["Popup 配置三项"]
+    P0 --> P1 --> P2 --> P3
+  end
+
+  subgraph collect["采集"]
+    C1["源站商品页"]
+    C2["插件：采集当前页"]
+    C3["上传到采集箱"]
+    C4["菜单：采集箱 查看"]
+    C1 --> C2 --> C3 --> C4
+  end
+
+  subgraph process["处理"]
+    W1["采集箱 → 编辑"]
+    W2["运行管线"]
+    W3["状态：可发布"]
+    W1 --> W2 --> W3
+  end
+
+  subgraph publish["发布"]
+    R1["发布中心：新建任务"]
+    R2["生成填表"]
+    R3["卖家后台 + 插件填入"]
+    R4["标记已填入"]
+    R5["平台点发布"]
+    R1 --> R2 --> R3 --> R4 --> R5
+  end
+
+  prep --> collect --> process --> publish
+        </pre>
+        <figcaption>从上到下：准备 → 采集 → 处理 → 发布</figcaption>
+      </figure>
+
+      <h3>两条采集入口（都会进采集箱）</h3>
+      <figure class="mermaid-wrap">
+        <pre class="mermaid">
+flowchart LR
+  E["插件单页采集<br/>1688/淘宝详情"]
+  B["批量采集菜单<br/>榜单/搜索 URL"]
+  I["采集箱 inbox"]
+
+  E --> I
+  B --> I
+        </pre>
+      </figure>
+    </section>
+
+    <!-- ========== 第二部分 ========== -->
+    <div class="part-banner part2" id="part2">
+      <h2>第二部分 · 技术说明</h2>
+      <p>架构、API 路径、上传策略、Worker、数据库表——供开发联调与深入讲解使用。</p>
+    </div>
+
+    <section class="block part2-block" id="s0">
+      <h2>4. 环境与架构</h2>
+      <figure class="mermaid-wrap wide">
+        <pre class="mermaid">
+flowchart LR
+  T1["终端1 api<br/>:8080"]
+  DB[("SQLite<br/>app.db")]
+  T2["终端2 web<br/>:3004"]
+  EXT["Chrome 插件"]
+
+  T1 --> DB
+  T2 -->|"代理 /api/v1"| T1
+  EXT -->|"X-Extension-Token"| T1
+        </pre>
+        <figcaption>Web 开发模式自动代理 API；插件直连 API 上传采集</figcaption>
+      </figure>
+      <table>
+        <tr><th>组件</th><th>地址</th><th>作用</th></tr>
+        <tr><td>Web</td><td>localhost:3004</td><td>React UI，JWT 登录</td></tr>
+        <tr><td>API</td><td>127.0.0.1:8080/api/v1</td><td>Hono REST + SQLite</td></tr>
+        <tr><td>插件</td><td>extension/</td><td>采集、Cookie、填表</td></tr>
+        <tr><td>GitHub Pages</td><td>静态站</td><td>localStorage 演示，无 SQLite</td></tr>
+      </table>
+    </section>
+
+    <section class="block part2-block" id="s1">
+      <h2>5. 标准作业五步</h2>
+      <figure class="mermaid-wrap wide">
+        <pre class="mermaid">
+flowchart LR
+  S0["0 启动<br/>api+web"]
+  S1["1 设置<br/>插件+令牌"]
+  S2["2 采集<br/>进采集箱"]
+  S3["3 处理<br/>工作台管线"]
+  S4["4 发布中心<br/>填草稿"]
+  S5["5 卖家后台<br/>人工发布"]
+
+  S0 --> S1 --> S2 --> S3 --> S4 --> S5
+        </pre>
+      </figure>
+    </section>
+
+    <section class="block part2-block" id="s2">
+      <h2>6. 启动与登录</h2>
+      <figure class="mermaid-wrap">
+        <pre class="mermaid">
+flowchart TB
+  A["npm run dev<br/>api 目录"] --> B["migrate 建库<br/>种子数据"]
+  B --> C["npm run dev<br/>web 目录"]
+  C --> D["POST /auth/login"]
+  D --> E["JWT → sessionStorage"]
+  E --> F["/app 工作台<br/>ApiModeBanner: API模式"]
+        </pre>
+      </figure>
+    </section>
+
+    <section class="block part2-block" id="s3">
+      <h2>7. 插件与 API 联调</h2>
+      <figure class="mermaid-wrap">
+        <pre class="mermaid">
+flowchart TB
+  A["设置页复制 psa_ 令牌"] --> B["Popup 填 API 地址"]
+  B --> C["chrome.storage.local"]
+  C --> D["POST /collect-jobs"]
+  C --> E["POST /extension/cookies"]
+  C --> F["GET /extension/publish-fill"]
+        </pre>
+      </figure>
+      <ul>
+        <li>令牌表：<code>extension_tokens</code></li>
+        <li>大模型设置：影响管线（当前 LLM mock）</li>
+      </ul>
+    </section>
+
+    <section class="block part2-block" id="s4">
+      <h2>8. 单页采集与上传路径</h2>
+      <h3>8.1 源站抓取</h3>
+      <figure class="mermaid-wrap">
+        <pre class="mermaid">
+flowchart TB
+  A["1688/淘宝/天猫详情页"] --> B["CAPTURE_PAGE"]
+  B --> C["L1 内嵌JSON"]
+  C --> D["L2 JSON-LD"]
+  D --> E["L4 DOM兜底"]
+  E --> F["NormalizedProduct"]
+  F --> G["上传到采集箱"]
+        </pre>
+      </figure>
+
+      <h3>8.2 上传三条路径（优先级）</h3>
+      <figure class="mermaid-wrap wide">
+        <pre class="mermaid">
+flowchart TB
+  U["点击上传"] --> Q{"有插件令牌?"}
+
+  Q -->|是| A["① API直传<br/>POST /collect-jobs"]
+  Q -->|否| Q2{"B站标签页已开?"}
+
+  Q2 -->|是| B["② 页内桥接<br/>__PSA_API.collectJob"]
+  Q2 -->|否| C["③ URL兜底<br/>demoImport参数"]
+
+  A --> DB[("SQLite products")]
+  B --> DB
+  C --> DB
+        </pre>
+        <figcaption>① 首选；③ 用于 GitHub Pages 无 API 演示</figcaption>
+      </figure>
+    </section>
+
+    <section class="block part2-block" id="s5">
+      <h2>9. 批量采集 Worker（可选）</h2>
+      <figure class="mermaid-wrap wide">
+        <pre class="mermaid">
+flowchart TB
+  A["源站已登录"] --> B["插件同步 Cookie"]
+  B --> C["POST /extension/cookies"]
+  C --> D["批量采集页填 URL"]
+  D --> E["POST /collect-jobs/batch"]
+  E --> F["Playwright Worker"]
+  F --> G["延迟 250-2400ms/条"]
+  G --> H["ingestCollect 入库"]
+  H --> I["采集箱多条新商品"]
+        </pre>
+      </figure>
+    </section>
+
+    <section class="block part2-block" id="s6">
+      <h2>10. 采集箱与处理工作台</h2>
+      <figure class="mermaid-wrap wide">
+        <pre class="mermaid">
+flowchart TB
+  A["/app/inbox 采集箱<br/>来源/关键词/日期筛选"] --> B["编辑 → workbench/:id"]
+  B --> B1["编辑内容: 标题/短描述/SKU"]
+  B1 --> B2["PATCH /products/:id<br/>skus·description·processed"]
+  B --> C["选模板 + 临时Prompt"]
+  C --> D["POST /pipeline-runs"]
+  D --> E["规则引擎 + LLM mock"]
+  E --> F["高曝光 / 高转化"]
+  F --> G["状态 ready"]
+  G --> H["image-jobs<br/>dedupe_watermark·translate_overlay"]
+  G --> I["创建发布任务"]
+        </pre>
+      </figure>
+      <table>
+        <tr><th>API</th><th>说明</th></tr>
+        <tr><td><code>GET /products?source=&keyword=&dateFrom=&dateTo=</code></td><td>采集箱服务端筛选</td></tr>
+        <tr><td><code>PATCH /products/:id</code></td><td>skus、description、processed.shortDescription、categoryId</td></tr>
+        <tr><td><code>POST /products/:id/image-jobs</code></td><td>operations 含 translate_overlay</td></tr>
+        <tr><td><code>POST /category-templates</code></td><td>body 含 skuConfig、categoryId</td></tr>
+      </table>
+    </section>
+
+    <section class="block part2-block" id="s7">
+      <h2>11. 模板 / 规则 / 洞察</h2>
+      <figure class="mermaid-wrap">
+        <pre class="mermaid">
+flowchart LR
+  T["/app/templates"] --> P["处理工作台<br/>pipeline-runs"]
+  R["/app/rules"] --> P
+  I["/app/insights"] -.->|"只读参考"| P
+        </pre>
+      </figure>
+      <table>
+        <tr><th>页面</th><th>API</th><th>说明</th></tr>
+        <tr><td>类目模板</td><td>/category-templates</td><td>童装 Prompt CRUD</td></tr>
+        <tr><td>规则库</td><td>/rule-sets</td><td>定价、标题、违禁词</td></tr>
+        <tr><td>选品洞察</td><td>/insights/run</td><td>演示数据</td></tr>
+      </table>
+    </section>
+
+    <section class="block part2-block" id="s8">
+      <h2>12. 发布中心与填草稿</h2>
+      <figure class="mermaid-wrap wide">
+        <pre class="mermaid">
+flowchart TB
+  A["/app/publish"] --> B["POST /publish-tasks"]
+  B --> C["POST .../prepare"]
+  C --> D["buildFillPayload<br/>定价·SKU·校验"]
+  D --> E["fill_payload_json"]
+  E --> F["卖家后台新建页"]
+  F --> G["GET /extension/publish-fill"]
+  G --> H["publish-fill.js<br/>DOM + Mock 预览面板"]
+  H --> I["PATCH completed"]
+        </pre>
+      </figure>
+      <table>
+        <tr><th>平台</th><th>卖家后台</th></tr>
+        <tr><td>Shopee</td><td>https://seller.shopee.cn/</td></tr>
+        <tr><td>TikTok Shop</td><td>https://seller.tiktokglobalshop.com/</td></tr>
+        <tr><td>淘宝</td><td>https://sell.taobao.com/</td></tr>
+      </table>
+      <div class="note ok">插件不自动点平台「发布」按钮，仅填草稿。</div>
+    </section>
+
+    <section class="block part2-block" id="s9">
+      <h2>13. 卖家后台人工发布</h2>
+      <figure class="mermaid-wrap">
+        <pre class="mermaid">
+flowchart LR
+  A["登录卖家中心"] --> B["核对草稿"]
+  B --> C["补全必填项"]
+  C --> D["平台点发布"]
+        </pre>
+      </figure>
+    </section>
+
+    <section class="block part2-block" id="s10">
+      <h2>14. 数据库与数据流</h2>
+      <figure class="mermaid-wrap wide">
+        <pre class="mermaid">
+flowchart TB
+  EXT["插件/Worker"] --> API["Hono API"]
+  WEB["React Web"] --> API
+  API --> DB[("SQLite app.db")]
+
+  DB --> T1["users · extension_tokens"]
+  DB --> T2["products · collect_jobs"]
+  DB --> T3["publish_tasks · image_jobs"]
+  DB --> T4["batch_jobs · cookie_jars"]
+  DB --> T5["templates · rules · insights"]
+        </pre>
+      </figure>
+      <table>
+        <tr><th>表</th><th>内容</th></tr>
+        <tr><td>products</td><td>采集箱商品、processed、images</td></tr>
+        <tr><td>publish_tasks</td><td>发布任务 + fill_payload_json</td></tr>
+        <tr><td>collect_jobs</td><td>每次采集记录</td></tr>
+        <tr><td>batch_collect_jobs</td><td>批量任务进度</td></tr>
+        <tr><td>cookie_jars</td><td>插件同步 Cookie</td></tr>
+      </table>
+    </section>
+
+    <section class="block part2-block" id="s11">
+      <h2>15. 现场演示清单</h2>
+      <ul class="checklist">
+        <li><span class="idx">1</span><span>双终端 + 登录 → API 模式</span></li>
+        <li><span class="idx">2</span><span>设置 → 下载插件 v0.6 → Popup 三栏（连接/采集/发布）</span></li>
+        <li><span class="idx">3</span><span>1688/淘宝采集上传 → 采集箱新行</span></li>
+        <li><span class="idx">4</span><span>采集箱筛选 → 工作台编辑保存 → 运行管线 → ready</span></li>
+        <li><span class="idx">4b</span><span>模板页配置 SKU 前缀/Hook → 工作台 SKU 编码预览</span></li>
+        <li><span class="idx">5</span><span>发布中心生成填表 → 插件填入 → completed</span></li>
+        <li><span class="idx">6</span><span>（可选）批量采集 + Cookie</span></li>
+      </ul>
+    </section>
+
+    <section class="block part2-block" id="s12">
+      <h2>16. 真功能 vs Mock</h2>
+      <figure class="mermaid-wrap">
+        <pre class="mermaid">
+flowchart LR
+  subgraph real["真逻辑"]
+    R1["JWT登录"]
+    R2["SQLite入库"]
+    R3["规则定价SKU"]
+    R4["填表payload"]
+    R5["DOM填入"]
+  end
+
+  subgraph mock["Mock演示"]
+    M1["LLM管线"]
+    M2["AI图片"]
+    M3["选品洞察"]
+    M4["Pages localStorage"]
+  end
+        </pre>
+      </figure>
+      <div class="legend">
+        <div class="legend-item real"><strong>✅ 真</strong><br>登录、采集入库、采集箱筛选、工作台 PATCH、模板 SKU 持久化、规则定价、发布填表、插件填 DOM</div>
+        <div class="legend-item mock"><strong>⚠️ Mock</strong><br>LLM 管线、AI 图片 Worker（返回占位图）、洞察数据、GitHub Pages 无 API 模式</div>
+      </div>
+    </section>
+
+    <footer>
+      电商助手 · docs/LOCAL_DEMO_FLOW.html · v2 更新 2026-05-30 · Mermaid 需联网加载 CDN
+    </footer>
+
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        fontSize: '20px',
+        fontFamily: '"PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif',
+        primaryColor: '#dbeafe',
+        primaryTextColor: '#1e293b',
+        primaryBorderColor: '#2563eb',
+        lineColor: '#64748b',
+        secondaryColor: '#ecfdf5',
+        tertiaryColor: '#fef3c7',
+        nodeBorder: '#2563eb',
+        clusterBkg: '#f8fafc',
+        titleColor: '#1e293b',
+        edgeLabelBackground: '#ffffff',
+      },
+      flowchart: {
+        useMaxWidth: false,
+        htmlLabels: true,
+        curve: 'basis',
+        padding: 24,
+        nodeSpacing: 55,
+        rankSpacing: 70,
+        diagramPadding: 16,
+      },
+      securityLevel: 'loose',
+    });
+  </script>
+</body>
+</html>

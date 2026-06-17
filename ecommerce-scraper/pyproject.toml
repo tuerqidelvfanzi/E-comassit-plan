@@ -1,0 +1,62 @@
+[project]
+name = "ecommerce-scraper"
+version = "0.1.0"
+description = "Dual-path e-commerce scraper with local + Apify auto-comparison"
+authors = [{ name = "scraper" }]
+requires-python = ">=3.10"
+
+dependencies = [
+    # Async / HTTP
+    "httpx>=0.27",
+    "aiohttp>=3.9",
+    "requests>=2.31",
+
+    # Browser automation (anti-detection)
+    "nodriver>=0.36",            # 替代 Playwright，CDP-free，反指纹强
+    "playwright>=1.44",          # fallback
+
+    # Data extraction
+    "beautifulsoup4>=4.12",
+    "lxml>=5.0",
+    "selectolax>=0.3",
+
+    # LLM extraction (optional)
+    "openai>=1.30",
+    "crawl4ai>=0.3",             # LLM 智能提取
+
+    # Apify client
+    "apify-client>=1.7",
+
+    # Proxy / networking
+    "python-dotenv>=1.0",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "tenacity>=8.2",             # 重试
+    "ratelimit>=2.2",
+
+    # Storage
+    "sqlalchemy>=2.0",
+    "aiosqlite>=0.19",
+
+    # Logging / monitoring
+    "loguru>=0.7",
+    "rich>=13.7",                # CLI 漂亮输出
+
+    # Comparison utilities
+    "thefuzz>=0.20",             # 字符串相似度
+    "python-Levenshtein>=0.25",
+]
+
+[project.optional-dependencies]
+mcp = ["mcp>=1.0"]
+all = ["ecommerce-scraper[mcp]"]
+
+[project.scripts]
+escrape = "scraper.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["scraper", "scraper.platforms", "scraper.layers"]

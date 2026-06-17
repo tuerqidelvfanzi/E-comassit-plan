@@ -1,0 +1,107 @@
+# yitang 项目路径清单
+# 位置: 项目根 .claude/path-manifest.yaml (跟着项目走,移动后跟着走)
+# 性质: 知识库/说明书,不是配置源,不要自动展开
+# 用途: 智能体(任何 agent)打开本项目时,先读这个文件
+#       理解硬编码路径的含义 + 移动后知道改哪 + 引导用户改对
+#       改完后下次再开同一个项目,无需再问
+
+# ============================================================================
+# §1. 项目级硬编码 (跟着项目走 — 移动到新盘符/新路径后必须改)
+# ============================================================================
+project_paths:
+  - id: PROJECT_ENCODED
+    name: "项目编码目录 (auto-memory 落点)"
+    current: d--02----06-yitang-app
+    derivation: "kebab-case(绝对路径). 例: d:\\02-学习\\06-yitang\\app -> d--02----06-yitang-app"
+    occurrences:
+      - file: .claude/settings.local.json
+        line: 6
+        pattern: 'Read(//c/Users/Barry.liang/.claude/projects/d--02----06-yitang-app/memory/**)'
+      - file: .claude/settings.local.json
+        line: 7
+        pattern: 'Read(//c/Users/Barry.liang/.claude/projects/d--02----06-yitang-app/**)'
+    move_action: |
+      智能体从新 cwd 自动算 PROJECT_ENCODED,
+      对比 current: 不一致 -> 提示用户改 settings.local.json 的 line 6 和 line 7
+
+  - id: PROJECT_TMP_DIR
+    name: "项目内引用的 d 盘 tmp"
+    current: D:/tmp
+    occurrences:
+      - file: .claude/settings.local.json
+        line: 8
+        pattern: "Read(//d/tmp/**)"
+      - file: .claude/settings.local.json
+        line: 11
+        pattern: 'Bash(pwsh -NoProfile -ExecutionPolicy Bypass -File "d:/tmp/*.ps1")'
+    move_action: |
+      若新机器 D:/tmp 不存在 -> 提示用户改 2 处;
+      存在 -> 无需动 (盘符写死是用户偏好)
+
+# ============================================================================
+# §2. 用户级硬编码 (跟机器走 — 不在本项目控制内,只列出供智能体参考)
+# ============================================================================
+user_paths:
+  - id: SAFE_HOOK_PY
+    current: D:/_config/obsidian-sync-mcp/safe_hook.py
+    occurrences:
+      - file: ~/.claude/settings.json
+        context: "3 个 hook (SessionStart/PreToolUse/UserPromptSubmit) 引用"
+    note: "用户级;整个 _config 搬了才改;否则不动"
+
+  - id: TMP_DIR
+    current: D:/tmp
+    occurrences:
+      - file: ~/.claude/settings.json
+        context: 'Read(//d/tmp/**) — WebFetch 限定的兜底'
+      - file: ~/.claude.json
+        context: "mcpServers.minimax.env.MINIMAX_MCP_BASE_PATH = D:/tmp/minimax-mcp-output"
+    note: "用户级;盘符换了需改 2 处"
+
+  - id: ANYSEARCH_CLI
+    current: C:/Users/Barry.liang/.claude/skills/anysearch/scripts/anysearch_cli.py
+    occurrences:
+      - file: ~/.claude/settings.local.json
+    note: "用户级 skill;跨项目共享,通常不动"
+
+# ============================================================================
+# §3. 智能体协议 (任何 agent 打开本项目时按此执行)
+# ============================================================================
+agent_protocol:
+  on_project_open:
+    step_1: "读本文件"
+    step_2: |
+      从当前 cwd 推 PROJECT_ENCODED;
+      对比 §1.PROJECT_ENCODED.current:
+        一致 -> 继续
+        不一致 -> 提示用户改 .claude/settings.local.json 的 line 6, 7
+    step_3: |
+      检查新机器 D:/tmp 是否存在:
+        不存在 -> 提示用户改 §1.PROJECT_TMP_DIR 的 3 处
+        存在 -> 继续
+    step_4: |
+      提醒用户: §2 的用户级配置不在本项目内,
+      若整盘符/整机器迁移,需手动改 ~/.claude/settings.json 和 ~/.claude.json
+    step_5: "本项目开工"
+  do_not:
+    - "不要自动写任何文件 (让用户拍板)"
+    - "不要修改本文件"
+    - "不要触碰 §2 用户级配置"
+  completion_marker: |
+    用户确认 5 步完成 -> 智能体在 response 末尾输出 "[moved-verified]"
+    下次再开同一项目 -> 看到 marker -> 跳过 step_2~4 -> 直接开工
+
+# ============================================================================
+# §4. 元信息
+# ============================================================================
+meta:
+  version: 1
+  created: 2026-06-17
+  rationale: |
+    用户明确要求: 不做复杂 hook/同步/自动展开.
+    智能体读这个文件 + 稍作修改和理解 -> 开工.
+    下次打开不重复设置.
+    不会漏 (列全所有硬编码) 不会重 (单一来源).
+  related:
+    - "项目根 CLAUDE.md (设计规格保留铁律)"
+    - ".claude/design-preservation.md"

@@ -1,0 +1,1827 @@
+/* 语义变量：各主题统一命名，组件使用 var(--color-*) */
+
+/* —— 当前浏览器配置 —— */
+:root[data-theme='browser'] {
+  --color-bg: #f8fafc;
+  --color-bg-gradient-from: #f8fafc;
+  --color-bg-gradient-to: #eff6ff;
+  --color-surface: #ffffff;
+  --color-muted: #f1f5f9;
+  --color-table-head: #f8fafc;
+  --color-code-bg: #f1f5f9;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-label: #475569;
+  --color-border: #e2e8f0;
+  --color-primary: #2563eb;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: #eff6ff;
+  --color-success: #059669;
+  --color-success-soft: #d1fae5;
+  --color-success-fg: #065f46;
+  --color-warn: #d97706;
+  --color-warn-soft: #fef3c7;
+  --color-warn-fg: #92400e;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #f1f5f9;
+  --color-badge-default-fg: #334155;
+  --color-focus-ring: rgba(37, 99, 235, 0.2);
+  --color-topbar: var(--color-surface);
+  --color-topbar-fg: var(--color-text);
+  --color-sidebar-fg: var(--color-text-label);
+  --color-nav-accent: var(--color-primary);
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --glow-primary: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='browser'] {
+    --color-bg: #0f172a;
+    --color-bg-gradient-from: #0f172a;
+    --color-bg-gradient-to: #1e293b;
+    --color-surface: #1e293b;
+    --color-muted: #334155;
+    --color-table-head: #1e293b;
+    --color-code-bg: #334155;
+    --color-text: #f1f5f9;
+    --color-text-muted: #94a3b8;
+    --color-text-label: #cbd5e1;
+    --color-border: #334155;
+    --color-primary: #3b82f6;
+    --color-primary-soft: #1e3a5f;
+    --color-badge-default-bg: #334155;
+    --color-badge-default-fg: #e2e8f0;
+    --color-focus-ring: rgba(59, 130, 246, 0.25);
+  }
+}
+
+/* —— 阳光墨玉 · Solarized Dark（Ethan Schoonover）—— */
+:root[data-theme='solarized'] {
+  --color-bg: #002b36;
+  --color-bg-gradient-from: #002b36;
+  --color-bg-gradient-to: #073642;
+  --color-surface: #073642;
+  --color-muted: #073642;
+  --color-table-head: #073642;
+  --color-table-row-hover: rgba(131, 148, 150, 0.08);
+  --color-code-bg: #002b36;
+  --color-text: #839496;
+  --color-text-muted: #586e75;
+  --color-text-label: #93a1a1;
+  --color-border: #586e75;
+  --color-primary: #268bd2;
+  --color-primary-fg: #fdf6e3;
+  --color-primary-soft: rgba(38, 139, 210, 0.22);
+  --color-accent-teal: #2aa198;
+  --color-accent-green: #859900;
+  --color-accent-yellow: #b58900;
+  --color-accent-purple: #6c71c4;
+  --color-success: #859900;
+  --color-success-soft: rgba(133, 153, 0, 0.28);
+  --color-success-fg: #859900;
+  --color-warn: #b58900;
+  --color-warn-soft: rgba(181, 137, 0, 0.22);
+  --color-warn-fg: #b58900;
+  --color-danger: #dc322f;
+  --color-badge-default-bg: #002b36;
+  --color-badge-default-fg: #93a1a1;
+  --color-focus-ring: rgba(38, 139, 210, 0.4);
+  --color-topbar: #073642;
+  --color-topbar-fg: #93a1a1;
+  --color-sidebar-fg: #839496;
+  --color-nav-accent: #268bd2;
+  --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.35);
+  --glow-primary: 0 0 0 1px rgba(38, 139, 210, 0.15);
+  --syntax-keyword: #268bd2;
+  --syntax-string: #859900;
+  --syntax-number: #b58900;
+  --syntax-comment: #586e75;
+  --syntax-type: #6c71c4;
+  --syntax-fn: #2aa198;
+  --syntax-error: #dc322f;
+}
+
+/* —— 赛博朋克 · 霓虹工具界面 —— */
+:root[data-theme='cyberpunk'] {
+  --color-bg: #0a0a12;
+  --color-bg-gradient-from: #0a0a12;
+  --color-bg-gradient-to: #12061f;
+  --color-surface: #12122a;
+  --color-muted: #1a1a38;
+  --color-table-head: #16162e;
+  --color-table-row-hover: rgba(0, 240, 255, 0.06);
+  --color-code-bg: #0c0c1a;
+  --color-text: #e8ecf4;
+  --color-text-muted: #7a8499;
+  --color-text-label: #b8c0d0;
+  --color-border: #3d3d6b;
+  --color-primary: #00f0ff;
+  --color-primary-fg: #0a0a12;
+  --color-primary-soft: rgba(0, 240, 255, 0.18);
+  --color-accent-pink: #ff2a6d;
+  --color-accent-yellow: #fcee0a;
+  --color-accent-green: #39ff14;
+  --color-success: #39ff14;
+  --color-success-soft: rgba(57, 255, 20, 0.18);
+  --color-success-fg: #39ff14;
+  --color-warn: #fcee0a;
+  --color-warn-soft: rgba(252, 238, 10, 0.18);
+  --color-warn-fg: #fcee0a;
+  --color-danger: #ff0055;
+  --color-badge-default-bg: #1a1a38;
+  --color-badge-default-fg: #c8d0dc;
+  --color-focus-ring: rgba(0, 240, 255, 0.45);
+  --color-topbar: #fcee0a;
+  --color-topbar-fg: #0a0a12;
+  --color-sidebar-fg: #fcee0a;
+  --color-nav-accent: #fcee0a;
+  --shadow-card: 0 0 16px rgba(0, 240, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.5);
+  --glow-primary: 0 0 14px rgba(0, 240, 255, 0.35);
+  --syntax-keyword: #00f0ff;
+  --syntax-string: #39ff14;
+  --syntax-number: #fcee0a;
+  --syntax-comment: #7a8499;
+  --syntax-type: #ff2a6d;
+  --syntax-fn: #00f0ff;
+  --syntax-error: #ff0055;
+}
+
+/* 主题专属微调 */
+:root[data-theme='solarized'] .btn-primary {
+  box-shadow: var(--glow-primary);
+}
+
+:root[data-theme='cyberpunk'] .btn-primary {
+  box-shadow: var(--glow-primary);
+  font-weight: 600;
+}
+
+:root[data-theme='cyberpunk'] aside nav a {
+  color: var(--color-sidebar-fg);
+}
+
+:root[data-theme='cyberpunk'] aside nav a:hover {
+  background: rgba(252, 238, 10, 0.08);
+}
+
+:root[data-theme='solarized'] tbody tr:hover {
+  background: var(--color-table-row-hover);
+}
+
+:root[data-theme='cyberpunk'] tbody tr:hover {
+  background: var(--color-table-row-hover);
+}
+
+/* —— 翡翠暗绿 · Jade —— */
+:root[data-theme='jade'] {
+  --color-bg: #051f18;
+  --color-bg-gradient-from: #051f18;
+  --color-bg-gradient-to: #0b2e24;
+  --color-surface: #0b2e24;
+  --color-muted: #164738;
+  --color-table-head: #0b2e24;
+  --color-table-row-hover: rgba(52, 211, 153, 0.08);
+  --color-code-bg: #051f18;
+  --color-text: #a7f3d0;
+  --color-text-muted: #6ee7b7;
+  --color-text-label: #34d399;
+  --color-border: #064e3b;
+  --color-primary: #34d399;
+  --color-primary-fg: #051f18;
+  --color-primary-soft: rgba(52, 211, 153, 0.22);
+  --color-success: #34d399;
+  --color-success-soft: rgba(52, 211, 153, 0.25);
+  --color-success-fg: #6ee7b7;
+  --color-warn: #fbbf24;
+  --color-warn-soft: rgba(251, 191, 36, 0.2);
+  --color-warn-fg: #fbbf24;
+  --color-danger: #f87171;
+  --color-badge-default-bg: #0b2e24;
+  --color-badge-default-fg: #a7f3d0;
+  --color-focus-ring: rgba(52, 211, 153, 0.4);
+  --color-topbar: #0b2e24;
+  --color-topbar-fg: #a7f3d0;
+  --color-sidebar-fg: #6ee7b7;
+  --color-nav-accent: #34d399;
+  --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.35);
+  --glow-primary: 0 0 12px rgba(52, 211, 153, 0.25);
+  --syntax-keyword: #34d399;
+  --syntax-string: #6ee7b7;
+  --syntax-number: #a7f3d0;
+  --syntax-comment: #064e3b;
+  --syntax-type: #2dd4bf;
+  --syntax-fn: #34d399;
+  --syntax-error: #f87171;
+}
+
+/* —— 日光暖白 · Sunlight —— */
+:root[data-theme='sunlight'] {
+  --color-bg: #fffbeb;
+  --color-bg-gradient-from: #fffbeb;
+  --color-bg-gradient-to: #fef3c7;
+  --color-surface: #ffffff;
+  --color-muted: #fef3c7;
+  --color-table-head: #fffbeb;
+  --color-table-row-hover: rgba(245, 158, 11, 0.12);
+  --color-code-bg: #fef3c7;
+  --color-text: #78350f;
+  --color-text-muted: #92400e;
+  --color-text-label: #b45309;
+  --color-border: #fde68a;
+  --color-primary: #f59e0b;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(245, 158, 11, 0.2);
+  --color-success: #059669;
+  --color-success-soft: #d1fae5;
+  --color-success-fg: #065f46;
+  --color-warn: #d97706;
+  --color-warn-soft: #fef3c7;
+  --color-warn-fg: #92400e;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #fef3c7;
+  --color-badge-default-fg: #78350f;
+  --color-focus-ring: rgba(245, 158, 11, 0.35);
+  --color-topbar: #fef3c7;
+  --color-topbar-fg: #78350f;
+  --color-sidebar-fg: #92400e;
+  --color-nav-accent: #f59e0b;
+  --shadow-card: 0 1px 3px rgba(120, 53, 15, 0.08);
+  --glow-primary: none;
+  --syntax-keyword: #d97706;
+  --syntax-string: #059669;
+  --syntax-number: #b45309;
+  --syntax-comment: #92400e;
+  --syntax-type: #ca8a04;
+  --syntax-fn: #f59e0b;
+  --syntax-error: #dc2626;
+}
+
+/* —— 极简白 · Minimal White —— */
+:root[data-theme='minimal-white'] {
+  --color-bg: #ffffff;
+  --color-bg-gradient-from: #ffffff;
+  --color-bg-gradient-to: #f8fafc;
+  --color-surface: #ffffff;
+  --color-muted: #f8fafc;
+  --color-table-head: #f8fafc;
+  --color-table-row-hover: rgba(37, 99, 235, 0.04);
+  --color-code-bg: #f8fafc;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-label: #475569;
+  --color-border: #e2e8f0;
+  --color-primary: #2563eb;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(37, 99, 235, 0.1);
+  --color-success: #059669;
+  --color-success-soft: #d1fae5;
+  --color-success-fg: #065f46;
+  --color-warn: #d97706;
+  --color-warn-soft: #fef3c7;
+  --color-warn-fg: #92400e;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #f1f5f9;
+  --color-badge-default-fg: #334155;
+  --color-focus-ring: rgba(37, 99, 235, 0.2);
+  --color-topbar: #ffffff;
+  --color-topbar-fg: #0f172a;
+  --color-sidebar-fg: #475569;
+  --color-nav-accent: #2563eb;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --glow-primary: none;
+}
+
+/* —— 德古拉紫 · Dracula —— */
+:root[data-theme='dracula'] {
+  --color-bg: #282a36;
+  --color-bg-gradient-from: #282a36;
+  --color-bg-gradient-to: #21222c;
+  --color-surface: #44475a;
+  --color-muted: #383a4a;
+  --color-table-head: #383a4a;
+  --color-table-row-hover: rgba(255, 121, 198, 0.08);
+  --color-code-bg: #21222c;
+  --color-text: #f8f8f2;
+  --color-text-muted: #6272a4;
+  --color-text-label: #e6e6e6;
+  --color-border: #6272a4;
+  --color-primary: #ff79c6;
+  --color-primary-fg: #282a36;
+  --color-primary-soft: rgba(255, 121, 198, 0.2);
+  --color-success: #50fa7b;
+  --color-success-soft: rgba(80, 250, 123, 0.2);
+  --color-success-fg: #50fa7b;
+  --color-warn: #f1fa8c;
+  --color-warn-soft: rgba(241, 250, 140, 0.2);
+  --color-warn-fg: #f1fa8c;
+  --color-danger: #ff5555;
+  --color-badge-default-bg: #383a4a;
+  --color-badge-default-fg: #f8f8f2;
+  --color-focus-ring: rgba(255, 121, 198, 0.4);
+  --color-topbar: #21222c;
+  --color-topbar-fg: #f8f8f2;
+  --color-sidebar-fg: #6272a4;
+  --color-nav-accent: #ff79c6;
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --glow-primary: 0 0 12px rgba(255, 121, 198, 0.3);
+}
+
+/* —— 东京夜景 · Tokyo Night —— */
+:root[data-theme='tokyo-night'] {
+  --color-bg: #1a1b26;
+  --color-bg-gradient-from: #1a1b26;
+  --color-bg-gradient-to: #16171f;
+  --color-surface: #24283b;
+  --color-muted: #1f2335;
+  --color-table-head: #1f2335;
+  --color-table-row-hover: rgba(122, 162, 247, 0.08);
+  --color-code-bg: #16171f;
+  --color-text: #c0caf5;
+  --color-text-muted: #565f89;
+  --color-text-label: #9aa5ce;
+  --color-border: #3b4261;
+  --color-primary: #7aa2f7;
+  --color-primary-fg: #1a1b26;
+  --color-primary-soft: rgba(122, 162, 247, 0.2);
+  --color-success: #9ece6a;
+  --color-success-soft: rgba(158, 206, 106, 0.2);
+  --color-success-fg: #9ece6a;
+  --color-warn: #e0af68;
+  --color-warn-soft: rgba(224, 175, 104, 0.2);
+  --color-warn-fg: #e0af68;
+  --color-danger: #f7768e;
+  --color-badge-default-bg: #1f2335;
+  --color-badge-default-fg: #c0caf5;
+  --color-focus-ring: rgba(122, 162, 247, 0.4);
+  --color-topbar: #16171f;
+  --color-topbar-fg: #c0caf5;
+  --color-sidebar-fg: #565f89;
+  --color-nav-accent: #7aa2f7;
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --glow-primary: 0 0 12px rgba(122, 162, 247, 0.3);
+}
+
+/* —— 北欧极简 · Nord —— */
+:root[data-theme='nord'] {
+  --color-bg: #2e3440;
+  --color-bg-gradient-from: #2e3440;
+  --color-bg-gradient-to: #282c34;
+  --color-surface: #3b4252;
+  --color-muted: #434c5e;
+  --color-table-head: #434c5e;
+  --color-table-row-hover: rgba(136, 192, 208, 0.08);
+  --color-code-bg: #282c34;
+  --color-text: #eceff4;
+  --color-text-muted: #8892a4;
+  --color-text-label: #d8dee9;
+  --color-border: #4c566a;
+  --color-primary: #88c0d0;
+  --color-primary-fg: #2e3440;
+  --color-primary-soft: rgba(136, 192, 208, 0.2);
+  --color-success: #a3be8c;
+  --color-success-soft: rgba(163, 190, 140, 0.2);
+  --color-success-fg: #a3be8c;
+  --color-warn: #ebcb8b;
+  --color-warn-soft: rgba(235, 203, 139, 0.2);
+  --color-warn-fg: #ebcb8b;
+  --color-danger: #bf616a;
+  --color-badge-default-bg: #434c5e;
+  --color-badge-default-fg: #eceff4;
+  --color-focus-ring: rgba(136, 192, 208, 0.4);
+  --color-topbar: #282c34;
+  --color-topbar-fg: #eceff4;
+  --color-sidebar-fg: #8892a4;
+  --color-nav-accent: #88c0d0;
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --glow-primary: none;
+}
+
+/* —— 蒸汽波 · Vaporwave —— */
+:root[data-theme='vaporwave'] {
+  --color-bg: #1a0a2e;
+  --color-bg-gradient-from: #1a0a2e;
+  --color-bg-gradient-to: #150828;
+  --color-surface: #2d1b4e;
+  --color-muted: #241542;
+  --color-table-head: #241542;
+  --color-table-row-hover: rgba(255, 113, 206, 0.08);
+  --color-code-bg: #150828;
+  --color-text: #e0e0ff;
+  --color-text-muted: #8080a0;
+  --color-text-label: #b8b8d8;
+  --color-border: #ff71ce;
+  --color-primary: #ff71ce;
+  --color-primary-fg: #1a0a2e;
+  --color-primary-soft: rgba(255, 113, 206, 0.25);
+  --color-success: #01cdfe;
+  --color-success-soft: rgba(1, 205, 254, 0.2);
+  --color-success-fg: #01cdfe;
+  --color-warn: #b967ff;
+  --color-warn-soft: rgba(185, 103, 255, 0.2);
+  --color-warn-fg: #b967ff;
+  --color-danger: #ff0040;
+  --color-badge-default-bg: #241542;
+  --color-badge-default-fg: #e0e0ff;
+  --color-focus-ring: rgba(255, 113, 206, 0.4);
+  --color-topbar: #150828;
+  --color-topbar-fg: #ff71ce;
+  --color-sidebar-fg: #8080a0;
+  --color-nav-accent: #ff71ce;
+  --shadow-card: 0 4px 20px rgba(255, 113, 206, 0.3);
+  --glow-primary: 0 0 16px rgba(255, 113, 206, 0.4);
+}
+
+/* —— 落日橙黑 · Sunset —— */
+:root[data-theme='sunset'] {
+  --color-bg: #121212;
+  --color-bg-gradient-from: #121212;
+  --color-bg-gradient-to: #1e1e1e;
+  --color-surface: #1e1e1e;
+  --color-muted: #2c2c2c;
+  --color-table-head: #1e1e1e;
+  --color-table-row-hover: rgba(255, 87, 34, 0.08);
+  --color-code-bg: #121212;
+  --color-text: #e5e5e5;
+  --color-text-muted: #a3a3a3;
+  --color-text-label: #d4d4d4;
+  --color-border: #333333;
+  --color-primary: #ff5722;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(255, 87, 34, 0.2);
+  --color-success: #4ade80;
+  --color-success-soft: rgba(74, 222, 128, 0.15);
+  --color-success-fg: #4ade80;
+  --color-warn: #fbbf24;
+  --color-warn-soft: rgba(251, 191, 36, 0.15);
+  --color-warn-fg: #fbbf24;
+  --color-danger: #ef4444;
+  --color-badge-default-bg: #2c2c2c;
+  --color-badge-default-fg: #e5e5e5;
+  --color-focus-ring: rgba(255, 87, 34, 0.4);
+  --color-topbar: #ff5722;
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #e5e5e5;
+  --color-nav-accent: #ff5722;
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --glow-primary: 0 0 14px rgba(255, 87, 34, 0.35);
+  --syntax-keyword: #ff5722;
+  --syntax-string: #4ade80;
+  --syntax-number: #fbbf24;
+  --syntax-comment: #737373;
+  --syntax-type: #fb923c;
+  --syntax-fn: #ff5722;
+  --syntax-error: #ef4444;
+}
+
+/* —— 羊皮纸 · Parchment（浅色手稿风）—— */
+:root[data-theme='parchment'] {
+  --color-bg: #f4e4be;
+  --color-bg-gradient-from: #f4e4be;
+  --color-bg-gradient-to: #f7eac9;
+  --color-surface: #f7eac9;
+  --color-muted: #f2e1b8;
+  --color-table-head: #f0deb5;
+  --color-table-row-hover: rgba(163, 104, 44, 0.1);
+  --color-code-bg: #e8d5ab;
+  --color-text: #5f4b32;
+  --color-text-muted: #7a6248;
+  --color-text-label: #594633;
+  --color-border: rgba(95, 75, 50, 0.2);
+  --color-primary: #a3682c;
+  --color-primary-fg: #f8f7f2;
+  --color-primary-soft: rgba(163, 104, 44, 0.2);
+  --color-success: #6b8e23;
+  --color-success-soft: rgba(107, 142, 35, 0.2);
+  --color-success-fg: #556b2f;
+  --color-warn: #b8860b;
+  --color-warn-soft: rgba(184, 134, 11, 0.2);
+  --color-warn-fg: #8b6914;
+  --color-danger: #a0522d;
+  --color-badge-default-bg: #e8d5ab;
+  --color-badge-default-fg: #5f4b32;
+  --color-focus-ring: rgba(163, 104, 44, 0.35);
+  --color-topbar: #f0deb5;
+  --color-topbar-fg: #5f4b32;
+  --color-sidebar-fg: #5f4b32;
+  --color-nav-accent: #a3682c;
+  --shadow-card: 0 2px 8px rgba(95, 75, 50, 0.12);
+  --glow-primary: none;
+  --syntax-keyword: #a3682c;
+  --syntax-string: #6b8e23;
+  --syntax-number: #b8860b;
+  --syntax-comment: #7a6248;
+  --syntax-type: #8b4513;
+  --syntax-fn: #a3682c;
+  --syntax-error: #a0522d;
+}
+
+/* ==================== 恢复的配色主题 ==================== */
+
+/* —— 编辑社论 · Editorial Serif（高级杂志风）—— */
+:root[data-theme='editorial-serif'] {
+  --color-bg: #faf8f5;
+  --color-bg-gradient-from: #faf8f5;
+  --color-bg-gradient-to: #f5f2ed;
+  --color-surface: #ffffff;
+  --color-muted: #f8f5f0;
+  --color-table-head: #f8f5f0;
+  --color-table-row-hover: rgba(26, 26, 26, 0.03);
+  --color-code-bg: #f0ece5;
+  --color-text: #1a1a1a;
+  --color-text-muted: #6b6b6b;
+  --color-text-label: #4a4a4a;
+  --color-border: #e5e0d8;
+  --color-primary: #1a1a1a;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(26, 26, 26, 0.08);
+  --color-success: #2d6a4f;
+  --color-success-soft: rgba(45, 106, 79, 0.12);
+  --color-success-fg: #2d6a4f;
+  --color-warn: #b45309;
+  --color-warn-soft: rgba(180, 83, 9, 0.12);
+  --color-warn-fg: #b45309;
+  --color-danger: #9b2c2c;
+  --color-badge-default-bg: #f0ece5;
+  --color-badge-default-fg: #4a4a4a;
+  --color-focus-ring: rgba(26, 26, 26, 0.2);
+  --color-topbar: #ffffff;
+  --color-topbar-fg: #1a1a1a;
+  --color-sidebar-fg: #6b6b6b;
+  --color-nav-accent: #1a1a1a;
+  --shadow-card: 0 2px 8px rgba(26, 26, 26, 0.06);
+  --glow-primary: none;
+  --syntax-keyword: #1a1a1a;
+  --syntax-string: #2d6a4f;
+  --syntax-number: #b45309;
+  --syntax-comment: #6b6b6b;
+  --syntax-type: #5c5c5c;
+  --syntax-fn: #1a1a1a;
+  --syntax-error: #9b2c2c;
+}
+
+/* —— 马卡龙 · Soft Pastel（柔和粉嫩）—— */
+:root[data-theme='soft-pastel'] {
+  --color-bg: #fef7f0;
+  --color-bg-gradient-from: #fef7f0;
+  --color-bg-gradient-to: #fdf2f8;
+  --color-surface: #ffffff;
+  --color-muted: #fef0f5;
+  --color-table-head: #fef0f5;
+  --color-table-row-hover: rgba(244, 114, 182, 0.08);
+  --color-code-bg: #fdf2f8;
+  --color-text: #4a3728;
+  --color-text-muted: #7a6558;
+  --color-text-label: #5c4a3d;
+  --color-border: #f0e6dc;
+  --color-primary: #f472b6;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(244, 114, 182, 0.15);
+  --color-success: #34d399;
+  --color-success-soft: rgba(52, 211, 153, 0.15);
+  --color-success-fg: #059669;
+  --color-warn: #fbbf24;
+  --color-warn-soft: rgba(251, 191, 36, 0.15);
+  --color-warn-fg: #b45309;
+  --color-danger: #f87171;
+  --color-badge-default-bg: #fef0f5;
+  --color-badge-default-fg: #7a6558;
+  --color-focus-ring: rgba(244, 114, 182, 0.3);
+  --color-topbar: #ffffff;
+  --color-topbar-fg: #4a3728;
+  --color-sidebar-fg: #7a6558;
+  --color-nav-accent: #f472b6;
+  --shadow-card: 0 2px 12px rgba(244, 114, 182, 0.1);
+  --glow-primary: none;
+  --syntax-keyword: #a78bfa;
+  --syntax-string: #34d399;
+  --syntax-number: #fbbf24;
+  --syntax-comment: #7a6558;
+  --syntax-type: #f472b6;
+  --syntax-fn: #a78bfa;
+  --syntax-error: #f87171;
+}
+
+/* —— 企业商务 · Corporate Clean —— */
+:root[data-theme='corporate-clean'] {
+  --color-bg: #f1f5f9;
+  --color-bg-gradient-from: #f1f5f9;
+  --color-bg-gradient-to: #e2e8f0;
+  --color-surface: #ffffff;
+  --color-muted: #e2e8f0;
+  --color-table-head: #e2e8f0;
+  --color-table-row-hover: rgba(30, 64, 175, 0.05);
+  --color-code-bg: #e2e8f0;
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+  --color-text-label: #334155;
+  --color-border: #cbd5e1;
+  --color-primary: #1e40af;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(30, 64, 175, 0.1);
+  --color-success: #047857;
+  --color-success-soft: rgba(4, 120, 87, 0.1);
+  --color-success-fg: #047857;
+  --color-warn: #b45309;
+  --color-warn-soft: rgba(180, 83, 9, 0.1);
+  --color-warn-fg: #b45309;
+  --color-danger: #b91c1c;
+  --color-badge-default-bg: #e2e8f0;
+  --color-badge-default-fg: #334155;
+  --color-focus-ring: rgba(30, 64, 175, 0.25);
+  --color-topbar: #1e40af;
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #64748b;
+  --color-nav-accent: #1e40af;
+  --shadow-card: 0 2px 8px rgba(30, 64, 175, 0.08);
+  --glow-primary: none;
+  --syntax-keyword: #1e40af;
+  --syntax-string: #047857;
+  --syntax-number: #b45309;
+  --syntax-comment: #64748b;
+  --syntax-type: #4338ca;
+  --syntax-fn: #1e40af;
+  --syntax-error: #b91c1c;
+}
+
+/* —— 学术白皮书 · Academic Paper —— */
+:root[data-theme='academic-paper'] {
+  --color-bg: #ffffff;
+  --color-bg-gradient-from: #ffffff;
+  --color-bg-gradient-to: #fafafa;
+  --color-surface: #ffffff;
+  --color-muted: #f5f5f5;
+  --color-table-head: #f5f5f5;
+  --color-table-row-hover: rgba(31, 41, 55, 0.03);
+  --color-code-bg: #f5f5f5;
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-text-label: #4b5563;
+  --color-border: #e5e7eb;
+  --color-primary: #1f2937;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(31, 41, 55, 0.08);
+  --color-success: #047857;
+  --color-success-soft: rgba(4, 120, 87, 0.1);
+  --color-success-fg: #047857;
+  --color-warn: #b45309;
+  --color-warn-soft: rgba(180, 83, 9, 0.1);
+  --color-warn-fg: #b45309;
+  --color-danger: #b91c1c;
+  --color-badge-default-bg: #f5f5f5;
+  --color-badge-default-fg: #4b5563;
+  --color-focus-ring: rgba(31, 41, 55, 0.2);
+  --color-topbar: #ffffff;
+  --color-topbar-fg: #1f2937;
+  --color-sidebar-fg: #6b7280;
+  --color-nav-accent: #1f2937;
+  --shadow-card: 0 1px 4px rgba(31, 41, 55, 0.05);
+  --glow-primary: none;
+  --syntax-keyword: #1f2937;
+  --syntax-string: #047857;
+  --syntax-number: #b45309;
+  --syntax-comment: #6b7280;
+  --syntax-type: #4b5563;
+  --syntax-fn: #1f2937;
+  --syntax-error: #b91c1c;
+}
+
+/* —— 瑞士网格 · Swiss Grid —— */
+:root[data-theme='swiss-grid'] {
+  --color-bg: #ffffff;
+  --color-bg-gradient-from: #ffffff;
+  --color-bg-gradient-to: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-muted: #f5f5f5;
+  --color-table-head: #f5f5f5;
+  --color-table-row-hover: rgba(0, 0, 0, 0.05);
+  --color-code-bg: #f5f5f5;
+  --color-text: #000000;
+  --color-text-muted: #404040;
+  --color-text-label: #1a1a1a;
+  --color-border: #000000;
+  --color-primary: #dc2626;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(220, 38, 38, 0.1);
+  --color-success: #000000;
+  --color-success-soft: rgba(0, 0, 0, 0.05);
+  --color-success-fg: #000000;
+  --color-warn: #dc2626;
+  --color-warn-soft: rgba(220, 38, 38, 0.1);
+  --color-warn-fg: #dc2626;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #f5f5f5;
+  --color-badge-default-fg: #1a1a1a;
+  --color-focus-ring: rgba(220, 38, 38, 0.3);
+  --color-topbar: #000000;
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #404040;
+  --color-nav-accent: #dc2626;
+  --shadow-card: 0 0 0 1px #000000;
+  --glow-primary: none;
+  --syntax-keyword: #dc2626;
+  --syntax-string: #000000;
+  --syntax-number: #dc2626;
+  --syntax-comment: #404040;
+  --syntax-type: #1a1a1a;
+  --syntax-fn: #dc2626;
+  --syntax-error: #dc2626;
+}
+
+/* —— 小红书白底 · XiaoHongShu —— */
+:root[data-theme='xiaohongshu-white'] {
+  --color-bg: #fffdfb;
+  --color-bg-gradient-from: #fffdfb;
+  --color-bg-gradient-to: #fff6f1;
+  --color-surface: #ffffff;
+  --color-muted: #fff1ea;
+  --color-table-head: #fff1ea;
+  --color-table-row-hover: rgba(255, 39, 66, 0.05);
+  --color-code-bg: #fff1ea;
+  --color-text: #1a1210;
+  --color-text-muted: #a08d85;
+  --color-text-label: #4f3a32;
+  --color-border: rgba(60, 30, 20, 0.1);
+  --color-primary: #ff2742;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(255, 39, 66, 0.1);
+  --color-success: #3ba55c;
+  --color-success-soft: rgba(59, 165, 92, 0.12);
+  --color-success-fg: #3ba55c;
+  --color-warn: #f5a524;
+  --color-warn-soft: rgba(245, 165, 36, 0.12);
+  --color-warn-fg: #f5a524;
+  --color-danger: #ff2742;
+  --color-badge-default-bg: #fff1ea;
+  --color-badge-default-fg: #4f3a32;
+  --color-focus-ring: rgba(255, 39, 66, 0.25);
+  --color-topbar: #ffffff;
+  --color-topbar-fg: #1a1210;
+  --color-sidebar-fg: #a08d85;
+  --color-nav-accent: #ff2742;
+  --shadow-card: 0 12px 30px rgba(255, 39, 66, 0.08);
+  --glow-primary: none;
+  --syntax-keyword: #ff2742;
+  --syntax-string: #3ba55c;
+  --syntax-number: #f5a524;
+  --syntax-comment: #a08d85;
+  --syntax-type: #ff7a90;
+  --syntax-fn: #ff2742;
+  --syntax-error: #ff2742;
+}
+
+/* —— 黑白高对比 · Sharp Mono —— */
+:root[data-theme='sharp-mono'] {
+  --color-bg: #ffffff;
+  --color-bg-gradient-from: #ffffff;
+  --color-bg-gradient-to: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-muted: #f0f0f0;
+  --color-table-head: #f0f0f0;
+  --color-table-row-hover: rgba(0, 0, 0, 0.05);
+  --color-code-bg: #f0f0f0;
+  --color-text: #000000;
+  --color-text-muted: #404040;
+  --color-text-label: #1a1a1a;
+  --color-border: #000000;
+  --color-primary: #000000;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(0, 0, 0, 0.08);
+  --color-success: #000000;
+  --color-success-soft: rgba(0, 0, 0, 0.05);
+  --color-success-fg: #000000;
+  --color-warn: #404040;
+  --color-warn-soft: rgba(64, 64, 64, 0.08);
+  --color-warn-fg: #404040;
+  --color-danger: #000000;
+  --color-badge-default-bg: #f0f0f0;
+  --color-badge-default-fg: #1a1a1a;
+  --color-focus-ring: rgba(0, 0, 0, 0.4);
+  --color-topbar: #000000;
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #404040;
+  --color-nav-accent: #000000;
+  --shadow-card: 0 2px 0 0 #000000;
+  --glow-primary: none;
+  --syntax-keyword: #000000;
+  --syntax-string: #404040;
+  --syntax-number: #000000;
+  --syntax-comment: #404040;
+  --syntax-type: #1a1a1a;
+  --syntax-fn: #000000;
+  --syntax-error: #000000;
+}
+
+/* —— 大字杂志 · Magazine Bold —— */
+:root[data-theme='magazine-bold'] {
+  --color-bg: #ffffff;
+  --color-bg-gradient-from: #ffffff;
+  --color-bg-gradient-to: #fafafa;
+  --color-surface: #1a1a1a;
+  --color-muted: #f5f5f5;
+  --color-table-head: #1a1a1a;
+  --color-table-row-hover: rgba(255, 0, 0, 0.08);
+  --color-code-bg: #f5f5f5;
+  --color-text: #1a1a1a;
+  --color-text-muted: #4a4a4a;
+  --color-text-label: #2a2a2a;
+  --color-border: #1a1a1a;
+  --color-primary: #ff0000;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(255, 0, 0, 0.1);
+  --color-success: #00aa00;
+  --color-success-soft: rgba(0, 170, 0, 0.1);
+  --color-success-fg: #00aa00;
+  --color-warn: #ff6b00;
+  --color-warn-soft: rgba(255, 107, 0, 0.1);
+  --color-warn-fg: #ff6b00;
+  --color-danger: #ff0000;
+  --color-badge-default-bg: #1a1a1a;
+  --color-badge-default-fg: #ffffff;
+  --color-focus-ring: rgba(255, 0, 0, 0.35);
+  --color-topbar: #ff0000;
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #4a4a4a;
+  --color-nav-accent: #ff0000;
+  --shadow-card: 0 8px 24px rgba(255, 0, 0, 0.15);
+  --glow-primary: 0 0 20px rgba(255, 0, 0, 0.3);
+  --syntax-keyword: #ff0000;
+  --syntax-string: #00aa00;
+  --syntax-number: #ff6b00;
+  --syntax-comment: #4a4a4a;
+  --syntax-type: #ff6b00;
+  --syntax-fn: #ff0000;
+  --syntax-error: #ff0000;
+}
+
+/* —— 工程白图 · Engineering Blueprint —— */
+:root[data-theme='engineering-whiteprint'] {
+  --color-bg: #ffffff;
+  --color-bg-gradient-from: #ffffff;
+  --color-bg-gradient-to: #e0f2fe;
+  --color-surface: #ffffff;
+  --color-muted: #e0f2fe;
+  --color-table-head: #e0f2fe;
+  --color-table-row-hover: rgba(14, 165, 233, 0.08);
+  --color-code-bg: #e0f2fe;
+  --color-text: #0c4a6e;
+  --color-text-muted: #0369a1;
+  --color-text-label: #0284c7;
+  --color-border: #7dd3fc;
+  --color-primary: #0284c7;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(2, 132, 199, 0.12);
+  --color-success: #059669;
+  --color-success-soft: rgba(5, 150, 105, 0.12);
+  --color-success-fg: #059669;
+  --color-warn: #d97706;
+  --color-warn-soft: rgba(217, 119, 6, 0.12);
+  --color-warn-fg: #d97706;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #e0f2fe;
+  --color-badge-default-fg: #0369a1;
+  --color-focus-ring: rgba(2, 132, 199, 0.3);
+  --color-topbar: #0284c7;
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #0369a1;
+  --color-nav-accent: #0ea5e9;
+  --shadow-card: 0 2px 8px rgba(14, 165, 233, 0.15);
+  --glow-primary: none;
+  --syntax-keyword: #0ea5e9;
+  --syntax-string: #059669;
+  --syntax-number: #d97706;
+  --syntax-comment: #0369a1;
+  --syntax-type: #0284c7;
+  --syntax-fn: #0ea5e9;
+  --syntax-error: #dc2626;
+}
+
+/* —— 新闻播报 · News Broadcast —— */
+:root[data-theme='news-broadcast'] {
+  --color-bg: #ffffff;
+  --color-bg-gradient-from: #ffffff;
+  --color-bg-gradient-to: #fef2f2;
+  --color-surface: #dc2626;
+  --color-muted: #fef2f2;
+  --color-table-head: #dc2626;
+  --color-table-row-hover: rgba(30, 58, 138, 0.08);
+  --color-code-bg: #fef2f2;
+  --color-text: #1e3a8a;
+  --color-text-muted: #3b82f6;
+  --color-text-label: #1e40af;
+  --color-border: #dc2626;
+  --color-primary: #dc2626;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(220, 38, 38, 0.12);
+  --color-success: #1e3a8a;
+  --color-success-soft: rgba(30, 58, 138, 0.12);
+  --color-success-fg: #1e3a8a;
+  --color-warn: #fbbf24;
+  --color-warn-soft: rgba(251, 191, 36, 0.12);
+  --color-warn-fg: #92400e;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #fef2f2;
+  --color-badge-default-fg: #1e40af;
+  --color-focus-ring: rgba(220, 38, 38, 0.35);
+  --color-topbar: #dc2626;
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #3b82f6;
+  --color-nav-accent: #fbbf24;
+  --shadow-card: 0 4px 16px rgba(220, 38, 38, 0.15);
+  --glow-primary: none;
+  --syntax-keyword: #dc2626;
+  --syntax-string: #1e3a8a;
+  --syntax-number: #fbbf24;
+  --syntax-comment: #3b82f6;
+  --syntax-type: #1e40af;
+  --syntax-fn: #dc2626;
+  --syntax-error: #dc2626;
+}
+
+/* —— Catppuccin Latte —— */
+:root[data-theme='catppuccin-latte'] {
+  --color-bg: #eff1f5;
+  --color-bg-gradient-from: #eff1f5;
+  --color-bg-gradient-to: #e6e9f0;
+  --color-surface: #ccd0da;
+  --color-muted: #bcc0cc;
+  --color-table-head: #bcc0cc;
+  --color-table-row-hover: rgba(200, 30, 220, 0.08);
+  --color-code-bg: #e6e9f0;
+  --color-text: #4c4f69;
+  --color-text-muted: #6c6f85;
+  --color-text-label: #5c5f77;
+  --color-border: #9ca0b0;
+  --color-primary: #7287fd;
+  --color-primary-fg: #eff1f5;
+  --color-primary-soft: rgba(114, 135, 253, 0.15);
+  --color-success: #40a02b;
+  --color-success-soft: rgba(64, 160, 43, 0.15);
+  --color-success-fg: #40a02b;
+  --color-warn: #df8e1d;
+  --color-warn-soft: rgba(223, 142, 29, 0.15);
+  --color-warn-fg: #df8e1d;
+  --color-danger: #d20f39;
+  --color-badge-default-bg: #bcc0cc;
+  --color-badge-default-fg: #4c4f69;
+  --color-focus-ring: rgba(114, 135, 253, 0.35);
+  --color-topbar: #ccd0da;
+  --color-topbar-fg: #4c4f69;
+  --color-sidebar-fg: #6c6f85;
+  --color-nav-accent: #ea76c4;
+  --shadow-card: 0 4px 12px rgba(76, 79, 105, 0.15);
+  --glow-primary: none;
+  --syntax-keyword: #7287fd;
+  --syntax-string: #40a02b;
+  --syntax-number: #df8e1d;
+  --syntax-comment: #6c6f85;
+  --syntax-type: #ea76c4;
+  --syntax-fn: #7287fd;
+  --syntax-error: #d20f39;
+}
+
+/* —— 冷色调 · Arctic Cool —— */
+:root[data-theme='arctic-cool'] {
+  --color-bg: #f0f9ff;
+  --color-bg-gradient-from: #f0f9ff;
+  --color-bg-gradient-to: #e0f2fe;
+  --color-surface: #bae6fd;
+  --color-muted: #7dd3fc;
+  --color-table-head: #7dd3fc;
+  --color-table-row-hover: rgba(8, 145, 178, 0.08);
+  --color-code-bg: #e0f2fe;
+  --color-text: #0c4a6e;
+  --color-text-muted: #0891b2;
+  --color-text-label: #0ea5e9;
+  --color-border: #38bdf8;
+  --color-primary: #0891b2;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(8, 145, 178, 0.12);
+  --color-success: #059669;
+  --color-success-soft: rgba(5, 150, 105, 0.12);
+  --color-success-fg: #059669;
+  --color-warn: #d97706;
+  --color-warn-soft: rgba(217, 119, 6, 0.12);
+  --color-warn-fg: #d97706;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #7dd3fc;
+  --color-badge-default-fg: #0c4a6e;
+  --color-focus-ring: rgba(8, 145, 178, 0.3);
+  --color-topbar: #bae6fd;
+  --color-topbar-fg: #0c4a6e;
+  --color-sidebar-fg: #0891b2;
+  --color-nav-accent: #0284c7;
+  --shadow-card: 0 4px 12px rgba(8, 145, 178, 0.15);
+  --glow-primary: none;
+  --syntax-keyword: #0891b2;
+  --syntax-string: #059669;
+  --syntax-number: #d97706;
+  --syntax-comment: #0891b2;
+  --syntax-type: #0284c7;
+  --syntax-fn: #0891b2;
+  --syntax-error: #dc2626;
+}
+
+/* —— 暖色调 · Sunset Warm —— */
+:root[data-theme='sunset-warm'] {
+  --color-bg: #fffbf5;
+  --color-bg-gradient-from: #fffbf5;
+  --color-bg-gradient-to: #fef3c7;
+  --color-surface: #fed7aa;
+  --color-muted: #fbd38d;
+  --color-table-head: #fbd38d;
+  --color-table-row-hover: rgba(234, 88, 12, 0.08);
+  --color-code-bg: #fef3c7;
+  --color-text: #78350f;
+  --color-text-muted: #c2410c;
+  --color-text-label: #ea580c;
+  --color-border: #fb923c;
+  --color-primary: #ea580c;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(234, 88, 12, 0.12);
+  --color-success: #059669;
+  --color-success-soft: rgba(5, 150, 105, 0.12);
+  --color-success-fg: #059669;
+  --color-warn: #d97706;
+  --color-warn-soft: rgba(217, 119, 6, 0.12);
+  --color-warn-fg: #c2410c;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #fbd38d;
+  --color-badge-default-fg: #78350f;
+  --color-focus-ring: rgba(234, 88, 12, 0.3);
+  --color-topbar: #fed7aa;
+  --color-topbar-fg: #78350f;
+  --color-sidebar-fg: #c2410c;
+  --color-nav-accent: #f59e0b;
+  --shadow-card: 0 4px 12px rgba(234, 88, 12, 0.15);
+  --glow-primary: none;
+  --syntax-keyword: #ea580c;
+  --syntax-string: #059669;
+  --syntax-number: #f59e0b;
+  --syntax-comment: #c2410c;
+  --syntax-type: #ea580c;
+  --syntax-fn: #ea580c;
+  --syntax-error: #dc2626;
+}
+
+/* —— 孟菲斯波普 · Memphis Pop —— */
+:root[data-theme='memphis-pop'] {
+  --color-bg: #ffffff;
+  --color-bg-gradient-from: #ffffff;
+  --color-bg-gradient-to: #fdf4ff;
+  --color-surface: #fef3c7;
+  --color-muted: #fef9c3;
+  --color-table-head: #fef9c3;
+  --color-table-row-hover: rgba(139, 92, 246, 0.08);
+  --color-code-bg: #fef3c7;
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-text-label: #4b5563;
+  --color-border: #fcd34d;
+  --color-primary: #8b5cf6;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(139, 92, 246, 0.12);
+  --color-success: #10b981;
+  --color-success-soft: rgba(16, 185, 129, 0.12);
+  --color-success-fg: #059669;
+  --color-warn: #f59e0b;
+  --color-warn-soft: rgba(245, 158, 11, 0.12);
+  --color-warn-fg: #b45309;
+  --color-danger: #ef4444;
+  --color-badge-default-bg: #fef9c3;
+  --color-badge-default-fg: #4b5563;
+  --color-focus-ring: rgba(139, 92, 246, 0.3);
+  --color-topbar: #f472b6;
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #6b7280;
+  --color-nav-accent: #8b5cf6;
+  --shadow-card: 0 8px 24px rgba(139, 92, 246, 0.15);
+  --glow-primary: none;
+  --syntax-keyword: #8b5cf6;
+  --syntax-string: #10b981;
+  --syntax-number: #f59e0b;
+  --syntax-comment: #6b7280;
+  --syntax-type: #f472b6;
+  --syntax-fn: #8b5cf6;
+  --syntax-error: #ef4444;
+}
+
+/* —— 包豪斯几何 · Bauhaus —— */
+:root[data-theme='bauhaus'] {
+  --color-bg: #ffffff;
+  --color-bg-gradient-from: #ffffff;
+  --color-bg-gradient-to: #fef9c3;
+  --color-surface: #fef9c3;
+  --color-muted: #fef08a;
+  --color-table-head: #fef08a;
+  --color-table-row-hover: rgba(220, 38, 38, 0.08);
+  --color-code-bg: #fef9c3;
+  --color-text: #1a1a1a;
+  --color-text-muted: #525252;
+  --color-text-label: #262626;
+  --color-border: #000000;
+  --color-primary: #dc2626;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(220, 38, 38, 0.12);
+  --color-success: #2563eb;
+  --color-success-soft: rgba(37, 99, 235, 0.12);
+  --color-success-fg: #2563eb;
+  --color-warn: #eab308;
+  --color-warn-soft: rgba(234, 179, 8, 0.12);
+  --color-warn-fg: #ca8a04;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #fef08a;
+  --color-badge-default-fg: #262626;
+  --color-focus-ring: rgba(220, 38, 38, 0.35);
+  --color-topbar: #dc2626;
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #525252;
+  --color-nav-accent: #2563eb;
+  --shadow-card: 0 4px 0 #000000;
+  --glow-primary: none;
+  --syntax-keyword: #dc2626;
+  --syntax-string: #2563eb;
+  --syntax-number: #eab308;
+  --syntax-comment: #525252;
+  --syntax-type: #16a34a;
+  --syntax-fn: #dc2626;
+  --syntax-error: #dc2626;
+}
+
+/* —— 世纪中期 · Mid-Century —— */
+:root[data-theme='midcentury'] {
+  --color-bg: #fefce8;
+  --color-bg-gradient-from: #fefce8;
+  --color-bg-gradient-to: #fef9c3;
+  --color-surface: #d9f99d;
+  --color-muted: #bef264;
+  --color-table-head: #bef264;
+  --color-table-row-hover: rgba(101, 163, 13, 0.08);
+  --color-code-bg: #fef9c3;
+  --color-text: #365314;
+  --color-text-muted: #4d7c0f;
+  --color-text-label: #65a30d;
+  --color-border: #84cc16;
+  --color-primary: #65a30d;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(101, 163, 13, 0.12);
+  --color-success: #15803d;
+  --color-success-soft: rgba(21, 128, 61, 0.12);
+  --color-success-fg: #15803d;
+  --color-warn: #92400e;
+  --color-warn-soft: rgba(146, 64, 14, 0.12);
+  --color-warn-fg: #92400e;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #bef264;
+  --color-badge-default-fg: #365314;
+  --color-focus-ring: rgba(101, 163, 13, 0.3);
+  --color-topbar: #92400e;
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #4d7c0f;
+  --color-nav-accent: #65a30d;
+  --shadow-card: 0 4px 12px rgba(101, 163, 13, 0.15);
+  --glow-primary: none;
+  --syntax-keyword: #65a30d;
+  --syntax-string: #15803d;
+  --syntax-number: #92400e;
+  --syntax-comment: #4d7c0f;
+  --syntax-type: #4d7c0f;
+  --syntax-fn: #65a30d;
+  --syntax-error: #dc2626;
+}
+
+/* —— 彩虹渐变 · Rainbow Gradient —— */
+:root[data-theme='rainbow-gradient'] {
+  --color-bg: #ffffff;
+  --color-bg-gradient-from: #ffffff;
+  --color-bg-gradient-to: #fdf4ff;
+  --color-surface: #fdf4ff;
+  --color-muted: #fae8ff;
+  --color-table-head: #fae8ff;
+  --color-table-row-hover: rgba(192, 38, 211, 0.08);
+  --color-code-bg: #fdf4ff;
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-text-label: #4b5563;
+  --color-border: #e879f9;
+  --color-primary: #c026d3;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(192, 38, 211, 0.12);
+  --color-success: #059669;
+  --color-success-soft: rgba(5, 150, 105, 0.12);
+  --color-success-fg: #059669;
+  --color-warn: #d97706;
+  --color-warn-soft: rgba(217, 119, 6, 0.12);
+  --color-warn-fg: #d97706;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #fae8ff;
+  --color-badge-default-fg: #4b5563;
+  --color-focus-ring: rgba(192, 38, 211, 0.3);
+  --color-topbar: linear-gradient(135deg, #c026d3, #0891b2);
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #6b7280;
+  --color-nav-accent: #c026d3;
+  --shadow-card: 0 4px 16px rgba(192, 38, 211, 0.15);
+  --glow-primary: none;
+  --syntax-keyword: #c026d3;
+  --syntax-string: #059669;
+  --syntax-number: #0891b2;
+  --syntax-comment: #6b7280;
+  --syntax-type: #f472b6;
+  --syntax-fn: #c026d3;
+  --syntax-error: #dc2626;
+}
+
+/* —— Catppuccin Mocha —— */
+:root[data-theme='catppuccin-mocha'] {
+  --color-bg: #1e1e2e;
+  --color-bg-gradient-from: #1e1e2e;
+  --color-bg-gradient-to: #181825;
+  --color-surface: #313244;
+  --color-muted: #45475a;
+  --color-table-head: #45475a;
+  --color-table-row-hover: rgba(203, 166, 247, 0.08);
+  --color-code-bg: #181825;
+  --color-text: #cdd6f4;
+  --color-text-muted: #a6adc8;
+  --color-text-label: #bac2de;
+  --color-border: #585b70;
+  --color-primary: #cba6f7;
+  --color-primary-fg: #1e1e2e;
+  --color-primary-soft: rgba(203, 166, 247, 0.15);
+  --color-success: #a6e3a1;
+  --color-success-soft: rgba(166, 227, 161, 0.15);
+  --color-success-fg: #a6e3a1;
+  --color-warn: #f9e2af;
+  --color-warn-soft: rgba(249, 226, 175, 0.15);
+  --color-warn-fg: #f9e2af;
+  --color-danger: #f38ba8;
+  --color-badge-default-bg: #45475a;
+  --color-badge-default-fg: #cdd6f4;
+  --color-focus-ring: rgba(203, 166, 247, 0.35);
+  --color-topbar: #313244;
+  --color-topbar-fg: #cdd6f4;
+  --color-sidebar-fg: #a6adc8;
+  --color-nav-accent: #cba6f7;
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --glow-primary: none;
+  --syntax-keyword: #cba6f7;
+  --syntax-string: #a6e3a1;
+  --syntax-number: #f9e2af;
+  --syntax-comment: #a6adc8;
+  --syntax-type: #f38ba8;
+  --syntax-fn: #cba6f7;
+  --syntax-error: #f38ba8;
+}
+
+/* —— Gruvbox Dark —— */
+:root[data-theme='gruvbox-dark'] {
+  --color-bg: #282828;
+  --color-bg-gradient-from: #282828;
+  --color-bg-gradient-to: #1d2021;
+  --color-surface: #3c3836;
+  --color-muted: #504945;
+  --color-table-head: #504945;
+  --color-table-row-hover: rgba(251, 73, 52, 0.08);
+  --color-code-bg: #1d2021;
+  --color-text: #ebdbb2;
+  --color-text-muted: #a89984;
+  --color-text-label: #d5c4a1;
+  --color-border: #665c54;
+  --color-primary: #fb4934;
+  --color-primary-fg: #282828;
+  --color-primary-soft: rgba(251, 73, 52, 0.15);
+  --color-success: #b8bb26;
+  --color-success-soft: rgba(184, 187, 38, 0.15);
+  --color-success-fg: #b8bb26;
+  --color-warn: #fabd2f;
+  --color-warn-soft: rgba(250, 189, 47, 0.15);
+  --color-warn-fg: #fabd2f;
+  --color-danger: #fb4934;
+  --color-badge-default-bg: #504945;
+  --color-badge-default-fg: #ebdbb2;
+  --color-focus-ring: rgba(251, 73, 52, 0.35);
+  --color-topbar: #3c3836;
+  --color-topbar-fg: #ebdbb2;
+  --color-sidebar-fg: #a89984;
+  --color-nav-accent: #fb4934;
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --glow-primary: none;
+  --syntax-keyword: #fb4934;
+  --syntax-string: #b8bb26;
+  --syntax-number: #fabd2f;
+  --syntax-comment: #a89984;
+  --syntax-type: #83a598;
+  --syntax-fn: #fb4934;
+  --syntax-error: #fb4934;
+}
+
+/* —— 玫瑰松石 · Rose Pine —— */
+:root[data-theme='rose-pine'] {
+  --color-bg: #191724;
+  --color-bg-gradient-from: #191724;
+  --color-bg-gradient-to: #1f1d2b;
+  --color-surface: #26233a;
+  --color-muted: #3178c6;
+  --color-table-head: #3178c6;
+  --color-table-row-hover: rgba(196, 167, 231, 0.08);
+  --color-code-bg: #1f1d2b;
+  --color-text: #e0def4;
+  --color-text-muted: #908caa;
+  --color-text-label: #c4a7e7;
+  --color-border: #524f67;
+  --color-primary: #c4a7e7;
+  --color-primary-fg: #191724;
+  --color-primary-soft: rgba(196, 167, 231, 0.15);
+  --color-success: #9ccfd8;
+  --color-success-soft: rgba(156, 207, 216, 0.15);
+  --color-success-fg: #9ccfd8;
+  --color-warn: #f6c177;
+  --color-warn-soft: rgba(246, 193, 119, 0.15);
+  --color-warn-fg: #f6c177;
+  --color-danger: #eb6f92;
+  --color-badge-default-bg: #3178c6;
+  --color-badge-default-fg: #e0def4;
+  --color-focus-ring: rgba(196, 167, 231, 0.35);
+  --color-topbar: #26233a;
+  --color-topbar-fg: #e0def4;
+  --color-sidebar-fg: #908caa;
+  --color-nav-accent: #c4a7e7;
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --glow-primary: none;
+  --syntax-keyword: #c4a7e7;
+  --syntax-string: #9ccfd8;
+  --syntax-number: #f6c177;
+  --syntax-comment: #908caa;
+  --syntax-type: #eb6f92;
+  --syntax-fn: #c4a7e7;
+  --syntax-error: #eb6f92;
+}
+
+/* —— 绿屏终端 · Terminal Green —— */
+:root[data-theme='terminal-green'] {
+  --color-bg: #0a0a0a;
+  --color-bg-gradient-from: #0a0a0a;
+  --color-bg-gradient-to: #0d0d0d;
+  --color-surface: #1a1a1a;
+  --color-muted: #2a2a2a;
+  --color-table-head: #2a2a2a;
+  --color-table-row-hover: rgba(0, 255, 0, 0.05);
+  --color-code-bg: #0d0d0d;
+  --color-text: #00ff00;
+  --color-text-muted: #00cc00;
+  --color-text-label: #00dd00;
+  --color-border: #004400;
+  --color-primary: #00ff00;
+  --color-primary-fg: #0a0a0a;
+  --color-primary-soft: rgba(0, 255, 0, 0.15);
+  --color-success: #00ff00;
+  --color-success-soft: rgba(0, 255, 0, 0.15);
+  --color-success-fg: #00ff00;
+  --color-warn: #ffff00;
+  --color-warn-soft: rgba(255, 255, 0, 0.15);
+  --color-warn-fg: #ffff00;
+  --color-danger: #ff0000;
+  --color-badge-default-bg: #2a2a2a;
+  --color-badge-default-fg: #00ff00;
+  --color-focus-ring: rgba(0, 255, 0, 0.4);
+  --color-topbar: #1a1a1a;
+  --color-topbar-fg: #00ff00;
+  --color-sidebar-fg: #00cc00;
+  --color-nav-accent: #00ff00;
+  --shadow-card: 0 2px 8px rgba(0, 255, 0, 0.1);
+  --glow-primary: 0 0 8px rgba(0, 255, 0, 0.4);
+  --syntax-keyword: #00ff00;
+  --syntax-string: #00cc00;
+  --syntax-number: #00dd00;
+  --syntax-comment: #008800;
+  --syntax-type: #00ff00;
+  --syntax-fn: #00ff00;
+  --syntax-error: #ff0000;
+}
+
+/* —— 毛玻璃 · Glassmorphism —— */
+:root[data-theme='glassmorphism'] {
+  --color-bg: rgba(30, 30, 50, 0.85);
+  --color-bg-gradient-from: rgba(30, 30, 50, 0.85);
+  --color-bg-gradient-to: rgba(40, 40, 70, 0.85);
+  --color-surface: rgba(255, 255, 255, 0.1);
+  --color-muted: rgba(255, 255, 255, 0.05);
+  --color-table-head: rgba(255, 255, 255, 0.08);
+  --color-table-row-hover: rgba(96, 165, 250, 0.1);
+  --color-code-bg: rgba(0, 0, 0, 0.2);
+  --color-text: #f0f0f0;
+  --color-text-muted: #a0a0c0;
+  --color-text-label: #c0c0e0;
+  --color-border: rgba(255, 255, 255, 0.15);
+  --color-primary: #60a5fa;
+  --color-primary-fg: #1e1e3e;
+  --color-primary-soft: rgba(96, 165, 250, 0.2);
+  --color-success: #34d399;
+  --color-success-soft: rgba(52, 211, 153, 0.2);
+  --color-success-fg: #34d399;
+  --color-warn: #fbbf24;
+  --color-warn-soft: rgba(251, 191, 36, 0.2);
+  --color-warn-fg: #fbbf24;
+  --color-danger: #f87171;
+  --color-badge-default-bg: rgba(255, 255, 255, 0.1);
+  --color-badge-default-fg: #f0f0f0;
+  --color-focus-ring: rgba(96, 165, 250, 0.4);
+  --color-topbar: rgba(255, 255, 255, 0.08);
+  --color-topbar-fg: #f0f0f0;
+  --color-sidebar-fg: #a0a0c0;
+  --color-nav-accent: #a78bfa;
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --glow-primary: none;
+  --syntax-keyword: #60a5fa;
+  --syntax-string: #34d399;
+  --syntax-number: #fbbf24;
+  --syntax-comment: #a0a0c0;
+  --syntax-type: #a78bfa;
+  --syntax-fn: #60a5fa;
+  --syntax-error: #f87171;
+}
+
+/* —— 极光渐变 · Aurora —— */
+:root[data-theme='aurora'] {
+  --color-bg: #0f172a;
+  --color-bg-gradient-from: #0f172a;
+  --color-bg-gradient-to: #1e293b;
+  --color-surface: #1e293b;
+  --color-muted: #334155;
+  --color-table-head: #334155;
+  --color-table-row-hover: rgba(139, 92, 246, 0.08);
+  --color-code-bg: #0f172a;
+  --color-text: #e0e7ff;
+  --color-text-muted: #a5b4fc;
+  --color-text-label: #c7d2fe;
+  --color-border: #4f46e5;
+  --color-primary: #8b5cf6;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(139, 92, 246, 0.2);
+  --color-success: #10b981;
+  --color-success-soft: rgba(16, 185, 129, 0.2);
+  --color-success-fg: #34d399;
+  --color-warn: #fbbf24;
+  --color-warn-soft: rgba(251, 191, 36, 0.2);
+  --color-warn-fg: #fbbf24;
+  --color-danger: #f87171;
+  --color-badge-default-bg: #334155;
+  --color-badge-default-fg: #e0e7ff;
+  --color-focus-ring: rgba(139, 92, 246, 0.4);
+  --color-topbar: linear-gradient(135deg, #10b981, #8b5cf6);
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #a5b4fc;
+  --color-nav-accent: #8b5cf6;
+  --shadow-card: 0 4px 20px rgba(139, 92, 246, 0.25);
+  --glow-primary: 0 0 16px rgba(139, 92, 246, 0.35);
+  --syntax-keyword: #8b5cf6;
+  --syntax-string: #10b981;
+  --syntax-number: #fbbf24;
+  --syntax-comment: #a5b4fc;
+  --syntax-type: #ec4899;
+  --syntax-fn: #8b5cf6;
+  --syntax-error: #f87171;
+}
+
+/* —— VC融资风 · Pitch Deck VC —— */
+:root[data-theme='pitch-deck-vc'] {
+  --color-bg: #0f0f23;
+  --color-bg-gradient-from: #0f0f23;
+  --color-bg-gradient-to: #1a1a3e;
+  --color-surface: #1a1a3e;
+  --color-muted: #252560;
+  --color-table-head: #252560;
+  --color-table-row-hover: rgba(99, 102, 241, 0.08);
+  --color-code-bg: #0f0f23;
+  --color-text: #e0e0ff;
+  --color-text-muted: #8080c0;
+  --color-text-label: #a0a0e0;
+  --color-border: #4040a0;
+  --color-primary: #6366f1;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(99, 102, 241, 0.2);
+  --color-success: #818cf8;
+  --color-success-soft: rgba(129, 140, 248, 0.2);
+  --color-success-fg: #818cf8;
+  --color-warn: #a78bfa;
+  --color-warn-soft: rgba(167, 139, 250, 0.2);
+  --color-warn-fg: #a78bfa;
+  --color-danger: #f472b6;
+  --color-badge-default-bg: #252560;
+  --color-badge-default-fg: #e0e0ff;
+  --color-focus-ring: rgba(99, 102, 241, 0.4);
+  --color-topbar: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #8080c0;
+  --color-nav-accent: #8b5cf6;
+  --shadow-card: 0 4px 20px rgba(99, 102, 241, 0.3);
+  --glow-primary: 0 0 20px rgba(99, 102, 241, 0.35);
+  --syntax-keyword: #6366f1;
+  --syntax-string: #818cf8;
+  --syntax-number: #a78bfa;
+  --syntax-comment: #8080c0;
+  --syntax-type: #f472b6;
+  --syntax-fn: #6366f1;
+  --syntax-error: #f472b6;
+}
+
+/* —— 赛博霓虹 · Cyberpunk Neon —— */
+:root[data-theme='cyberpunk-neon'] {
+  --color-bg: #0d0221;
+  --color-bg-gradient-from: #0d0221;
+  --color-bg-gradient-to: #1a0533;
+  --color-surface: #1a0a3e;
+  --color-muted: #2d0a5e;
+  --color-table-head: #2d0a5e;
+  --color-table-row-hover: rgba(255, 0, 255, 0.08);
+  --color-code-bg: #0d0221;
+  --color-text: #ffffff;
+  --color-text-muted: #e0e0ff;
+  --color-text-label: #c0c0ff;
+  --color-border: #ff00ff;
+  --color-primary: #ff00ff;
+  --color-primary-fg: #0d0221;
+  --color-primary-soft: rgba(255, 0, 255, 0.25);
+  --color-success: #00ff9f;
+  --color-success-soft: rgba(0, 255, 159, 0.25);
+  --color-success-fg: #00ff9f;
+  --color-warn: #ffff00;
+  --color-warn-soft: rgba(255, 255, 0, 0.25);
+  --color-warn-fg: #ffff00;
+  --color-danger: #ff0040;
+  --color-badge-default-bg: #2d0a5e;
+  --color-badge-default-fg: #ffffff;
+  --color-focus-ring: rgba(255, 0, 255, 0.5);
+  --color-topbar: #ff00ff;
+  --color-topbar-fg: #0d0221;
+  --color-sidebar-fg: #e0e0ff;
+  --color-nav-accent: #00ffff;
+  --shadow-card: 0 0 30px rgba(255, 0, 255, 0.3);
+  --glow-primary: 0 0 20px rgba(255, 0, 255, 0.5);
+  --syntax-keyword: #ff00ff;
+  --syntax-string: #00ff9f;
+  --syntax-number: #ffff00;
+  --syntax-comment: #e0e0ff;
+  --syntax-type: #00ffff;
+  --syntax-fn: #ff00ff;
+  --syntax-error: #ff0040;
+}
+
+/* —— 蓝图工程 · Blueprint —— */
+:root[data-theme='blueprint'] {
+  --color-bg: #0c2d48;
+  --color-bg-gradient-from: #0c2d48;
+  --color-bg-gradient-to: #14527a;
+  --color-surface: #145374;
+  --color-muted: #1a6090;
+  --color-table-head: #1a6090;
+  --color-table-row-hover: rgba(46, 140, 192, 0.1);
+  --color-code-bg: #0c2d48;
+  --color-text: #b1d4e0;
+  --color-text-muted: #8ab8c8;
+  --color-text-label: #a0c8d8;
+  --color-border: #2e8bc0;
+  --color-primary: #2e8bc0;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(46, 140, 192, 0.2);
+  --color-success: #57c7d3;
+  --color-success-soft: rgba(87, 199, 211, 0.2);
+  --color-success-fg: #57c7d3;
+  --color-warn: #f0b429;
+  --color-warn-soft: rgba(240, 180, 41, 0.2);
+  --color-warn-fg: #f0b429;
+  --color-danger: #e85d75;
+  --color-badge-default-bg: #1a6090;
+  --color-badge-default-fg: #b1d4e0;
+  --color-focus-ring: rgba(46, 140, 192, 0.4);
+  --color-topbar: #0c2d48;
+  --color-topbar-fg: #b1d4e0;
+  --color-sidebar-fg: #8ab8c8;
+  --color-nav-accent: #2e8bc0;
+  --shadow-card: 0 4px 16px rgba(12, 45, 72, 0.4);
+  --glow-primary: none;
+  --syntax-keyword: #2e8bc0;
+  --syntax-string: #57c7d3;
+  --syntax-number: #f0b429;
+  --syntax-comment: #8ab8c8;
+  --syntax-type: #57c7d3;
+  --syntax-fn: #2e8bc0;
+  --syntax-error: #e85d75;
+}
+
+/* —— Y2K镜面 · Y2K Chrome —— */
+:root[data-theme='y2k-chrome'] {
+  --color-bg: #dfe4ec;
+  --color-bg-gradient-from: #dfe4ec;
+  --color-bg-gradient-to: #eef1f6;
+  --color-surface: rgba(255, 255, 255, 0.72);
+  --color-muted: rgba(255, 255, 255, 0.5);
+  --color-table-head: rgba(255, 255, 255, 0.6);
+  --color-table-row-hover: rgba(138, 92, 255, 0.08);
+  --color-code-bg: rgba(200, 210, 225, 0.6);
+  --color-text: #1a1f2e;
+  --color-text-muted: #4a536a;
+  --color-text-label: #2a3040;
+  --color-border: rgba(120, 135, 170, 0.32);
+  --color-primary: #8a5cff;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(138, 92, 255, 0.15);
+  --color-success: #3ccfd8;
+  --color-success-soft: rgba(60, 207, 216, 0.15);
+  --color-success-fg: #3ccfd8;
+  --color-warn: #ff84c4;
+  --color-warn-soft: rgba(255, 132, 196, 0.15);
+  --color-warn-fg: #ff84c4;
+  --color-danger: #ff5c5c;
+  --color-badge-default-bg: rgba(255, 255, 255, 0.5);
+  --color-badge-default-fg: #2a3040;
+  --color-focus-ring: rgba(138, 92, 255, 0.4);
+  --color-topbar: linear-gradient(135deg, #dfe4ec, #c8d2e1);
+  --color-topbar-fg: #1a1f2e;
+  --color-sidebar-fg: #4a536a;
+  --color-nav-accent: #8a5cff;
+  --shadow-card: 0 12px 30px rgba(70, 90, 130, 0.22), 0 4px 8px rgba(0, 0, 0, 0.08);
+  --glow-primary: none;
+  --syntax-keyword: #8a5cff;
+  --syntax-string: #3ccfd8;
+  --syntax-number: #ff84c4;
+  --syntax-comment: #4a536a;
+  --syntax-type: #8a5cff;
+  --syntax-fn: #8a5cff;
+  --syntax-error: #ff5c5c;
+}
+
+/* —— 新粗野主义 · Neo-Brutalism —— */
+:root[data-theme='neo-brutalism'] {
+  --color-bg: #ffffff;
+  --color-bg-gradient-from: #ffffff;
+  --color-bg-gradient-to: #fef9c3;
+  --color-surface: #ffff00;
+  --color-muted: #fef08a;
+  --color-table-head: #fef08a;
+  --color-table-row-hover: rgba(0, 0, 0, 0.05);
+  --color-code-bg: #fef9c3;
+  --color-text: #000000;
+  --color-text-muted: #404040;
+  --color-text-label: #1a1a1a;
+  --color-border: #000000;
+  --color-primary: #000000;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(0, 0, 0, 0.08);
+  --color-success: #000000;
+  --color-success-soft: rgba(0, 0, 0, 0.05);
+  --color-success-fg: #000000;
+  --color-warn: #ff0000;
+  --color-warn-soft: rgba(255, 0, 0, 0.08);
+  --color-warn-fg: #ff0000;
+  --color-danger: #ff0000;
+  --color-badge-default-bg: #ffff00;
+  --color-badge-default-fg: #000000;
+  --color-focus-ring: rgba(0, 0, 0, 0.4);
+  --color-topbar: #ffff00;
+  --color-topbar-fg: #000000;
+  --color-sidebar-fg: #404040;
+  --color-nav-accent: #ff0000;
+  --shadow-card: 4px 4px 0 #000000;
+  --glow-primary: none;
+  --syntax-keyword: #ff0000;
+  --syntax-string: #000000;
+  --syntax-number: #000000;
+  --syntax-comment: #404040;
+  --syntax-type: #ff0000;
+  --syntax-fn: #000000;
+  --syntax-error: #ff0000;
+}
+
+/* —— CRT扫描线 · Retro TV CRT —— */
+:root[data-theme='retro-tv'] {
+  --color-bg: #2d2d2d;
+  --color-bg-gradient-from: #2d2d2d;
+  --color-bg-gradient-to: #3d3d3d;
+  --color-surface: #3d3d3d;
+  --color-muted: #4d4d4d;
+  --color-table-head: #4d4d4d;
+  --color-table-row-hover: rgba(255, 217, 61, 0.08);
+  --color-code-bg: #2d2d2d;
+  --color-text: #ffd93d;
+  --color-text-muted: #c9a227;
+  --color-text-label: #e6b91e;
+  --color-border: #5d5d5d;
+  --color-primary: #ffd93d;
+  --color-primary-fg: #2d2d2d;
+  --color-primary-soft: rgba(255, 217, 61, 0.2);
+  --color-success: #6bcb77;
+  --color-success-soft: rgba(107, 203, 119, 0.2);
+  --color-success-fg: #6bcb77;
+  --color-warn: #f0b429;
+  --color-warn-soft: rgba(240, 180, 41, 0.2);
+  --color-warn-fg: #f0b429;
+  --color-danger: #e85d75;
+  --color-badge-default-bg: #4d4d4d;
+  --color-badge-default-fg: #ffd93d;
+  --color-focus-ring: rgba(255, 217, 61, 0.4);
+  --color-topbar: #3d3d3d;
+  --color-topbar-fg: #ffd93d;
+  --color-sidebar-fg: #c9a227;
+  --color-nav-accent: #ffd93d;
+  --shadow-card: inset 0 0 60px rgba(0, 0, 0, 0.5);
+  --glow-primary: none;
+  --syntax-keyword: #ffd93d;
+  --syntax-string: #6bcb77;
+  --syntax-number: #f0b429;
+  --syntax-comment: #c9a227;
+  --syntax-type: #6bcb77;
+  --syntax-fn: #ffd93d;
+  --syntax-error: #e85d75;
+}
+
+/* —— 和风极简 · Japanese Minimal —— */
+:root[data-theme='japanese-minimal'] {
+  --color-bg: #faf9f6;
+  --color-bg-gradient-from: #faf9f6;
+  --color-bg-gradient-to: #f5f3ef;
+  --color-surface: #ffffff;
+  --color-muted: #f5f3ef;
+  --color-table-head: #f5f3ef;
+  --color-table-row-hover: rgba(196, 30, 58, 0.05);
+  --color-code-bg: #f5f3ef;
+  --color-text: #2c2c2c;
+  --color-text-muted: #5c5c5c;
+  --color-text-label: #3c3c3c;
+  --color-border: #d4cfc7;
+  --color-primary: #c41e3a;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: rgba(196, 30, 58, 0.1);
+  --color-success: #4a7c59;
+  --color-success-soft: rgba(74, 124, 89, 0.12);
+  --color-success-fg: #4a7c59;
+  --color-warn: #b8860b;
+  --color-warn-soft: rgba(184, 134, 11, 0.12);
+  --color-warn-fg: #b8860b;
+  --color-danger: #c41e3a;
+  --color-badge-default-bg: #f5f3ef;
+  --color-badge-default-fg: #3c3c3c;
+  --color-focus-ring: rgba(196, 30, 58, 0.25);
+  --color-topbar: #c41e3a;
+  --color-topbar-fg: #ffffff;
+  --color-sidebar-fg: #5c5c5c;
+  --color-nav-accent: #c41e3a;
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.04);
+  --glow-primary: none;
+  --syntax-keyword: #c41e3a;
+  --syntax-string: #4a7c59;
+  --syntax-number: #b8860b;
+  --syntax-comment: #5c5c5c;
+  --syntax-type: #4a7c59;
+  --syntax-fn: #c41e3a;
+  --syntax-error: #c41e3a;
+}
+
+/* —— 自定义（由用户 CSS 覆盖，以下为兜底）—— */
+:root[data-theme='custom'] {
+  --color-bg: #f8fafc;
+  --color-bg-gradient-from: #f8fafc;
+  --color-bg-gradient-to: #eff6ff;
+  --color-surface: #ffffff;
+  --color-muted: #f1f5f9;
+  --color-table-head: #f8fafc;
+  --color-table-row-hover: rgba(37, 99, 235, 0.06);
+  --color-code-bg: #f1f5f9;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-label: #475569;
+  --color-border: #e2e8f0;
+  --color-primary: #2563eb;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: #eff6ff;
+  --color-success: #059669;
+  --color-success-soft: #d1fae5;
+  --color-success-fg: #065f46;
+  --color-warn: #d97706;
+  --color-warn-soft: #fef3c7;
+  --color-warn-fg: #92400e;
+  --color-danger: #dc2626;
+  --color-badge-default-bg: #f1f5f9;
+  --color-badge-default-fg: #334155;
+  --color-focus-ring: rgba(37, 99, 235, 0.2);
+  --color-topbar: var(--color-surface);
+  --color-topbar-fg: var(--color-text);
+  --color-sidebar-fg: var(--color-text-label);
+  --color-nav-accent: var(--color-primary);
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --glow-primary: none;
+  --syntax-keyword: #2563eb;
+  --syntax-string: #059669;
+  --syntax-number: #d97706;
+  --syntax-comment: #64748b;
+  --syntax-type: #7c3aed;
+  --syntax-fn: #2563eb;
+  --syntax-error: #dc2626;
+}
+
+.code-block {
+  color: var(--syntax-string);
+  font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-size: 0.875rem;
+  border: 1px solid var(--color-border);
+}

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>电商助手</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand">
+        <img src="../icons/icon48.png" alt="" width="28" height="28" class="logo" />
+        <div>
+          <strong>电商助手</strong>
+          <span class="ver">v0.6</span>
+        </div>
+      </div>
+      <span id="conn-status" class="status-pill">未连接</span>
+    </header>
+
+    <nav class="tabs" role="tablist">
+      <button type="button" class="tab active" data-tab="connect">连接</button>
+      <button type="button" class="tab" data-tab="collect">采集</button>
+      <button type="button" class="tab" data-tab="publish">发布</button>
+      <button type="button" class="tab" data-tab="theme">主题</button>
+    </nav>
+
+    <!-- 连接 -->
+    <section class="tab-panel active" id="panel-connect">
+      <p class="lead">配置 B 站 API 后，采集与填表数据走真库；未配置时走演示 Mock。</p>
+      <label class="field">
+        <span>后台地址</span>
+        <input id="app-base" type="url" placeholder="http://localhost:3004" />
+      </label>
+      <label class="field">
+        <span>API 地址</span>
+        <input id="api-base" type="url" placeholder="http://127.0.0.1:8080" />
+      </label>
+      <label class="field">
+        <span>插件令牌</span>
+        <input id="ext-token" type="password" placeholder="B 站设置 → 复制 psa_…" autocomplete="off" />
+      </label>
+      <button type="button" id="btn-test-api" class="btn secondary">测试 API 连接</button>
+      <p id="api-test-msg" class="msg"></p>
+      <button type="button" id="btn-sync-cookies" class="btn secondary">同步当前站 Cookie</button>
+      <p id="cookie-status" class="msg"></p>
+    </section>
+
+    <!-- 采集 -->
+    <section class="tab-panel" id="panel-collect" hidden>
+      <p class="lead">在 1688 / 淘宝 / 天猫 商品详情页采集，上传到采集箱。</p>
+      <button type="button" id="btn-capture" class="btn primary">采集当前页</button>
+      <button type="button" id="btn-link" class="btn secondary">粘贴链接采集</button>
+      <div class="preview hidden" id="preview">
+        <p class="preview-label">采集预览</p>
+        <p id="preview-title" class="preview-title"></p>
+        <p id="preview-meta" class="msg"></p>
+        <button type="button" id="btn-upload" class="btn primary">上传到采集箱</button>
+      </div>
+    </section>
+
+    <!-- 发布 -->
+    <section class="tab-panel" id="panel-publish" hidden>
+      <p class="lead">在 B 站「发布中心」生成填表后，打开卖家后台新建页，点此填入。</p>
+      <label class="field">
+        <span>目标平台</span>
+        <select id="platform">
+          <option value="shopee">Shopee 草稿</option>
+          <option value="tiktok">TikTok Shop 草稿</option>
+          <option value="taobao">淘宝草稿</option>
+        </select>
+      </label>
+      <button type="button" id="btn-load-fill" class="btn secondary">从 API 拉取填表数据</button>
+      <div id="fill-preview" class="fill-card hidden">
+        <p class="fill-card-title">填表载荷预览 <span class="mock-tag">MOCK 面板</span></p>
+        <dl class="fill-dl" id="fill-dl"></dl>
+      </div>
+      <button type="button" id="btn-publish" class="btn primary">填入当前卖家页（DOM + 预览）</button>
+      <button type="button" id="btn-mock-only" class="btn secondary">仅打开 Mock 预览面板</button>
+      <p class="hint">步骤：发布中心「生成填表」→ 打开卖家后台「新建商品」→ 点上方按钮 → 左侧预览核对 → 平台内发布。</p>
+    </section>
+
+    <!-- 主题 -->
+    <section class="tab-panel" id="panel-theme" hidden>
+      <p class="lead">选择主题风格，同步到 Web 端。</p>
+      <div class="theme-grid" id="theme-grid">
+        <button type="button" class="theme-card" data-theme="trello-premium">
+          <div class="theme-preview">
+            <span class="theme-dot" style="background:#0079BF"></span>
+            <span class="theme-dot" style="background:#F7F7F7"></span>
+            <span class="theme-dot" style="background:#FFFFFF"></span>
+          </div>
+          <span class="theme-name">Trello 高级风</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="linear-dark">
+          <div class="theme-preview">
+            <span class="theme-dot" style="background:#5E6AD2"></span>
+            <span class="theme-dot" style="background:#0D0D0D"></span>
+            <span class="theme-dot" style="background:#1A1A1A"></span>
+          </div>
+          <span class="theme-name">Linear 极客风</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="monday-vibrant">
+          <div class="theme-preview">
+            <span class="theme-dot" style="background:#FF3D57"></span>
+            <span class="theme-dot" style="background:#FAFAFA"></span>
+            <span class="theme-dot" style="background:#FFFFFF"></span>
+          </div>
+          <span class="theme-name">Monday 活力风</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="enterprise-classic">
+          <div class="theme-preview">
+            <span class="theme-dot" style="background:#1E40AF"></span>
+            <span class="theme-dot" style="background:#F1F5F9"></span>
+            <span class="theme-dot" style="background:#FFFFFF"></span>
+          </div>
+          <span class="theme-name">企业商务风</span>
+        </button>
+      </div>
+      <p class="msg" id="theme-msg"></p>
+    </section>
+
+    <footer>
+      <a id="link-inbox" href="#" target="_blank" rel="noopener">打开采集箱</a>
+      <span>·</span>
+      <a id="link-publish" href="#" target="_blank" rel="noopener">发布中心</a>
+    </footer>
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "name": "yitang-diagram-pack",
+  "owner": {
+    "name": "tuerqidelvfanzi",
+    "email": "tuerqidelvfanzi@example.com"
+  },
+  "metadata": {
+    "description": "Mermaid 思考 + drawio 交付的图生成器",
+    "version": "1.0.0",
+    "homepage": "https://github.com/tuerqidelvfanzi/yitang-diagram-pack"
+  },
+  "plugins": [
+    {
+      "name": "yitang-diagram-pack",
+      "source": "./",
+      "description": "Mermaid 内部思考 + drawio 最终交付。支持数据流图/架构图/时序图/ER/状态机/流程图/C4 等 9 类图。",
+      "version": "1.0.0",
+      "author": {
+        "name": "tuerqidelvfanzi"
+      },
+      "license": "MIT",
+      "keywords": [
+        "drawio",
+        "mermaid",
+        "diagram",
+        "architecture",
+        "data-flow"
+      ],
+      "category": "productivity"
+    }
+  ]
+}

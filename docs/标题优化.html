@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>越南 Shopee 标题优化工作台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #ee4d2d;
+      --primary-dark: #cc3625;
+      --secondary: #f5f5f5;
+      --text: #333;
+      --text-light: #666;
+      --border: #e0e0e0;
+      --success: #4caf50;
+      --warning: #ff9800;
+      --danger: #f44336;
+      --info: #2196f3;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--secondary); min-height: 100vh; }
+
+    /* Header */
+    .header { background: linear-gradient(135deg, #ee4d2d 0%, #ff6b4a 100%); color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header h1 { font-size: 1.5em; font-weight: 600; }
+    .header-badge { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 12px; font-size: 0.8em; }
+    .target-selector { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 8px; font-size: 0.95em; cursor: pointer; }
+    .target-selector option { color: #333; }
+
+    /* Main Layout */
+    .main-container { display: flex; max-width: 1400px; margin: 20px auto; gap: 20px; padding: 0 20px; }
+    .editor-panel { flex: 1; background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden; }
+    .steps-panel { width: 360px; background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden; height: fit-content; position: sticky; top: 80px; }
+
+    /* Panel Header */
+    .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .panel-header h2 { font-size: 1.1em; color: var(--text); font-weight: 600; }
+    .panel-header .icon { width: 28px; height: 28px; background: var(--primary); color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.9em; }
+    .panel-body { padding: 20px; }
+
+    /* Title Input Section */
+    .title-section { margin-bottom: 24px; }
+    .title-label { font-weight: 500; color: var(--text); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .title-label .badge { background: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; }
+    .title-input { width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; font-size: 1em; transition: border-color 0.3s; min-height: 60px; resize: vertical; font-family: inherit; }
+    .title-input:focus { outline: none; border-color: var(--primary); }
+    .title-stats { display: flex; gap: 16px; margin-top: 8px; font-size: 0.85em; color: var(--text-light); }
+    .title-stats .stat { display: flex; align-items: center; gap: 4px; }
+    .title-stats .stat.warning { color: var(--warning); }
+    .title-stats .stat.danger { color: var(--danger); }
+    .title-stats .stat.success { color: var(--success); }
+
+    /* Keywords Section */
+    .keywords-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; }
+    .keyword-chip { padding: 6px 12px; border-radius: 16px; font-size: 0.85em; display: flex; align-items: center; gap: 4px; }
+    .keyword-chip.keep { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+    .keyword-chip.remove { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+    .keyword-chip .icon { font-size: 0.9em; }
+
+    /* Output Section */
+    .output-section { background: #f8f9fa; border-radius: 8px; padding: 16px; margin-top: 20px; border: 2px solid var(--border); }
+    .output-title { font-weight: 600; color: var(--text); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .output-title .vn-badge { background: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; }
+    .output-text { font-size: 1.1em; color: var(--text); line-height: 1.6; padding: 12px; background: white; border-radius: 6px; border: 1px solid var(--border); min-height: 50px; }
+    .output-text.empty { color: #999; font-style: italic; }
+
+    /* Warning Box */
+    .warning-box { background: #fff3e0; border: 1px solid #ffcc80; border-radius: 8px; padding: 12px 16px; margin-top: 12px; display: flex; align-items: flex-start; gap: 10px; }
+    .warning-box .icon { color: var(--warning); font-size: 1.2em; }
+    .warning-box .text { font-size: 0.9em; color: #e65100; line-height: 1.5; }
+
+    /* Step List */
+    .step-list { padding: 0; }
+    .step-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border); transition: background 0.2s; }
+    .step-item:last-child { border-bottom: none; }
+    .step-item:hover { background: #fafafa; }
+    .step-item.active { background: #fff3e0; }
+    .step-item.completed { background: #e8f5e9; }
+    .step-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85em; flex-shrink: 0; }
+    .step-item.pending .step-icon { background: #e0e0e0; color: #999; }
+    .step-item.active .step-icon { background: var(--primary); color: white; }
+    .step-item.completed .step-icon { background: var(--success); color: white; }
+    .step-content { flex: 1; }
+    .step-content .name { font-weight: 500; color: var(--text); font-size: 0.95em; }
+    .step-content .desc { font-size: 0.8em; color: var(--text-light); margin-top: 2px; }
+    .step-item.completed .step-content .name { color: #2e7d32; }
+
+    /* Action Buttons */
+    .action-bar { display: flex; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border-radius: 8px; font-size: 1em; font-weight: 500; cursor: pointer; transition: all 0.3s; border: none; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(238,77,45,0.3); }
+    .btn-secondary { background: #f0f0f0; color: var(--text); }
+    .btn-secondary:hover { background: #e0e0e0; }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #43a047; }
+    .btn-sm { padding: 8px 16px; font-size: 0.9em; }
+
+    /* Process Log */
+    .process-log { background: #1a1a2e; border-radius: 8px; padding: 16px; margin-top: 16px; max-height: 200px; overflow-y: auto; font-family: "Consolas", monospace; font-size: 0.85em; }
+    .log-entry { padding: 4px 0; border-bottom: 1px solid #333; color: #0f0; }
+    .log-entry:last-child { border-bottom: none; }
+    .log-entry.info { color: #4fc3f7; }
+    .log-entry.success { color: #81c784; }
+    .log-entry.warning { color: #ffb74d; }
+    .log-entry.error { color: #e57373; }
+
+    /* Result Card */
+    .result-card { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 12px; padding: 24px; margin-top: 20px; text-align: center; }
+    .result-card .emoji { font-size: 3em; margin-bottom: 12px; }
+    .result-card h3 { color: #2e7d32; margin-bottom: 8px; }
+    .result-card .final-title { background: white; padding: 16px; border-radius: 8px; margin-top: 16px; font-size: 1.1em; color: var(--text); border: 2px solid #a5d6a7; }
+    .result-card .char-count { font-size: 0.9em; color: #2e7d32; margin-top: 8px; }
+
+    /* Translation Table */
+    .translation-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.9em; }
+    .translation-table th, .translation-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    .translation-table th { background: #f5f5f5; font-weight: 500; color: var(--text); }
+    .translation-table td { color: var(--text-light); }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #333; color: white; padding: 14px 20px; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.3); z-index: 1000; transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+    .toast.warning { background: var(--warning); }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .main-container { flex-direction: column; }
+      .steps-panel { width: 100%; position: static; }
+      .keywords-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <h1>📦 越南 Shopee 标题优化</h1>
+      <span class="header-badge">≤20字符</span>
+    </div>
+    <select class="target-selector" id="target-market">
+      <option value="vn-shopee">🇻🇳 越南 Shopee</option>
+      <option value="th-tiktok">🇹🇭 泰国 TikTok</option>
+      <option value="ph-shopee">🇵🇭 菲律宾 Shopee</option>
+    </select>
+  </header>
+
+  <div class="main-container">
+    <!-- Editor Panel -->
+    <div class="editor-panel">
+      <div class="panel-header">
+        <h2>标题编辑器</h2>
+        <div class="icon">✏️</div>
+      </div>
+      <div class="panel-body">
+
+        <!-- Step 1: Original Title -->
+        <div class="title-section">
+          <div class="title-label">
+            <span>📥 原始标题</span>
+            <span class="badge">来自淘宝/拼多多</span>
+          </div>
+          <textarea class="title-input" id="original-title" placeholder="粘贴原始标题，例如：可爱蓝色小熊熊图案卡通印花休闲百搭纯棉短袖T恤儿童韩版">可爱蓝色小熊熊图案卡通印花休闲百搭纯棉短袖T恤儿童韩版</textarea>
+          <div class="title-stats">
+            <span class="stat" id="char-count">中文字符：37</span>
+            <span class="stat" id="cjk-warning"></span>
+          </div>
+        </div>
+
+        <!-- Step 2: Keywords Extraction -->
+        <div class="title-section">
+          <div class="title-label">
+            <span>🔍 关键词提取</span>
+          </div>
+          <div class="keywords-grid" id="keywords-grid">
+            <!-- Keywords will be rendered here -->
+          </div>
+        </div>
+
+        <!-- Step 3: Chinese Compression -->
+        <div class="title-section">
+          <div class="title-label">
+            <span>📝 压缩后（汉字 ≤10）</span>
+          </div>
+          <div class="output-text" id="compressed-title">等待处理...</div>
+          <div class="warning-box" id="compression-warning" style="display:none;">
+            <span class="icon">⚠️</span>
+            <span class="text" id="compression-msg"></span>
+          </div>
+        </div>
+
+        <!-- Step 4: Vietnamese Translation -->
+        <div class="title-section">
+          <div class="title-label">
+            <span>🌐 越南语翻译</span>
+          </div>
+          <table class="translation-table" id="translation-table">
+            <thead>
+              <tr><th>中文</th><th>越南语</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <!-- Step 5: Final Output -->
+        <div class="output-section">
+          <div class="output-title">
+            <span>✅ 越南站标题</span>
+            <span class="vn-badge">越南 Shopee</span>
+          </div>
+          <div class="output-text empty" id="final-title">输入原始标题后点击「开始优化」</div>
+          <div class="title-stats" style="margin-top:8px;">
+            <span class="stat" id="final-char-count">字符数：--</span>
+          </div>
+        </div>
+
+        <!-- Step 6: Banned Words Check -->
+        <div class="warning-box" id="banned-warning" style="display:none; margin-top:16px;">
+          <span class="icon">🚫</span>
+          <span class="text" id="banned-msg">检测到违禁词：Nike, Adidas</span>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+          <button class="btn btn-primary" onclick="runOptimization()">▶ 开始优化</button>
+          <button class="btn btn-secondary" onclick="resetAll()">🔄 重置</button>
+          <button class="btn btn-success" onclick="copyResult()">📋 复制结果</button>
+        </div>
+
+        <!-- Process Log -->
+        <div class="process-log" id="process-log" style="display:none;">
+          <div class="log-entry info">[系统] 准备开始优化...</div>
+        </div>
+
+        <!-- Result Card -->
+        <div class="result-card" id="result-card" style="display:none;">
+          <div class="emoji">🎉</div>
+          <h3>优化完成！</h3>
+          <p style="color:#666;font-size:0.9em;">标题已符合越南 Shopee 规范</p>
+          <div class="final-title" id="result-title"></div>
+          <div class="char-count" id="result-char-count"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Steps Panel -->
+    <div class="steps-panel">
+      <div class="panel-header">
+        <h2>优化步骤</h2>
+        <div class="icon">📋</div>
+      </div>
+      <div class="step-list">
+        <div class="step-item pending" id="step-1">
+          <div class="step-icon">1</div>
+          <div class="step-content">
+            <div class="name">关键词提取</div>
+            <div class="desc">品类词、材质词、颜色词</div>
+          </div>
+        </div>
+        <div class="step-item pending" id="step-2">
+          <div class="step-icon">2</div>
+          <div class="step-content">
+            <div class="name">汉字压缩</div>
+            <div class="desc">汉字数量压缩到 ≤10</div>
+          </div>
+        </div>
+        <div class="step-item pending" id="step-3">
+          <div class="step-icon">3</div>
+          <div class="step-content">
+            <div class="name">越南语翻译</div>
+            <div class="desc">中→越南语本地化</div>
+          </div>
+        </div>
+        <div class="step-item pending" id="step-4">
+          <div class="step-icon">4</div>
+          <div class="step-content">
+            <div class="name">字符截断</div>
+            <div class="desc">确保 ≤20 字符</div>
+          </div>
+        </div>
+        <div class="step-item pending" id="step-5">
+          <div class="step-icon">5</div>
+          <div class="step-content">
+            <div class="name">违禁词检测</div>
+            <div class="desc">品牌词、国内标识</div>
+          </div>
+        </div>
+        <div class="step-item pending" id="step-6">
+          <div class="step-icon">✓</div>
+          <div class="step-content">
+            <div class="name">输出结果</div>
+            <div class="desc">生成优化后标题</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Translation Dictionary
+    const translations = {
+      'T恤': 'Thun',
+      '短袖': 'Tay Ngắn',
+      '纯棉': 'Cotton',
+      '儿童': 'Trẻ Em',
+      '男童': 'Bé Trai',
+      '女童': 'Bé Gái',
+      '蓝色': 'Xanh Dương',
+      '白色': 'Trắng',
+      '黑色': 'Đen',
+      '粉色': 'Hồng',
+      '绿色': 'Xanh Lá',
+      '黄色': 'Vàng',
+      '红色': 'Đỏ',
+      '灰色': 'Xám',
+      '可爱': 'Dễ Thương',
+      '卡通': 'Hoạt Hình',
+      '印花': 'Họa Tiết',
+      '休闲': 'Thư Giãn',
+      '百搭': 'Đa Năng',
+      '宽松': 'Rộng',
+      '修身': ' Ôm',
+      '韩版': 'Hàn Quốc',
+      '夏季': 'Hè',
+      '新款': 'Mới',
+      '潮流': 'Thời Thượng',
+      '透气': 'Thoáng Khí',
+      '小熊': 'Gấu',
+      '图案': 'Họa Tiết',
+      '上衣': 'Áo'
+    };
+
+    // Banned Words
+    const bannedWords = ['Nike', 'Adidas', 'Gucci', 'Apple', 'Samsung', '华为', '小米', '苹果', '三星', 'Made in China', '3C认证'];
+
+    // Keyword Categories
+    const keywordCategories = {
+      'T恤': { type: 'keep', category: '品类' },
+      '短袖': { type: 'keep', category: '款式' },
+      '纯棉': { type: 'keep', category: '材质' },
+      '儿童': { type: 'keep', category: '人群' },
+      '男童': { type: 'keep', category: '人群' },
+      '女童': { type: 'keep', category: '人群' },
+      '蓝色': { type: 'keep', category: '颜色' },
+      '白色': { type: 'keep', category: '颜色' },
+      '黑色': { type: 'keep', category: '颜色' },
+      '粉色': { type: 'keep', category: '颜色' },
+      '绿色': { type: 'keep', category: '颜色' },
+      '小熊': { type: 'keep', category: '特色' },
+      '卡通': { type: 'remove', category: '风格' },
+      '印花': { type: 'remove', category: '风格' },
+      '休闲': { type: 'remove', category: '风格' },
+      '百搭': { type: 'remove', category: '风格' },
+      '宽松': { type: 'remove', category: '版型' },
+      '韩版': { type: 'remove', category: '风格' },
+      '夏季': { type: 'remove', category: '季节' },
+      '新款': { type: 'remove', category: '状态' },
+      '潮流': { type: 'remove', category: '风格' },
+      '可爱': { type: 'remove', category: '风格' },
+      '图案': { type: 'remove', category: '风格' },
+      '上衣': { type: 'remove', category: '品类' }
+    };
+
+    // Toast notification
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show ' + type;
+      setTimeout(() => { toast.className = 'toast'; }, 3000);
+    }
+
+    // Add log entry
+    function addLog(message, type = 'info') {
+      const logArea = document.getElementById('process-log');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry ' + type;
+      entry.textContent = '[系统] ' + message;
+      logArea.appendChild(entry);
+      logArea.scrollTop = logArea.scrollHeight;
+    }
+
+    // Update step status
+    function updateStep(stepNum, status) {
+      const step = document.getElementById('step-' + stepNum);
+      step.className = 'step-item ' + status;
+      if (status === 'completed') {
+        step.querySelector('.step-icon').textContent = '✓';
+      } else if (status === 'active') {
+        step.querySelector('.step-icon').textContent = stepNum;
+      }
+    }
+
+    // Count Chinese characters
+    function countCJK(text) {
+      return (text.match(/[一-鿿]/g) || []).length;
+    }
+
+    // Extract keywords from title
+    function extractKeywords(title) {
+      const keywords = [];
+      for (const keyword of Object.keys(keywordCategories)) {
+        if (title.includes(keyword)) {
+          keywords.push({
+            word: keyword,
+            ...keywordCategories[keyword]
+          });
+        }
+      }
+      return keywords;
+    }
+
+    // Compress title
+    function compressTitle(title, maxCJK = 10) {
+      // Keep: 品类词、材质词、颜色词、人群词
+      const keepTypes = ['品类', '材质', '颜色', '人群'];
+      const keep = [];
+      const remove = [];
+
+      const keywords = extractKeywords(title);
+      keywords.forEach(k => {
+        if (keepTypes.includes(k.category)) {
+          keep.push(k.word);
+        } else {
+          remove.push(k.word);
+        }
+      });
+
+      let compressed = keep.join('');
+      let cjkCount = countCJK(compressed);
+
+      // If still too long, further compress
+      if (cjkCount > maxCJK) {
+        // Keep first 10 characters
+        compressed = compressed.substring(0, maxCJK);
+        cjkCount = maxCJK;
+      }
+
+      return {
+        compressed,
+        cjkCount,
+        keep,
+        remove,
+        warning: cjkCount > 9 ? `汉字数量${cjkCount}字，建议压缩到9字以内` : null
+      };
+    }
+
+    // Translate to Vietnamese
+    function translateToVietnamese(text) {
+      let result = text;
+      for (const [cn, vn] of Object.entries(translations)) {
+        result = result.replace(new RegExp(cn, 'g'), vn);
+      }
+      return result;
+    }
+
+    // Truncate to max characters
+    function truncateToLimit(text, maxLen = 20) {
+      if (text.length <= maxLen) return { text, truncated: false };
+
+      // Split into words
+      const words = text.split(' ');
+      let result = [];
+      let charCount = 0;
+
+      for (const word of words) {
+        if (charCount + word.length + (result.length > 0 ? 1 : 0) <= maxLen) {
+          result.push(word);
+          charCount += word.length;
+        } else {
+          break;
+        }
+      }
+
+      return {
+        text: result.join(' '),
+        truncated: true,
+        removed: words.slice(result.length).join(' ')
+      };
+    }
+
+    // Check banned words
+    function checkBannedWords(title) {
+      const found = [];
+      for (const word of bannedWords) {
+        if (title.toLowerCase().includes(word.toLowerCase())) {
+          found.push(word);
+        }
+      }
+      return found;
+    }
+
+    // Main optimization function
+    async function runOptimization() {
+      const original = document.getElementById('original-title').value.trim();
+      if (!original) {
+        showToast('请输入原始标题', 'error');
+        return;
+      }
+
+      // Show log area
+      document.getElementById('process-log').style.display = 'block';
+      document.getElementById('process-log').innerHTML = '';
+      document.getElementById('result-card').style.display = 'none';
+
+      // Update char count
+      const cjkCount = countCJK(original);
+      document.getElementById('char-count').textContent = `中文字符：${cjkCount}`;
+
+      const cjkWarning = document.getElementById('cjk-warning');
+      if (cjkCount > 15) {
+        cjkWarning.textContent = '⚠️ 必须压缩';
+        cjkWarning.className = 'stat danger';
+      } else if (cjkCount > 9) {
+        cjkWarning.textContent = '⚠️ 建议压缩';
+        cjkWarning.className = 'stat warning';
+      } else {
+        cjkWarning.textContent = '✓ 符合要求';
+        cjkWarning.className = 'stat success';
+      }
+
+      // Step 1: Extract Keywords
+      updateStep(1, 'active');
+      addLog('开始提取关键词...', 'info');
+      await delay(500);
+
+      const keywords = extractKeywords(original);
+      const keywordsGrid = document.getElementById('keywords-grid');
+      keywordsGrid.innerHTML = '';
+
+      const keepWords = keywords.filter(k => k.type === 'keep');
+      const removeWords = keywords.filter(k => k.type === 'remove');
+
+      keepWords.forEach(k => {
+        keywordsGrid.innerHTML += `<div class="keyword-chip keep"><span class="icon">✓</span>${k.word} <small>(${k.category})</small></div>`;
+      });
+      removeWords.forEach(k => {
+        keywordsGrid.innerHTML += `<div class="keyword-chip remove"><span class="icon">✕</span>${k.word} <small>(${k.category})</small></div>`;
+      });
+
+      updateStep(1, 'completed');
+      addLog(`提取完成：保留${keepWords.length}个，删除${removeWords.length}个`, 'success');
+      await delay(500);
+
+      // Step 2: Compress
+      updateStep(2, 'active');
+      addLog('开始压缩汉字...', 'info');
+      await delay(500);
+
+      const { compressed, cjkCount: newCount, keep, remove, warning } = compressTitle(original);
+      document.getElementById('compressed-title').textContent = compressed;
+      document.getElementById('compressed-title').classList.remove('empty');
+
+      const compWarning = document.getElementById('compression-warning');
+      if (warning) {
+        compWarning.style.display = 'flex';
+        document.getElementById('compression-msg').textContent = warning;
+        addLog(warning, 'warning');
+      } else {
+        compWarning.style.display = 'none';
+      }
+
+      updateStep(2, 'completed');
+      addLog(`压缩完成：${original.length}字 → ${compressed.length}字`, 'success');
+      await delay(500);
+
+      // Step 3: Translate
+      updateStep(3, 'active');
+      addLog('开始越南语翻译...', 'info');
+      await delay(500);
+
+      const translated = translateToVietnamese(compressed);
+      const tableBody = document.querySelector('#translation-table tbody');
+      tableBody.innerHTML = '';
+
+      keep.forEach(word => {
+        const vn = translations[word] || '?';
+        tableBody.innerHTML += `<tr><td>${word}</td><td>${vn}</td></tr>`;
+      });
+
+      updateStep(3, 'completed');
+      addLog(`翻译完成：${translated}`, 'success');
+      await delay(500);
+
+      // Step 4: Truncate
+      updateStep(4, 'active');
+      addLog('检查字符限制（≤20）...', 'info');
+      await delay(500);
+
+      const { text: truncated, truncated: wasTruncated, removed } = truncateToLimit(translated, 20);
+
+      updateStep(4, 'completed');
+      if (wasTruncated) {
+        addLog(`截断完成：移除"${removed}"`, 'warning');
+      } else {
+        addLog('字符数符合要求 ✓', 'success');
+      }
+      await delay(500);
+
+      // Step 5: Banned Words Check
+      updateStep(5, 'active');
+      addLog('检查违禁词...', 'info');
+      await delay(500);
+
+      const bannedFound = checkBannedWords(original);
+      const bannedWarning = document.getElementById('banned-warning');
+
+      if (bannedFound.length > 0) {
+        bannedWarning.style.display = 'flex';
+        document.getElementById('banned-msg').textContent = `检测到违禁词：${bannedFound.join(', ')}`;
+        addLog(`警告：发现违禁词 ${bannedFound.join(', ')}`, 'error');
+      } else {
+        bannedWarning.style.display = 'none';
+        addLog('未检测到违禁词 ✓', 'success');
+      }
+
+      updateStep(5, 'completed');
+      await delay(500);
+
+      // Step 6: Output
+      updateStep(6, 'active');
+      addLog('生成最终标题...', 'info');
+      await delay(500);
+
+      const finalTitle = truncated;
+      document.getElementById('final-title').textContent = finalTitle;
+      document.getElementById('final-title').classList.remove('empty');
+      document.getElementById('final-char-count').textContent = `字符数：${finalTitle.length}`;
+
+      updateStep(6, 'completed');
+      addLog(`优化完成！最终标题：${finalTitle}`, 'success');
+
+      // Show result card
+      document.getElementById('result-title').textContent = finalTitle;
+      document.getElementById('result-char-count').textContent = `${finalTitle.length} 字符 ✓`;
+      document.getElementById('result-card').style.display = 'block';
+
+      showToast('标题优化完成！', 'success');
+    }
+
+    // Reset all
+    function resetAll() {
+      document.getElementById('original-title').value = '';
+      document.getElementById('keywords-grid').innerHTML = '';
+      document.getElementById('compressed-title').textContent = '等待处理...';
+      document.getElementById('compressed-title').classList.add('empty');
+      document.getElementById('compression-warning').style.display = 'none';
+      document.querySelector('#translation-table tbody').innerHTML = '';
+      document.getElementById('final-title').textContent = '输入原始标题后点击「开始优化」';
+      document.getElementById('final-title').classList.add('empty');
+      document.getElementById('final-char-count').textContent = '字符数：--';
+      document.getElementById('banned-warning').style.display = 'none';
+      document.getElementById('process-log').style.display = 'none';
+      document.getElementById('result-card').style.display = 'none';
+      document.getElementById('char-count').textContent = '中文字符：0';
+      document.getElementById('cjk-warning').textContent = '';
+
+      // Reset steps
+      for (let i = 1; i <= 6; i++) {
+        updateStep(i, 'pending');
+      }
+
+      showToast('已重置', 'info');
+    }
+
+    // Copy result
+    function copyResult() {
+      const result = document.getElementById('final-title').textContent;
+      if (result && !result.includes('输入原始标题')) {
+        navigator.clipboard.writeText(result).then(() => {
+          showToast('已复制到剪贴板', 'success');
+        });
+      } else {
+        showToast('没有可复制的内容', 'warning');
+      }
+    }
+
+    // Delay helper
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Listen to input changes
+    document.getElementById('original-title').addEventListener('input', function() {
+      const cjkCount = countCJK(this.value);
+      document.getElementById('char-count').textContent = `中文字符：${cjkCount}`;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+@import './styles/themes.css';
+@import './styles/theme-presets.css';
+
+@theme {
+  --font-sans: 'Segoe UI', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.text-label {
+  color: var(--color-text-label);
+}
+
+.bg-app-gradient {
+  background: linear-gradient(
+    to bottom right,
+    var(--color-bg-gradient-from),
+    var(--color-bg-gradient-to)
+  );
+}
+
+.bg-surface {
+  background: var(--color-surface);
+}
+
+.bg-muted {
+  background: var(--color-muted);
+}
+
+.bg-table-head {
+  background: var(--color-table-head);
+}
+
+.bg-code {
+  background: var(--color-code-bg);
+}
+
+.text-danger {
+  color: var(--color-danger);
+}

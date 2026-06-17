@@ -1,0 +1,47 @@
+{
+  "version": "1.0.0",
+  "platform": "tiktok",
+  "hosts": [
+    "seller.tiktokglobalshop.com",
+    "seller-us.tiktok.com",
+    "seller.tiktokshopglobalselling.com"
+  ],
+  "title": [
+    "input[data-testid=\"product-name-input\"]",
+    "input[placeholder*=\"Product name\" i]",
+    "input[name=\"productName\"]",
+    "textarea[data-testid*=\"title\" i]"
+  ],
+  "price": [
+    "input[data-testid=\"price-input\"]",
+    "input[name=\"price\"]",
+    "input[placeholder*=\"Price\" i]"
+  ],
+  "stock": [
+    "input[data-testid=\"stock-input\"]",
+    "input[name=\"quantity\"]"
+  ],
+  "description": [
+    "textarea[data-testid=\"description-input\"]",
+    "div[contenteditable=\"true\"][data-testid*=\"description\"]"
+  ],
+  "brand": [
+    "input[data-testid=\"brand-input\"]",
+    "[data-testid=\"brand-selector\"]"
+  ],
+  "logistics": {
+    "weight": ["input[name=\"weight\"]", "input[data-testid*=\"weight\" i]"],
+    "length": ["input[name=\"length\"]"],
+    "width": ["input[name=\"width\"]"],
+    "height": ["input[name=\"height\"]"]
+  },
+  "mainImage": [
+    "input[type=\"file\"][accept*=\"image\"]",
+    "[data-testid=\"upload-image\"] input[type=\"file\"]"
+  ],
+  "skuTable": [
+    "[data-testid=\"sku-table\"]",
+    ".product-sku-table"
+  ],
+  "notes": "TikTok Shop 卖家中心；优先 DOM 填表，Open API 作 fallback；ADS Power 指纹浏览器 gate 见 LISTING_PUBLISH_IMPLEMENTATION.md"
+}

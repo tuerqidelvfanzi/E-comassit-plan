@@ -1,0 +1,33 @@
+name: Web 任务 (B)
+description: web/ 采集箱、工作台、设置、API
+title: "[web] "
+labels:
+  - web
+body:
+  - type: markdown
+    attributes:
+      value: |
+        负责人：**B · Web** · 目录 `web/` only
+        契约：`docs/COLLECT_SCHEMA.md`
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: 范围
+      options:
+        - label: 采集箱 / inboxStore
+        - label: 工作台
+        - label: 设置 / 大模型
+        - label: collect-jobs API
+        - label: 部署 / CI
+  - type: textarea
+    id: sample-json
+    attributes:
+      label: 用于测试的 NormalizedProduct（若测导入）
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 完成检查
+      options:
+        - label: collectTypes 与 Schema 一致
+        - label: 未修改 extension/（非契约 PR）
+        - label: npm run lint && npm run build 通过

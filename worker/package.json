@@ -1,0 +1,13 @@
+{
+  "name": "ecommerce-assistant-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Collect Worker CLI — 调用 API 批量任务（Playwright 在 API 进程内执行）",
+  "scripts": {
+    "run": "tsx src/cli.ts"
+  },
+  "dependencies": {
+    "tsx": "^4.19.3"
+  }
+}
