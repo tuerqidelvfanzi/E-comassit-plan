@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Download, Globe, Inbox, PenLine, Send } from 'lucide-react';
+import { Download, Globe, Inbox, Sparkles, FileText } from 'lucide-react';
 import { downloadExtensionZip } from '../lib/extension';
 
 type Step = {
@@ -11,39 +11,48 @@ type Step = {
   button?: { label: string; onClick: () => void };
 };
 
+/**
+ * 当前展示范围（会议 12:00-17:00 共识）的标准作业流程：
+ *   1. 安装插件 / 选数据源
+ *   2. 采集数据（链接 / 批量 / 插件详情页）
+ *   3. 数据入库 → 采集箱
+ *   4. 后端 Skill 分析 → 选品 / 竞品分析 / 标题优化
+ *   5. 输出结论（选品报告 / 竞品分析 / 优化后标题）
+ */
 const steps: Step[] = [
   {
     n: 1,
-    title: '安装插件',
-    desc: '在设置页点击「下载插件」，解压后于 Chrome 扩展程序页加载已解压项。',
+    title: '安装插件或选择采集源',
+    desc: '下载浏览器插件并安装，或使用链接直采、批量采集作为数据源。',
     icon: Download,
     button: { label: '下载插件', onClick: downloadExtensionZip },
   },
   {
     n: 2,
-    title: '登录目标网站并采集',
-    desc: '打开 1688 / 淘宝等商品页，登录账号后点击插件「采集当前页」并上传到采集箱。',
+    title: '采集商品数据',
+    desc: '插件：在 1688 / 淘宝详情页点击「采集当前页」。链接：粘贴商品链接直采。批量：榜单/搜索页批量入库。',
     icon: Globe,
-  },
-  {
-    n: 3,
-    title: '回到后台采集箱编辑',
-    desc: '在本站采集箱查看刚采集的商品，进入处理工作台做规则与 LLM 优化。',
-    icon: Inbox,
     link: { label: '打开采集箱', to: '/app/inbox' },
   },
   {
+    n: 3,
+    title: '数据进入采集箱',
+    desc: '插件/链接/批量采集的商品数据自动入库，可在采集箱查看、筛选与导出。',
+    icon: Inbox,
+    link: { label: '查看采集箱', to: '/app/inbox' },
+  },
+  {
     n: 4,
-    title: '发布到各站草稿箱',
-    desc: '处理完成后在发布中心创建任务，用插件在 Shopee / TikTok / 淘宝卖家后台填入草稿。',
-    icon: PenLine,
-    link: { label: '发布中心', to: '/app/publish' },
+    title: '后端 Skill 分析',
+    desc: '后端按既定 Skill 流程逐步执行：选品维度评估 → 标题规则优化 → 竞品信息抽取，得出结论。',
+    icon: Sparkles,
+    link: { label: '进入选品', to: '/app/insights' },
   },
   {
     n: 5,
-    title: '在目标网站正式发布',
-    desc: '登录对应平台卖家中心，检查草稿内容后点击平台内的「发布」完成上架。',
-    icon: Send,
+    title: '输出结论',
+    desc: '输出选品报告（值得推广候选）、优化后的上架标题、竞品分析结论，可导出或继续处理。',
+    icon: FileText,
   },
 ];
 

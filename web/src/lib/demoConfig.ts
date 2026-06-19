@@ -7,31 +7,32 @@ export const isDemoMode = (): boolean => {
 
 import type { NavGroup } from '../v2/nav';
 
+/**
+ * 演示模式菜单 - 与 v3NavGroups 保持一致的范围：
+ * 3 大核心功能（选品/竞品分析/标题优化）+ 支撑功能（采集箱/链接直采/批量采集/Dashboard）
+ */
 export const demoNavGroups: NavGroup[] = [
+  { title: '工作台', icon: '🏠', items: [
+    { to: '/app', label: '总览', end: true, icon: '🏠' },
+  ]},
+  { title: '选品中心', icon: '📊', items: [
+    { to: '/app/insights', label: '选品', icon: '🎯' },
+    { to: '/app/competitors', label: '竞品分析', icon: '🔍' },
+  ]},
   { title: '采集中心', icon: '📦', items: [
     { to: '/app/inbox', label: '采集箱', icon: '📥' },
     { to: '/app/link-collect', label: '链接直采', icon: '🔗' },
+    { to: '/app/batch-collect', label: '批量采集', icon: '⚡' },
   ]},
-  { title: '工作台', icon: '⚙️', items: [
-    { to: '/app', label: '处理管线', end: true, icon: '🔄' },
+  { title: '处理中心', icon: '✏️', items: [
     { to: '/app/title-optimization', label: '标题优化', icon: '✏️' },
-  ]},
-  { title: '看板', icon: '📊', items: [
-    { to: '/app/insights', label: '选品洞察', icon: '💡' },
-    { to: '/app/publish', label: '发布队列', icon: '📤' },
-  ]},
-  { title: '配置', icon: '🔧', items: [
-    { to: '/app/templates', label: '类目模板', icon: '📋' },
-    { to: '/app/settings/themes', label: '主题风格', icon: '🎨' },
-  ]},
-  { title: '系统', icon: '⚡', items: [
-    { to: '/app/settings', label: 'LLM配置', icon: '🤖' },
   ]},
 ];
 
 export const DEMO_ROUTES = new Set([
-  '/', '/app', '/app/inbox', '/app/link-collect',
-  '/app/insights', '/app/publish', '/app/title-optimization',
-  '/app/templates', '/app/settings/themes', '/app/settings',
+  '/', '/app',
+  '/app/insights', '/app/competitors',
+  '/app/inbox', '/app/link-collect', '/app/batch-collect',
+  '/app/title-optimization',
   '/login', '/register',
 ]);

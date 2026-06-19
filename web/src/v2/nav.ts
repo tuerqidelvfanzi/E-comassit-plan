@@ -6,14 +6,33 @@ export type NavGroup = {
   items: NavItem[];
 };
 
-/** V3.0 菜单配置 - 按功能模块分组 */
+/**
+ * V3.0 菜单配置 - 当前展示范围 = 会议 12:00-17:00 共识
+ *
+ * 核心三大功能：
+ *   1. 选品（plugin → 采集 → 后端 Skill 分析 → 选品报告）
+ *   2. 标题优化（导入表格 → 预设规则 → 输出上架标题）
+ *   3. 竞品分析（输入商品链接 → 自动分析 → 输出结论）
+ *
+ * 支撑功能：Dashboard / 采集箱 / 链接直采 / 批量采集
+ *
+ * 其他功能（工作台、发布、模板、规则、设置、主题、标题 V2、集成、团队）
+ * 当前阶段隐去，路由保留供后续迭代。
+ */
 export const v3NavGroups: NavGroup[] = [
+  {
+    title: '工作台',
+    icon: '🏠',
+    items: [
+      { to: '/app', label: '总览', end: true, icon: '🏠' },
+    ],
+  },
   {
     title: '选品中心',
     icon: '📊',
     items: [
+      { to: '/app/insights', label: '选品', icon: '🎯' },
       { to: '/app/competitors', label: '竞品分析', icon: '🔍' },
-      { to: '/app/insights', label: '选品洞察', icon: '💡' },
     ],
   },
   {
@@ -26,35 +45,10 @@ export const v3NavGroups: NavGroup[] = [
     ],
   },
   {
-    title: '工作台',
-    icon: '⚙️',
+    title: '处理中心',
+    icon: '✏️',
     items: [
-      { to: '/app', label: '处理管线', end: true, icon: '🔄' },
       { to: '/app/title-optimization', label: '标题优化', icon: '✏️' },
-    ],
-  },
-  {
-    title: '发布中心',
-    icon: '🚀',
-    items: [
-      { to: '/app/publish', label: '发布队列', icon: '📤' },
-    ],
-  },
-  {
-    title: '配置中心',
-    icon: '🛠️',
-    items: [
-      { to: '/app/templates', label: '类目模板', icon: '📋' },
-      { to: '/app/rules', label: '规则库', icon: '📐' },
-      { to: '/app/settings/themes', label: '主题风格', icon: '🎨' },
-    ],
-  },
-  {
-    title: '系统设置',
-    icon: '⚡',
-    items: [
-      { to: '/app/integrations', label: '平台集成', icon: '🔌' },
-      { to: '/app/settings', label: 'LLM配置', icon: '🤖' },
     ],
   },
 ];
